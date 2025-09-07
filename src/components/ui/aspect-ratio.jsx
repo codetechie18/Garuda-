@@ -1,3 +1,0 @@
-// Converted from TSX to JSX
-import React from "react";
-// ...existing code from aspect-ratio.tsx, with types removed...
