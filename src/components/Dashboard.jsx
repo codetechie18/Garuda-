@@ -17,7 +17,7 @@ const Dashboard = () => {
   const stats = [
     {
       title: 'New Reports',
-      value: '42',
+      value: '500',
       change: '+12%',
       icon: FileText,
       color: 'text-info',
@@ -25,7 +25,7 @@ const Dashboard = () => {
     },
     {
       title: 'Active Cases',
-      value: '18',
+      value: '269',
       change: '+5%',
       icon: AlertTriangle,
       color: 'text-warning',
@@ -33,7 +33,7 @@ const Dashboard = () => {
     },
     {
       title: 'Resolved',
-      value: '156',
+      value: '892',
       change: '+23%',
       icon: CheckCircle,
       color: 'text-success',
@@ -41,7 +41,7 @@ const Dashboard = () => {
     },
     {
       title: 'Pending',
-      value: '8',
+      value: '98',
       change: '-18%',
       icon: Clock,
       color: 'text-destructive',
