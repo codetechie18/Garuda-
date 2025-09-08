@@ -1,119 +1,328 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Shield, BarChart3, FileText, User, LogOut, Settings } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Shield, BarChart3, FileText, User, LogOut, ChevronDown } from 'lucide-react';
 
-const Navbar = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
+const Navbar = ({ user, onLogout }) => {
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const location = useLocation();
-  const [user] = useState(() => {
-    const userData = localStorage.getItem('user');
-    return userData ? JSON.parse(userData) : null;
-  });
+  const profileRef = useRef(null);
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/');
-  };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
+    };
 
-  const handleProfileClick = () => {
-    navigate('/profile');
-  };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-    { path: '/reports', label: 'Reports', icon: FileText },
-  ];
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="bg-card border-b border-border shadow-card">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <div className="flex justify-between items-center h-16 relative">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-2xl">
-              <Shield className="w-6 h-6 text-primary" />
+    <nav className="navbar">
+      <div className="navbar-container">
+        <div className="navbar-left">
+          <Link to="/dashboard" className="navbar-brand">
+            <Shield size={32} className="brand-icon" />
+            <div className="brand-text">
+              <span className="brand-name">GARUDA</span>
+              <span className="brand-subtitle">Cybersecurity Portal</span>
             </div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
-                GARUDA
-              </h1>
-              <p className="text-xs text-muted-foreground">Cybersecurity Portal</p>
-            </div>
+          </Link>
+          
+          <div className="navbar-nav">
+            <Link 
+              to="/dashboard" 
+              className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
+            >
+              <BarChart3 size={20} />
+              <span>Dashboard</span>
+            </Link>
+            <Link 
+              to="/reports" 
+              className={`nav-link ${isActive('/reports') ? 'active' : ''}`}
+            >
+              <FileText size={20} />
+              <span>Reports</span>
+            </Link>
           </div>
-
-          {/* Navigation Items - Desktop only */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-              return (
-                <Button
-                  key={item.path}
-                  variant={isActive ? "default" : "ghost"}
-                  onClick={() => navigate(item.path)}
-                  className={`flex items-center gap-2 px-3 py-2 transition-all duration-200 ${
-                    isActive 
-                      ? 'bg-primary text-primary-foreground shadow-sm' 
-                      : 'hover:bg-accent hover:text-accent-foreground'
-                  }`}
+        </div>
+        
+        <div className="navbar-right">
+          <span className="welcome-text">Welcome, {user?.firstName}</span>
+          <div className="profile-dropdown" ref={profileRef}>
+            <button 
+              className="profile-button"
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+            >
+              <div className="profile-avatar">
+                {user?.avatar || user?.firstName?.[0] + user?.lastName?.[0]}
+              </div>
+              <span className="profile-initials hidden-sm">{user?.avatar}</span>
+              <ChevronDown size={16} className={`chevron ${showProfileMenu ? 'rotated' : ''}`} />
+            </button>
+            
+            {showProfileMenu && (
+              <div className="profile-menu slide-in">
+                <Link 
+                  to="/profile" 
+                  className="profile-menu-item"
+                  onClick={() => setShowProfileMenu(false)}
                 >
-                  <Icon className="w-4 h-4" />
-                  {item.label}
-                </Button>
-              );
-            })}
-          </div>
-
-          {/* Profile Dropdown & Hamburger for mobile */}
-          <div className="flex items-center gap-3">
-            <span className="hidden sm:block text-sm text-muted-foreground">
-              Welcome, {user?.firstName || 'Agent'}
-            </span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full hover-lift">
-                  <Avatar className="h-10 w-10 border-2 border-primary/20">
-                    <AvatarImage src={user?.photo} alt={user?.username} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                      {user?.firstName?.[0] || 'A'}{user?.lastName?.[0] || 'S'}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex flex-col space-y-1 p-2">
-                  <p className="text-sm font-medium leading-none">{user?.firstName} {user?.lastName}</p>
-                  <p className="text-xs leading-none text-muted-foreground">@{user?.username}</p>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleProfileClick} className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  Profile Settings
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Preferences
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <User size={18} />
+                  <span>Profile Settings</span>
+                </Link>
+                <button 
+                  className="profile-menu-item logout-item"
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    onLogout();
+                  }}
+                >
+                  <LogOut size={18} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
+      
+      <style jsx>{`
+        .navbar {
+          background: white;
+          border-bottom: 1px solid #e5e7eb;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+        
+        .navbar-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 70px;
+        }
+        
+        .navbar-left {
+          display: flex;
+          align-items: center;
+          gap: 48px;
+        }
+        
+        .navbar-brand {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          text-decoration: none;
+          color: #1e3a8a;
+        }
+        
+        .brand-icon {
+          animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
+        }
+        
+        .brand-text {
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .brand-name {
+          font-size: 20px;
+          font-weight: 700;
+          line-height: 1;
+        }
+        
+        .brand-subtitle {
+          font-size: 12px;
+          color: #64748b;
+          line-height: 1;
+        }
+        
+        .navbar-nav {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        .nav-link {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 16px;
+          text-decoration: none;
+          color: #64748b;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+          font-weight: 500;
+        }
+        
+        .nav-link:hover {
+          background: #f1f5f9;
+          color: #1e3a8a;
+          transform: translateY(-1px);
+        }
+        
+        .nav-link.active {
+          background: #1e3a8a;
+          color: white;
+        }
+        
+        .navbar-right {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        
+        .welcome-text {
+          color: #64748b;
+          font-size: 14px;
+          font-weight: 500;
+        }
+        
+        .profile-dropdown {
+          position: relative;
+        }
+        
+        .profile-button {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 12px;
+          background: none;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        
+        .profile-button:hover {
+          background: #f1f5f9;
+        }
+        
+        .profile-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 600;
+          font-size: 14px;
+        }
+        
+        .profile-initials {
+          font-weight: 600;
+          color: #1e3a8a;
+        }
+        
+        .chevron {
+          transition: transform 0.3s ease;
+          color: #64748b;
+        }
+        
+        .chevron.rotated {
+          transform: rotate(180deg);
+        }
+        
+        .profile-menu {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          min-width: 200px;
+          z-index: 1000;
+          margin-top: 8px;
+        }
+        
+        .profile-menu-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          width: 100%;
+          padding: 12px 16px;
+          text-decoration: none;
+          color: #374151;
+          background: none;
+          border: none;
+          text-align: left;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-size: 14px;
+        }
+        
+        .profile-menu-item:hover {
+          background: #f9fafb;
+          color: #1e3a8a;
+        }
+        
+        .logout-item {
+          border-top: 1px solid #e5e7eb;
+          color: #dc2626;
+        }
+        
+        .logout-item:hover {
+          background: #fef2f2;
+          color: #dc2626;
+        }
+        
+        @media (max-width: 768px) {
+          .navbar-container {
+            padding: 0 16px;
+          }
+          
+          .navbar-left {
+            gap: 24px;
+          }
+          
+          .brand-text {
+            display: none;
+          }
+          
+          .navbar-nav {
+            gap: 4px;
+          }
+          
+          .nav-link span {
+            display: none;
+          }
+          
+          .nav-link {
+            padding: 12px;
+          }
+          
+          .welcome-text {
+            display: none;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .navbar-container {
+            height: 60px;
+          }
+          
+          .profile-avatar {
+            width: 36px;
+            height: 36px;
+          }
+        }
+      `}</style>
     </nav>
   );
 };

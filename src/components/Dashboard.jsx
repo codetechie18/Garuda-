@@ -1,229 +1,570 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  AlertTriangle, 
-  CheckCircle, 
-  Clock, 
-  FileText,
-  TrendingUp,
-  Shield,
-  Users,
-  Activity
-} from 'lucide-react';
-import Navbar from './Navbar';
-import ReportsChart from './ReportsChart';
+import { useState, useEffect } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { FileText, Activity, CheckCircle, Clock, AlertTriangle, TrendingUp } from 'lucide-react';
 
-const Dashboard = () => {
-  const stats = [
-    {
-      title: 'New Reports',
-      value: '500',
-      change: '+12%',
-      icon: FileText,
-      color: 'text-info',
-      bgColor: 'bg-info/10'
-    },
-    {
-      title: 'Active Cases',
-      value: '269',
-      change: '+5%',
-      icon: AlertTriangle,
-      color: 'text-warning',
-      bgColor: 'bg-warning/10'
-    },
-    {
-      title: 'Resolved',
-      value: '892',
-      change: '+23%',
-      icon: CheckCircle,
-      color: 'text-success',
-      bgColor: 'bg-success/10'
-    },
-    {
-      title: 'Pending',
-      value: '98',
-      change: '-18%',
-      icon: Clock,
-      color: 'text-destructive',
-      bgColor: 'bg-destructive/10'
-    }
-  ];
+const Dashboard = ({ user }) => {
+  const [stats, setStats] = useState({
+    newReports: 500,
+    activeCases: 269,
+    resolved: 892,
+    pending: 98
+  });
 
-  const recentCases = [
+  const [chartData] = useState([
+    { name: 'Resolved', value: 892, color: '#10b981' },
+    { name: 'Active', value: 269, color: '#f59e0b' },
+    { name: 'New', value: 500, color: '#3b82f6' },
+    { name: 'Pending', value: 98, color: '#ef4444' }
+  ]);
+
+  const [trendData] = useState([
+    { month: 'Jan', reports: 120 },
+    { month: 'Feb', reports: 150 },
+    { month: 'Mar', reports: 180 },
+    { month: 'Apr', reports: 220 },
+    { month: 'May', reports: 200 },
+    { month: 'Jun', reports: 250 }
+  ]);
+
+  const [recentCases] = useState([
     {
       id: 'SEC-001',
       title: 'Suspicious Network Activity',
-      severity: 'High',
-      status: 'Active',
+      agent: 'Agent Smith',
       time: '2 hours ago',
-      agent: 'Agent Smith'
+      priority: 'High',
+      status: 'Active'
     },
     {
       id: 'SEC-002',
       title: 'Malware Detection',
-      severity: 'Critical',
-      status: 'New',
+      agent: 'Agent Jones',
       time: '4 hours ago',
-      agent: 'Agent Jones'
+      priority: 'Critical',
+      status: 'New'
     },
     {
       id: 'SEC-003',
       title: 'Unauthorized Access Attempt',
-      severity: 'Medium',
-      status: 'Investigating',
+      agent: 'Agent Brown',
       time: '6 hours ago',
-      agent: 'Agent Brown'
+      priority: 'Medium',
+      status: 'Investigating'
     },
     {
       id: 'SEC-004',
       title: 'Data Breach Alert',
-      severity: 'Critical',
-      status: 'Resolved',
+      agent: 'Agent Davis',
       time: '1 day ago',
-      agent: 'Agent Davis'
+      priority: 'Critical',
+      status: 'Resolved'
     }
-  ];
+  ]);
 
-  const getSeverityColor = (severity) => {
-    switch (severity) {
-      case 'Critical': return 'status-critical';
-      case 'High': return 'text-destructive';
-      case 'Medium': return 'text-warning';
-      case 'Low': return 'text-success';
-      default: return 'text-muted-foreground';
-    }
-  };
+  useEffect(() => {
+    // Animate counters
+    const animateCounters = () => {
+      const counters = document.querySelectorAll('.stat-number');
+      counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const increment = target / 100;
+        let current = 0;
+        
+        const updateCounter = () => {
+          if (current < target) {
+            current += increment;
+            counter.textContent = Math.ceil(current);
+            setTimeout(updateCounter, 20);
+          } else {
+            counter.textContent = target;
+          }
+        };
+        
+        updateCounter();
+      });
+    };
+    
+    setTimeout(animateCounters, 300);
+  }, []);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'New': return 'status-new';
-      case 'Active': return 'status-active';
-      case 'Investigating': return 'status-active';
-      case 'Resolved': return 'status-resolved';
-      default: return 'text-muted-foreground';
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'Critical': return '#dc2626';
+      case 'High': return '#ea580c';
+      case 'Medium': return '#d97706';
+      case 'Low': return '#0284c7';
+      default: return '#6b7280';
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Header */}
-        <div className="animate-fade-in">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Security Dashboard</h1>
-          <p className="text-muted-foreground">Monitor and manage cybersecurity incidents</p>
+    <div className="dashboard">
+      <div className="dashboard-container">
+        <div className="dashboard-header fade-in">
+          <div>
+            <h1>Security Dashboard</h1>
+            <p>Monitor and manage cybersecurity incidents</p>
+          </div>
+          <div className="dashboard-time">
+            <span>{new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</span>
+          </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={stat.title} className="hover-lift card-hover" style={{ animationDelay: `${index * 100}ms` }}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                      <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                      <p className={`text-xs ${stat.change.startsWith('+') ? 'text-success' : 'text-destructive'}`}>
-                        {stat.change} from last month
-                      </p>
-                    </div>
-                    <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                      <Icon className={`w-6 h-6 ${stat.color}`} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+        {/* Stats Grid */}
+        <div className="stats-grid fade-in">
+          <div className="stat-card scale-up">
+            <div className="stat-icon new">
+              <FileText size={24} />
+            </div>
+            <div className="stat-content">
+              <h3>New Reports</h3>
+              <div className="stat-number" data-target="500">0</div>
+              <span className="stat-change positive">+12% from last month</span>
+            </div>
+          </div>
+
+          <div className="stat-card scale-up">
+            <div className="stat-icon active">
+              <AlertTriangle size={24} />
+            </div>
+            <div className="stat-content">
+              <h3>Active Cases</h3>
+              <div className="stat-number" data-target="269">0</div>
+              <span className="stat-change positive">+5% from last month</span>
+            </div>
+          </div>
+
+          <div className="stat-card scale-up">
+            <div className="stat-icon resolved">
+              <CheckCircle size={24} />
+            </div>
+            <div className="stat-content">
+              <h3>Resolved</h3>
+              <div className="stat-number" data-target="892">0</div>
+              <span className="stat-change positive">+23% from last month</span>
+            </div>
+          </div>
+
+          <div className="stat-card scale-up">
+            <div className="stat-icon pending">
+              <Clock size={24} />
+            </div>
+            <div className="stat-content">
+              <h3>Pending</h3>
+              <div className="stat-number" data-target="98">0</div>
+              <span className="stat-change negative">-18% from last month</span>
+            </div>
+          </div>
         </div>
 
-        {/* Charts and Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Reports Chart */}
-          <Card className="animate-scale-in card-hover">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                Reports Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ReportsChart />
-            </CardContent>
-          </Card>
-
-          {/* Recent Cases */}
-          <Card className="animate-scale-in card-hover" style={{ animationDelay: '200ms' }}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-primary" />
-                Recent Cases
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentCases.map((case_, index) => (
-                  <div key={case_.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-sm">{case_.id}</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(case_.severity)}`}>
-                          {case_.severity}
-                        </span>
-                      </div>
-                      <p className="text-sm font-medium text-foreground">{case_.title}</p>
-                      <p className="text-xs text-muted-foreground">{case_.agent} • {case_.time}</p>
-                    </div>
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(case_.status)}`}>
-                      {case_.status}
-                    </div>
+        {/* Charts Section */}
+        <div className="charts-section fade-in">
+          <div className="chart-card">
+            <div className="chart-header">
+              <h3>Reports Overview</h3>
+              <p>Distribution of security reports by status</p>
+            </div>
+            <div className="pie-chart-container">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="value"
+                    animationBegin={0}
+                    animationDuration={1000}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="chart-legend">
+                {chartData.map((item, index) => (
+                  <div key={index} className="legend-item">
+                    <div 
+                      className="legend-color" 
+                      style={{ backgroundColor: item.color }}
+                    ></div>
+                    <span>{item.name}</span>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
+          <div className="chart-card">
+            <div className="chart-header">
+              <h3>Monthly Trends</h3>
+              <p>Security reports over the last 6 months</p>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={trendData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line 
+                  type="monotone" 
+                  dataKey="reports" 
+                  stroke="#3b82f6" 
+                  strokeWidth={3}
+                  dot={{ fill: '#3b82f6', r: 6 }}
+                  animationDuration={1500}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        {/* System Status */}
-        <Card className="animate-fade-in">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-primary" />
-              System Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-success/10">
-                <div className="w-3 h-3 rounded-full bg-success animate-pulse"></div>
-                <div>
-                  <p className="font-medium text-success">Firewall Status</p>
-                  <p className="text-sm text-success/80">Active & Protected</p>
+        {/* Recent Cases */}
+        <div className="recent-cases card fade-in">
+          <div className="section-header">
+            <h3>Recent Cases</h3>
+            <span className="cases-count">{recentCases.length} active cases</span>
+          </div>
+          <div className="cases-list">
+            {recentCases.map((case_, index) => (
+              <div key={case_.id} className="case-item slide-in" style={{animationDelay: `${index * 0.1}s`}}>
+                <div className="case-info">
+                  <div className="case-header">
+                    <span className="case-id">{case_.id}</span>
+                    <div className="case-badges">
+                      <span 
+                        className="badge priority-badge"
+                        style={{ 
+                          backgroundColor: `${getPriorityColor(case_.priority)}20`,
+                          color: getPriorityColor(case_.priority)
+                        }}
+                      >
+                        {case_.priority}
+                      </span>
+                      <span className={`badge status-${case_.status.toLowerCase()}`}>
+                        {case_.status}
+                      </span>
+                    </div>
+                  </div>
+                  <h4 className="case-title">{case_.title}</h4>
+                  <div className="case-meta">
+                    <span className="case-agent">{case_.agent}</span>
+                    <span className="case-time">{case_.time}</span>
+                  </div>
+                </div>
+                <div className="case-actions">
+                  <button className="btn btn-outline">View</button>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-success/10">
-                <div className="w-3 h-3 rounded-full bg-success animate-pulse"></div>
-                <div>
-                  <p className="font-medium text-success">Threat Detection</p>
-                  <p className="text-sm text-success/80">Monitoring</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-warning/10">
-                <div className="w-3 h-3 rounded-full bg-warning animate-pulse"></div>
-                <div>
-                  <p className="font-medium text-warning">System Updates</p>
-                  <p className="text-sm text-warning/80">2 Pending</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            ))}
+          </div>
+        </div>
       </div>
+
+      <style jsx>{`
+        .dashboard {
+          min-height: calc(100vh - 70px);
+          background: #f8fafc;
+          padding: 24px 0;
+        }
+        
+        .dashboard-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 24px;
+        }
+        
+        .dashboard-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 32px;
+        }
+        
+        .dashboard-header h1 {
+          font-size: 32px;
+          font-weight: 700;
+          color: #1e293b;
+          margin-bottom: 4px;
+        }
+        
+        .dashboard-header p {
+          color: #64748b;
+          font-size: 16px;
+        }
+        
+        .dashboard-time {
+          color: #64748b;
+          font-size: 14px;
+          font-weight: 500;
+        }
+        
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 24px;
+          margin-bottom: 32px;
+        }
+        
+        .stat-card {
+          background: white;
+          padding: 24px;
+          border-radius: 12px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+        }
+        
+        .stat-icon.new { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .stat-icon.active { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .stat-icon.resolved { background: linear-gradient(135deg, #10b981, #059669); }
+        .stat-icon.pending { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        
+        .stat-content {
+          flex: 1;
+        }
+        
+        .stat-content h3 {
+          font-size: 14px;
+          font-weight: 600;
+          color: #64748b;
+          margin-bottom: 4px;
+        }
+        
+        .stat-number {
+          font-size: 32px;
+          font-weight: 700;
+          color: #1e293b;
+          margin-bottom: 4px;
+        }
+        
+        .stat-change {
+          font-size: 12px;
+          font-weight: 600;
+        }
+        
+        .stat-change.positive { color: #10b981; }
+        .stat-change.negative { color: #ef4444; }
+        
+        .charts-section {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+          margin-bottom: 32px;
+        }
+        
+        .chart-card {
+          background: white;
+          padding: 24px;
+          border-radius: 12px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-header {
+          margin-bottom: 24px;
+        }
+        
+        .chart-header h3 {
+          font-size: 18px;
+          font-weight: 600;
+          color: #1e293b;
+          margin-bottom: 4px;
+        }
+        
+        .chart-header p {
+          color: #64748b;
+          font-size: 14px;
+        }
+        
+        .pie-chart-container {
+          position: relative;
+        }
+        
+        .chart-legend {
+          display: flex;
+          justify-content: center;
+          gap: 24px;
+          margin-top: 16px;
+          flex-wrap: wrap;
+        }
+        
+        .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+          font-weight: 500;
+        }
+        
+        .legend-color {
+          width: 12px;
+          height: 12px;
+          border-radius: 2px;
+        }
+        
+        .recent-cases {
+          padding: 24px;
+        }
+        
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+        }
+        
+        .section-header h3 {
+          font-size: 18px;
+          font-weight: 600;
+          color: #1e293b;
+        }
+        
+        .cases-count {
+          background: #f1f5f9;
+          color: #64748b;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: 600;
+        }
+        
+        .cases-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        
+        .case-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 16px;
+          background: #f8fafc;
+          border-radius: 8px;
+          border: 1px solid #e2e8f0;
+          transition: all 0.3s ease;
+        }
+        
+        .case-item:hover {
+          background: white;
+          border-color: #3b82f6;
+          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        }
+        
+        .case-info {
+          flex: 1;
+        }
+        
+        .case-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+        }
+        
+        .case-id {
+          font-size: 12px;
+          font-weight: 600;
+          color: #1e3a8a;
+          background: #dbeafe;
+          padding: 2px 8px;
+          border-radius: 4px;
+        }
+        
+        .case-badges {
+          display: flex;
+          gap: 8px;
+        }
+        
+        .priority-badge {
+          font-size: 10px;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-weight: 600;
+        }
+        
+        .status-active { background: #fef3c7; color: #d97706; }
+        .status-new { background: #dbeafe; color: #2563eb; }
+        .status-investigating { background: #fef3c7; color: #ca8a04; }
+        .status-resolved { background: #dcfce7; color: #16a34a; }
+        
+        .case-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: #1e293b;
+          margin-bottom: 8px;
+        }
+        
+        .case-meta {
+          display: flex;
+          gap: 16px;
+          font-size: 14px;
+          color: #64748b;
+        }
+        
+        .case-actions {
+          margin-left: 16px;
+        }
+        
+        @media (max-width: 768px) {
+          .dashboard-container {
+            padding: 0 16px;
+          }
+          
+          .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+          }
+          
+          .dashboard-header h1 {
+            font-size: 24px;
+          }
+          
+          .stats-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .charts-section {
+            grid-template-columns: 1fr;
+          }
+          
+          .case-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+          }
+          
+          .case-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+          }
+        }
+      `}</style>
     </div>
   );
 };

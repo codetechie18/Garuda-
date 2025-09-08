@@ -1,33 +1,93 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./components/Login";
-import Dashboard from "./components/Dashboard";
-import Reports from "./components/Reports";
-import Profile from "./components/Profile";
-import NotFound from "./pages/NotFound";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import Reports from './components/Reports';
+import Profile from './components/Profile';
+import Navbar from './components/Navbar';
+import './App.css';
 
-const queryClient = new QueryClient();
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+  useEffect(() => {
+    const savedUser = localStorage.getItem('garudaUser');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+      setIsLoggedIn(true);
+    }
+    setLoading(false);
+  }, []);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+    setIsLoggedIn(true);
+    localStorage.setItem('garudaUser', JSON.stringify(userData));
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem('garudaUser');
+  };
+
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('garudaUser', JSON.stringify(updatedUser));
+  };
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
+
+  return (
+    <Router>
+      <div className="App">
+        {isLoggedIn && <Navbar user={user} onLogout={handleLogout} />}
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/profile" element={<Profile />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route 
+            path="/login" 
+            element={
+              isLoggedIn ? 
+              <Navigate to="/dashboard" replace /> : 
+              <Login onLogin={handleLogin} />
+            } 
+          />
+          <Route 
+            path="/dashboard" 
+            element={
+              isLoggedIn ? 
+              <Dashboard user={user} /> : 
+              <Navigate to="/login" replace />
+            } 
+          />
+          <Route 
+            path="/reports" 
+            element={
+              isLoggedIn ? 
+              <Reports user={user} /> : 
+              <Navigate to="/login" replace />
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              isLoggedIn ? 
+              <Profile user={user} updateUser={updateUser} /> : 
+              <Navigate to="/login" replace />
+            } 
+          />
+          <Route path="/" element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+      </div>
+    </Router>
+  );
+}
 
 export default App;
