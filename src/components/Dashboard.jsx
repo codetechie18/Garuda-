@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { FileText, Activity, CheckCircle, Clock, AlertTriangle, TrendingUp } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { FileText, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import Map from './Map';
 
 const Dashboard = ({ user }) => {
   const [stats, setStats] = useState({
@@ -17,15 +18,7 @@ const Dashboard = ({ user }) => {
     { name: 'Pending', value: 98, color: '#ef4444' }
   ]);
 
-  const [trendData] = useState([
-    { month: 'Jan', reports: 120 },
-    { month: 'Feb', reports: 150 },
-    { month: 'Mar', reports: 180 },
-    { month: 'Apr', reports: 220 },
-    { month: 'May', reports: 200 },
-    { month: 'Jun', reports: 250 }
-  ]);
-
+  
   const [recentCases] = useState([
     {
       id: 'SEC-001',
@@ -162,6 +155,8 @@ const Dashboard = ({ user }) => {
           </div>
         </div>
 
+          
+
         {/* Charts Section */}
         <div className="charts-section fade-in">
           <div className="chart-card">
@@ -202,31 +197,23 @@ const Dashboard = ({ user }) => {
             </div>
           </div>
 
-          <div className="chart-card">
+          {/* Full map card placed after Reports */}
+          <div className="chart-card full-map-card">
             <div className="chart-header">
-              <h3>Monthly Trends</h3>
-              <p>Security reports over the last 6 months</p>
+              <h3>Incident Map</h3>
+              <p>Geographical distribution of incidents</p>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="reports" 
-                  stroke="#3b82f6" 
-                  strokeWidth={3}
-                  dot={{ fill: '#3b82f6', r: 6 }}
-                  animationDuration={1500}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <div className="map-card-body">
+              <Map points={[
+                { lat: 28.6139, lng: 77.2090, title: 'New Delhi', count: 12 },
+                { lat: 19.0760, lng: 72.8777, title: 'Mumbai', count: 8 },
+                { lat: 12.9716, lng: 77.5946, title: 'Bangalore', count: 6 },
+              ]} />
+            </div>
           </div>
-        </div>
 
-        {/* Recent Cases */}
+        </div>
+         {/* Recent Cases */}
         <div className="recent-cases card fade-in">
           <div className="section-header">
             <h3>Recent Cases</h3>
@@ -259,16 +246,13 @@ const Dashboard = ({ user }) => {
                     <span className="case-time">{case_.time}</span>
                   </div>
                 </div>
-                <div className="case-actions">
-                  <button className="btn btn-outline">View</button>
-                </div>
+               
               </div>
             ))}
           </div>
         </div>
-      </div>
-
-      <style jsx>{`
+</div>
+      <style >{`
         .dashboard {
           min-height: calc(100vh - 70px);
           background: #f8fafc;
@@ -382,6 +366,13 @@ const Dashboard = ({ user }) => {
           border-radius: 12px;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+
+        /* ensure map card sits below the navbar and doesn't overlap */
+        .full-map-card {
+          margin-top: 0; /* keep natural flow */
+          position: relative;
+          z-index: 1; /* lower stacking context than navbar */
+        }
         
         .chart-header {
           margin-bottom: 24px;
@@ -400,6 +391,19 @@ const Dashboard = ({ user }) => {
         }
         
         .pie-chart-container {
+          position: relative;
+        }
+
+        /* Leaflet container adjustments to prevent overlap with sticky navbar */
+        .map-card-body {
+          height: 360px;
+          overflow: hidden;
+          margin-top: 8px;
+        }
+
+        /* Leaflet's own container should be below navbar's z-index */
+        .leaflet-container {
+          z-index: 0 !important;
           position: relative;
         }
         
