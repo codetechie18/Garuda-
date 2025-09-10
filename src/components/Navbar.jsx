@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, BarChart3, FileText, User, LogOut, ChevronDown } from 'lucide-react';
+import { Shield, BarChart3, FileText, User, LogOut, ChevronDown, Menu, X } from 'lucide-react';
 
 const Navbar = ({ user, onLogout }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const profileRef = useRef(null);
 
@@ -24,6 +26,15 @@ const Navbar = ({ user, onLogout }) => {
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-left">
+          <button
+            className="hamburger"
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+
           <Link to="/dashboard" className="navbar-brand">
             <Shield size={32} className="brand-icon" />
             <div className="brand-text">
@@ -31,11 +42,14 @@ const Navbar = ({ user, onLogout }) => {
               <span className="brand-subtitle">Cybersecurity Portal</span>
             </div>
           </Link>
-          
+        </div>
+        
+        <div className="navbar-right">
           <div className="navbar-nav">
             <Link 
               to="/dashboard" 
               className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
             >
               <BarChart3 size={20} />
               <span>Dashboard</span>
@@ -43,22 +57,25 @@ const Navbar = ({ user, onLogout }) => {
             <Link 
               to="/reports" 
               className={`nav-link ${isActive('/reports') ? 'active' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
             >
               <FileText size={20} />
               <span>Reports</span>
             </Link>
           </div>
-        </div>
-        
-        <div className="navbar-right">
+
           <span className="welcome-text">Welcome, {user?.firstName}</span>
           <div className="profile-dropdown" ref={profileRef}>
             <button 
               className="profile-button"
               onClick={() => setShowProfileMenu(!showProfileMenu)}
             >
-              <div className="profile-avatar">
-                {user?.avatar || user?.firstName?.[0] + user?.lastName?.[0]}
+              <div className="nav-profile-avatar">
+                {user?.avatar && typeof user.avatar === 'string' && (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) ? (
+                  <img src={user.avatar} alt={`${user?.firstName || ''} avatar`} className="profile-img" />
+                ) : (
+                  (user?.avatar) ? user.avatar : ((user?.firstName?.[0] || '') + (user?.lastName?.[0] || ''))
+                )}
               </div>
               <span className="profile-initials hidden-sm">{user?.avatar}</span>
               <ChevronDown size={16} className={`chevron ${showProfileMenu ? 'rotated' : ''}`} />
@@ -89,21 +106,41 @@ const Navbar = ({ user, onLogout }) => {
           </div>
         </div>
       </div>
+
+      {/* Mobile menu (visible when hamburger toggled) */}
+      {mobileMenuOpen && (
+        <div className="mobile-menu">
+          <Link to="/dashboard" className={`mobile-link ${isActive('/dashboard') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+            <BarChart3 size={18} />
+            <span>Dashboard</span>
+          </Link>
+          <Link to="/reports" className={`mobile-link ${isActive('/reports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+            <FileText size={18} />
+            <span>Reports</span>
+          </Link>
+        </div>
+      )}
       
-      <style jsx>{`
+  <style>{`
         .navbar {
           background: white;
           border-bottom: 1px solid #e5e7eb;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           position: sticky;
+          left: 0;
+          right: 0;
           top: 0;
-          z-index: 100;
+          /* make navbar sit above interactive layers like maps */
+          z-index: 9999;
         }
         
         .navbar-container {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 0 24px;
+          padding-left: 8px; /* reduced left padding so logo sits more to the left */
+        
+          padding-top: 0;
+          padding-bottom: 0;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -122,6 +159,11 @@ const Navbar = ({ user, onLogout }) => {
           gap: 12px;
           text-decoration: none;
           color: #1e3a8a;
+          position: absolute; /* pin brand to left edge of navbar */
+          left: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 1100;
         }
         
         .brand-icon {
@@ -183,6 +225,11 @@ const Navbar = ({ user, onLogout }) => {
           display: flex;
           align-items: center;
           gap: 16px;
+          margin-left: 0;
+          position: absolute; /* pin to right edge of navbar */
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
         }
         
         .welcome-text {
@@ -211,9 +258,11 @@ const Navbar = ({ user, onLogout }) => {
           background: #f1f5f9;
         }
         
-        .profile-avatar {
+        .nav-profile-avatar {
           width: 40px;
           height: 40px;
+          min-width: 40px;
+          max-width: 40px;
           border-radius: 50%;
           background: linear-gradient(135deg, #1e3a8a, #3b82f6);
           display: flex;
@@ -222,6 +271,14 @@ const Navbar = ({ user, onLogout }) => {
           color: white;
           font-weight: 600;
           font-size: 14px;
+          overflow: hidden; /* prevent long text or images from expanding the box */
+        }
+
+        .nav-profile-avatar .profile-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
         }
         
         .profile-initials {
@@ -232,6 +289,11 @@ const Navbar = ({ user, onLogout }) => {
         .chevron {
           transition: transform 0.3s ease;
           color: #64748b;
+        }
+
+        /* hide hamburger on desktop by default; show only in mobile media query */
+        .hamburger {
+          display: none;
         }
         
         .chevron.rotated {
@@ -290,9 +352,60 @@ const Navbar = ({ user, onLogout }) => {
           .navbar-left {
             gap: 24px;
           }
-          
+          /* keep brand icon visible on small screens; hide textual part */
           .brand-text {
             display: none;
+          }
+
+          /* show hamburger */
+          .hamburger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            color: #1e3a8a;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+          }
+
+          .hamburger:hover {
+            background: #f1f5f9;
+          }
+
+          .navbar-nav {
+            display: none; /* hide normal nav on small */
+          }
+
+          /* mobile menu styles */
+          .mobile-menu {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 70px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            z-index: 900;
+          }
+
+          .mobile-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #374151;
+            border-bottom: 1px solid #f3f4f6;
+          }
+
+          .mobile-link.active {
+            background: #1e3a8a;
+            color: white;
           }
           
           .navbar-nav {
@@ -328,3 +441,17 @@ const Navbar = ({ user, onLogout }) => {
 };
 
 export default Navbar;
+
+Navbar.propTypes = {
+  user: PropTypes.shape({
+    firstName: PropTypes.string,
+    lastName: PropTypes.string,
+    avatar: PropTypes.string,
+  }),
+  onLogout: PropTypes.func,
+};
+
+Navbar.defaultProps = {
+  user: {},
+  onLogout: () => {},
+};
