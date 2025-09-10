@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Reports from './components/Reports';
+import Scrape from './components/Scrape';
 import Profile from './components/Profile';
 import Navbar from './components/Navbar';
 import './App.css';
@@ -72,6 +73,14 @@ function App() {
             element={
               isLoggedIn ? 
               <Reports user={user} /> : 
+              <Navigate to="/login" replace />
+            } 
+          />
+          <Route 
+            path="/scrape" 
+            element={
+              isLoggedIn ? 
+              <Scrape user={user} /> : 
               <Navigate to="/login" replace />
             } 
           />

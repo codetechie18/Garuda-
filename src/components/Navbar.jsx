@@ -62,6 +62,14 @@ const Navbar = ({ user, onLogout }) => {
               <FileText size={20} />
               <span>Reports</span>
             </Link>
+            <Link 
+              to="/scrape" 
+              className={`nav-link ${isActive('/scrape') ? 'active' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <FileText size={20} />
+              <span>Scrape</span>
+            </Link>
           </div>
 
           <span className="welcome-text">Welcome, {user?.firstName}</span>
@@ -117,6 +125,10 @@ const Navbar = ({ user, onLogout }) => {
           <Link to="/reports" className={`mobile-link ${isActive('/reports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
             <FileText size={18} />
             <span>Reports</span>
+          </Link>
+          <Link to="/scrape" className={`mobile-link ${isActive('/scrape') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+            <FileText size={18} />
+            <span>Scrape</span>
           </Link>
         </div>
       )}
