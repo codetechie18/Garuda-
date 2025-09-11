@@ -231,16 +231,22 @@
   }
 
   .hamburger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    color: #1e3a8a;
-    border-radius: 8px;
-    transition: background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: #1e3a8a;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  /* pin hamburger to the left edge so it doesn't collide with the brand */
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1200;
   }
 
   .hamburger:hover {
@@ -293,6 +299,11 @@
   
   .welcome-text {
     display: none;
+  }
+  
+  /* move brand icon right so it doesn't overlap the hamburger */
+  .navbar-brand {
+    left: 56px; /* leave room for the pinned hamburger */
   }
 }
 

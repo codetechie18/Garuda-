@@ -1,45 +1,197 @@
-/* Styles extracted from Scrape.jsx */
-.scrape-page{ min-height: calc(100vh - 70px); padding: 24px 0; background:#f8fafc }
-.scrape-container{ max-width:1100px; margin:0 auto; background:white; padding:28px; border-radius:12px; box-shadow:0 1px 6px rgba(2,6,23,0.08) }
+/* Scrape.css - vanilla CSS, cleaned and consistently formatted */
+
+/* Global box-sizing (recommended) */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Page and container */
+.scrape-page {
+    min-height: calc(100vh - 70px);
+    padding: 24px 0;
+    background: #f8fafc;
+}
+
+.scrape-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(2, 6, 23, 0.08);
+}
+
+/* Ensure the main heading wraps and scales on smaller screens so words like "Search" don't escape the box */
+.scrape-container h1 {
+    margin: 0 0 12px 0;
+    font-size: clamp(20px, 3.2vw, 28px);
+    line-height: 1.1;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+}
 
 /* Form layout */
-.scrape-form .form-row{ display:flex; gap:12px; align-items:center; margin-bottom:16px }
-.form-select{ padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; background:white }
-.form-input{ flex:1; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px }
-.btn.btn-primary{ display:inline-flex; align-items:center; gap:8px }
+.scrape-form .form-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+}
 
-/* Results layout - use grid for bigger screens */
-.results{ margin-top:16px; display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px }
-.result-card{ padding:14px; border:1px solid #eef2ff; border-radius:8px; background:#ffffff }
-.result-title{ font-weight:700; color:#0ea5e9; text-decoration:none; display:block; margin-bottom:6px }
-.result-excerpt{ color:#475569; margin-bottom:8px }
-.result-meta{ color:#94a3b8; font-size:13px }
+.form-select {
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+}
 
-.integration-note{ margin-top:20px; color:#475569 }
-.error{ color:#dc2626; margin-top:8px }
-.empty{ color:#94a3b8 }
+.form-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+/* Ensure form controls can shrink inside flex containers and don't force overflow */
+.scrape-form .form-row,
+.scrape-form .form-row > * {
+    min-width: 0;
+}
+.form-input, .form-select {
+    max-width: 100%;
+    min-width: 0;
+    overflow: auto;
+}
+.btn.btn-primary { flex-shrink: 0; }
+
+.btn.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Prevent button text from causing layout overflow; allow ellipsis if space is tight */
+.btn.btn-primary {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Results layout */
+.results {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.result-card {
+    padding: 14px;
+    border: 1px solid #eef2ff;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.result-title {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+    color: #0ea5e9;
+    text-decoration: none;
+}
+
+.result-excerpt {
+    margin-bottom: 8px;
+    color: #475569;
+}
+
+.result-meta {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+/* Notes and messages */
+.integration-note {
+    margin-top: 20px;
+    color: #475569;
+}
+
+.error {
+    margin-top: 8px;
+    color: #dc2626;
+}
+
+.empty {
+    color: #94a3b8;
+}
 
 /* Responsive adjustments */
 @media (max-width: 900px) {
-  .scrape-container{ padding:20px }
-  .results{ grid-template-columns: repeat(1, minmax(0,1fr)); }
+    .scrape-container {
+        padding: 20px;
+    }
+
+    .results {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 640px) {
-  .scrape-container{ padding:16px; border-radius:10px }
-  .scrape-form .form-row{ flex-direction:column; align-items:stretch }
-  .form-select, .form-input, .btn.btn-primary{ width:100% }
-  .form-select, .form-input{ box-sizing:border-box }
-  .btn.btn-primary{ justify-content:center; padding:10px 12px }
-  .result-card{ padding:12px }
-  .result-title{ font-size:15px }
-  .result-excerpt{ font-size:14px }
+    .scrape-container {
+        padding: 16px;
+        border-radius: 10px;
+    }
+
+    .scrape-form .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-select,
+    .form-input,
+    .btn.btn-primary {
+        width: 100%;
+    }
+
+    .form-select,
+    .form-input {
+        box-sizing: border-box;
+    }
+
+    .btn.btn-primary {
+        justify-content: center;
+        padding: 10px 12px;
+    }
+
+    .result-card {
+        padding: 12px;
+    }
+
+    .result-title {
+        font-size: 15px;
+    }
+
+    .result-excerpt {
+        font-size: 14px;
+    }
 }
 
 /* Small phone tweaks */
 @media (max-width: 380px) {
-  .scrape-container{ padding:12px }
-  .scrape-form .form-row{ gap:8px }
-  .result-title{ font-size:14px }
-  .result-meta{ font-size:12px }
+    .scrape-container {
+        padding: 12px;
+    }
+
+    .scrape-form .form-row {
+        gap: 8px;
+    }
+
+    .result-title {
+        font-size: 14px;
+    }
+
+    .result-meta {
+        font-size: 12px;
+    }
 }
