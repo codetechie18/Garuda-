@@ -149,6 +149,22 @@
     color: var(--text);
 }
 
+/* select with icon when showing 'All' */
+.select-with-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+.select-with-icon .select-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--muted);
+    pointer-events: none;
+}
+.select-with-icon .filter-select {
+    padding-left: 36px; /* make room for the icon */
+}
+
 /* Add report overlay & form */
 .add-report-overlay {
     position: fixed;

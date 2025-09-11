@@ -94,8 +94,28 @@ const Reports = ({ user }) => {
         <div className="controls-section fade-in">
           <div className="search-bar"><Search size={20} className="search-icon" /><input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search reports, agents, or descriptions..." className="search-input" /></div>
           <div className="filters">
-            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="filter-select"><option>All Status</option><option>New</option><option>Active</option><option>Investigating</option><option>Resolved</option></select>
-            <select value={severityFilter} onChange={e => setSeverityFilter(e.target.value)} className="filter-select"><option>All Severity</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select>
+            <div className="select-with-icon">
+              {statusFilter && statusFilter.startsWith('All') && <Calendar size={16} className="select-icon" />}
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="filter-select">
+                <option>All Status</option>
+                <option>New</option>
+                <option>Active</option>
+                <option>Investigating</option>
+                <option>Resolved</option>
+              </select>
+            </div>
+
+            <div className="select-with-icon">
+              {severityFilter && severityFilter.startsWith('All') && <Tag size={16} className="select-icon" />}
+              <select value={severityFilter} onChange={e => setSeverityFilter(e.target.value)} className="filter-select">
+                <option>All Severity</option>
+                <option>Critical</option>
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
+              </select>
+            </div>
+
             <button className="btn btn-primary" onClick={() => setShowAddReport(true)}><Plus size={20} /> Add Report</button>
           </div>
         </div>

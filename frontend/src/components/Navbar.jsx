@@ -21,14 +21,24 @@ const Navbar = ({ user, onLogout }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // close mobile drawer on Escape key for accessibility
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape' && mobileMenuOpen) setMobileMenuOpen(false);
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [mobileMenuOpen]);
+
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${mobileMenuOpen ? 'drawer-open' : ''}`}>
       <div className="navbar-container">
         <div className="navbar-left">
           <button
-            className="hamburger"
+            className={`hamburger ${mobileMenuOpen ? 'open' : ''}`}
             aria-expanded={mobileMenuOpen}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
@@ -116,22 +126,39 @@ const Navbar = ({ user, onLogout }) => {
         </div>
       </div>
 
-      {/* Mobile menu (visible when hamburger toggled) */}
+      {/* Left drawer (visible when hamburger toggled) */}
       {mobileMenuOpen && (
-        <div className="mobile-menu">
-          <Link to="/dashboard" className={`mobile-link ${isActive('/dashboard') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-            <BarChart3 size={18} />
-            <span>Dashboard</span>
-          </Link>
-          <Link to="/reports" className={`mobile-link ${isActive('/reports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-            <FileText size={18} />
-            <span>Reports</span>
-          </Link>
-          <Link to="/scrape" className={`mobile-link ${isActive('/scrape') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-            <FileText size={18} />
-            <span>Scrape</span>
-          </Link>
-        </div>
+        <>
+          <div className="backdrop" onClick={() => setMobileMenuOpen(false)} aria-hidden />
+          <aside className="side-drawer open" role="dialog" aria-modal="true">
+            <div className="side-drawer-header">
+              <Link to="/dashboard" className="drawer-brand" onClick={() => setMobileMenuOpen(false)}>
+                <Shield size={24} className="brand-icon" />
+                <span className="drawer-brand-text">GARUDA</span>
+              </Link>
+              <button className="close-drawer" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu"><X size={18} /></button>
+            </div>
+            <nav className="drawer-nav">
+              <Link to="/dashboard" className={`drawer-link ${isActive('/dashboard') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                <BarChart3 size={16} />
+                <span>Dashboard</span>
+              </Link>
+              <div className="drawer-section">
+                <div className="drawer-section-title">Social Insights</div>
+                <Link to="/social/search" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Search</Link>
+                <Link to="/scrape" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Scrape</Link>
+              </div>
+              <div className="drawer-section">
+                <div className="drawer-section-title">Reporting</div>
+                <Link to="/reports" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Search</Link>
+                <Link to="/reports/quick" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Quick Report</Link>
+              </div>
+              <Link to="/users" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>User Management</Link>
+              <Link to="/admin" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>Administration</Link>
+              <Link to="/scheduler" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>Scheduler</Link>
+            </nav>
+          </aside>
+        </>
       )}
       
   {/* styles moved to Navbar.css */}
