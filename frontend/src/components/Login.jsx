@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Eye, EyeOff, Shield, User, Lock } from 'lucide-react';
 
 const Login = ({ onLogin }) => {
@@ -9,7 +10,7 @@ const Login = ({ onLogin }) => {
     lastName: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
+  // registration flow removed
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -39,14 +40,7 @@ const Login = ({ onLogin }) => {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (isRegistering) {
-      if (!formData.firstName.trim()) {
-        newErrors.firstName = 'First name is required';
-      }
-      if (!formData.lastName.trim()) {
-        newErrors.lastName = 'Last name is required';
-      }
-    }
+  // registration removed
 
     return newErrors;
   };
@@ -60,29 +54,16 @@ const Login = ({ onLogin }) => {
       return;
     }
 
-    if (isRegistering) {
-      // Registration logic
-      const userData = {
-        username: formData.username,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: `${formData.username}@garuda.gov.in`,
-        avatar: `${formData.firstName[0]}${formData.lastName[0]}`,
-        joinDate: new Date().toLocaleDateString()
-      };
-      onLogin(userData);
-    } else {
-      // Login logic - for demo, any valid credentials work
-      const userData = {
-        username: formData.username,
-        firstName: 'Agent',
-        lastName: 'Smith',
-        email: `${formData.username}@garuda.gov.in`,
-        avatar: 'AS',
-        joinDate: '2024-01-15'
-      };
-      onLogin(userData);
-    }
+    // Login logic - for demo, any valid credentials work
+    const userData = {
+      username: formData.username,
+      firstName: 'Agent',
+      lastName: 'Smith',
+      email: `${formData.username}@garuda.gov.in`,
+      avatar: 'AS',
+      joinDate: '2024-01-15'
+    };
+    onLogin(userData);
   };
 
   const handleResetPassword = (e) => {
@@ -151,41 +132,7 @@ const Login = ({ onLogin }) => {
           </div>
           
           <form onSubmit={handleSubmit}>
-            {isRegistering && (
-              <>
-                <div className="form-group">
-                  <label className="form-label">
-                    <User size={20} />
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    className={`form-input ${errors.firstName ? 'error' : ''}`}
-                    placeholder="Enter your first name"
-                  />
-                  {errors.firstName && <span className="error-text">{errors.firstName}</span>}
-                </div>
-                
-                <div className="form-group">
-                  <label className="form-label">
-                    <User size={20} />
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    className={`form-input ${errors.lastName ? 'error' : ''}`}
-                    placeholder="Enter your last name"
-                  />
-                  {errors.lastName && <span className="error-text">{errors.lastName}</span>}
-                </div>
-              </>
-            )}
+            {/* registration removed - simplified login only */}
             
             <div className="form-group">
               <label className="form-label">
@@ -228,8 +175,12 @@ const Login = ({ onLogin }) => {
               {errors.password && <span className="error-text">{errors.password}</span>}
             </div>
             
-            {!isRegistering && (
-              <div className="forgot-password">
+            <div style={{textAlign: 'center'}}>
+              <button type="submit" className="btn btn-primary btn-large mx-auto block mb-3">
+                Login
+              </button>
+
+              <div className="forgot-password mt-2">
                 <button
                   type="button"
                   className="reset-link"
@@ -238,24 +189,12 @@ const Login = ({ onLogin }) => {
                   Reset Password
                 </button>
               </div>
-            )}
-            
-            <button type="submit" className="btn btn-primary w-full mb-3">
-              {isRegistering ? 'Register' : 'Login'}
-            </button>
-            
-            <button 
-              type="button" 
-              className="btn btn-outline w-full"
-              onClick={() => setIsRegistering(!isRegistering)}
-            >
-              {isRegistering ? 'Already have an account? Login' : 'Need an account? Register'}
-            </button>
+            </div>
           </form>
         </div>
       </div>
       
-      <style jsx>{`
+  <style>{`
         .login-container {
           min-height: 100vh;
           display: flex;
@@ -392,6 +331,27 @@ const Login = ({ onLogin }) => {
         .form-input.error {
           border-color: #dc2626;
         }
+
+        .btn-large {
+          padding: 14px 28px;
+          font-size: 16px;
+          border-radius: 8px;
+          width: 320px; /* wider fixed width */
+        }
+
+        @media (max-width: 480px) {
+          .btn-large {
+            width: 100%; /* full width on small screens */
+          }
+        }
+
+        /* ensure button text is centered */
+        .btn, .btn-large {
+          display: inline-flex !important;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
         
         @media (max-width: 480px) {
           .login-form {
@@ -409,3 +369,7 @@ const Login = ({ onLogin }) => {
 };
 
 export default Login;
+
+Login.propTypes = {
+  onLogin: PropTypes.func.isRequired,
+};
