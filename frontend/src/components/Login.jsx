@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Eye, EyeOff, Shield, User, Lock } from 'lucide-react';
+import './Login.css';
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
-    username: '',
+    Email: '',
     password: '',
     firstName: '',
     lastName: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  // registration flow removed
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -30,8 +30,8 @@ const Login = ({ onLogin }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
+    if (!formData.Email.trim()) {
+      newErrors.Email = 'Email is required';
     }
     
     if (!formData.password.trim()) {
@@ -39,8 +39,6 @@ const Login = ({ onLogin }) => {
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-
-  // registration removed
 
     return newErrors;
   };
@@ -56,10 +54,10 @@ const Login = ({ onLogin }) => {
 
     // Login logic - for demo, any valid credentials work
     const userData = {
-      username: formData.username,
+      Email: formData.Email,
       firstName: 'Agent',
       lastName: 'Smith',
-      email: `${formData.username}@garuda.gov.in`,
+      email: `${formData.Email}@garuda.gov.in`,
       avatar: 'AS',
       joinDate: '2024-01-15'
     };
@@ -90,12 +88,12 @@ const Login = ({ onLogin }) => {
               <div className="form-group">
                 <label className="form-label">
                   <User size={20} />
-                  Username or Email
+                  Email or Email
                 </label>
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Enter your username or email"
+                  placeholder="Enter your Email or email"
                   required
                 />
               </div>
@@ -132,22 +130,21 @@ const Login = ({ onLogin }) => {
           </div>
           
           <form onSubmit={handleSubmit}>
-            {/* registration removed - simplified login only */}
-            
+           
             <div className="form-group">
               <label className="form-label">
                 <User size={20} />
-                Username
+                Email
               </label>
               <input
                 type="text"
-                name="username"
-                value={formData.username}
+                name="Email"
+                value={formData.Email}
                 onChange={handleChange}
-                className={`form-input ${errors.username ? 'error' : ''}`}
-                placeholder="Enter your username"
+                className={`form-input ${errors.Email ? 'error' : ''}`}
+                placeholder="Enter your Email"
               />
-              {errors.username && <span className="error-text">{errors.username}</span>}
+              {errors.Email && <span className="error-text">{errors.Email}</span>}
             </div>
             
             <div className="form-group">
@@ -194,176 +191,6 @@ const Login = ({ onLogin }) => {
         </div>
       </div>
       
-  <style>{`
-        .login-container {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          padding: 20px;
-        }
-        
-        .login-background {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
-          z-index: -1;
-        }
-        
-        .grid-pattern {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-image: 
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
-          background-size: 50px 50px;
-          animation: gridMove 20s linear infinite;
-        }
-        
-        @keyframes gridMove {
-          0% { transform: translate(0, 0); }
-          100% { transform: translate(50px, 50px); }
-        }
-        
-        .login-form-container {
-          max-width: 400px;
-          width: 100%;
-        }
-        
-        .login-form {
-          background: rgba(255, 255, 255, 0.95);
-          padding: 40px;
-          border-radius: 20px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .login-header {
-          text-align: center;
-          margin-bottom: 32px;
-        }
-        
-        .login-icon {
-          color: #1e3a8a;
-          margin-bottom: 16px;
-          animation: pulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
-        }
-        
-        .login-header h1 {
-          color: #1e3a8a;
-          font-size: 24px;
-          font-weight: 700;
-          margin-bottom: 8px;
-        }
-        
-        .login-header p {
-          color: #64748b;
-          font-size: 14px;
-        }
-        
-        .form-label {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 8px;
-          font-weight: 600;
-          color: #374151;
-        }
-        
-        .password-input {
-          position: relative;
-        }
-        
-        .password-toggle {
-          position: absolute;
-          right: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: #6b7280;
-          padding: 4px;
-        }
-        
-        .password-toggle:hover {
-          color: #374151;
-        }
-        
-        .forgot-password {
-          text-align: right;
-          margin-bottom: 24px;
-        }
-        
-        .reset-link {
-          background: none;
-          border: none;
-          color: #3b82f6;
-          cursor: pointer;
-          font-size: 14px;
-          text-decoration: underline;
-        }
-        
-        .reset-link:hover {
-          color: #1d4ed8;
-        }
-        
-        .error-text {
-          color: #dc2626;
-          font-size: 12px;
-          margin-top: 4px;
-          display: block;
-        }
-        
-        .form-input.error {
-          border-color: #dc2626;
-        }
-
-        .btn-large {
-          padding: 14px 28px;
-          font-size: 16px;
-          border-radius: 8px;
-          width: 320px; /* wider fixed width */
-        }
-
-        @media (max-width: 480px) {
-          .btn-large {
-            width: 100%; /* full width on small screens */
-          }
-        }
-
-        /* ensure button text is centered */
-        .btn, .btn-large {
-          display: inline-flex !important;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-        }
-        
-        @media (max-width: 480px) {
-          .login-form {
-            padding: 24px;
-            margin: 20px;
-          }
-          
-          .login-header h1 {
-            font-size: 20px;
-          }
-        }
-      `}</style>
     </div>
   );
 };
