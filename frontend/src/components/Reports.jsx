@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Search, Plus, Eye, Edit2, Calendar, User, Tag } from 'lucide-react';
-import './Reports.css';
+import '../Styles/Reports.css';
 
 const INITIAL_REPORTS = [
   { id: 'SEC-001', title: 'Suspicious Network Activity Detected', description: 'Unusual traffic patterns detected from external IP addresses attempting to access restricted network segments.', agent: 'Agent Smith', date: '1/15/2024', time: '2 hours ago', priority: 'High', status: 'Active', category: 'Network Security', details: 'Multiple failed authentication attempts detected from IP range 192.168.1.0/24. Potential brute force attack in progress. Immediate investigation required.', fullDetails: 'A comprehensive security analysis revealed multiple failed authentication attempts originating from the IP range 192.168.1.0/24. The attack pattern suggests a coordinated brute force attempt targeting administrative accounts.' },

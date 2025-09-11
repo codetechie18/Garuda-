@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { User, Edit2, Save, X, Lock, Shield, Calendar, Mail, Phone, MapPin } from 'lucide-react';
-import './Profile.css';
+import '../Styles/Profile.css';
 
 const Profile = ({ user, updateUser }) => {
   const [isEditing, setIsEditing] = useState(false);

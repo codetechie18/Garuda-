@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import './Scrape.css';
+import '../Styles/Scrape.css';
 
 const SAMPLE_RESULTS = [
   { id: 'sample-1', title: '#cybersecurity - Example post 1', excerpt: 'Dummy post excerpt about cybersecurity best practices.', source: 'example.com', url: '#' },

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { FileText, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 import Map from './Map';
-import './Dashboard.css';
+import '../Styles/Dashboard.css';
 
 const Dashboard = ({ user }) => {
   const [stats, setStats] = useState({

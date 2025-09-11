@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Eye, EyeOff, Shield, User, Lock } from 'lucide-react';
-import './Login.css';
+import '../Styles/Login.css';
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({

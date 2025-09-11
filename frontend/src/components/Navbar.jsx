@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import { Shield, BarChart3, FileText, User, LogOut, ChevronDown, Menu, X } from 'lucide-react';
-import './Navbar.css';
+import '../Styles/Navbar.css';
 
 const Navbar = ({ user, onLogout }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -153,7 +153,13 @@ const Navbar = ({ user, onLogout }) => {
                 <Link to="/reports" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Search</Link>
                 <Link to="/reports/quick" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Quick Report</Link>
               </div>
-              <Link to="/users" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>User Management</Link>
+<Link 
+  to="/usermanagement" 
+  className="drawer-link" 
+  onClick={() => setMobileMenuOpen(false)}
+>
+  User Management
+</Link>
               <Link to="/admin" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>Administration</Link>
               <Link to="/scheduler" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>Scheduler</Link>
             </nav>
