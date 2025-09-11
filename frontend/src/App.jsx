@@ -8,6 +8,8 @@ import Profile from './components/Profile';
 import Navbar from './components/Navbar';
 import './App.css';
 
+
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);

@@ -3,16 +3,16 @@ import { Eye, EyeOff, Shield, User, Lock } from 'lucide-react';
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: '',
-    firstName: '',
-    lastName: ''
   });
+  const [resetIdentifier, setResetIdentifier] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState(''); // Server se aane wale error ke liye
 
+  // Input field me kuch bhi type karne par state update karega
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -24,13 +24,16 @@ const Login = ({ onLogin }) => {
         [e.target.name]: ''
       });
     }
+    setApiError(''); 
   };
 
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email address is invalid';
     }
     
     if (!formData.password.trim()) {
@@ -39,19 +42,10 @@ const Login = ({ onLogin }) => {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (isRegistering) {
-      if (!formData.firstName.trim()) {
-        newErrors.firstName = 'First name is required';
-      }
-      if (!formData.lastName.trim()) {
-        newErrors.lastName = 'Last name is required';
-      }
-    }
-
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
     
@@ -60,37 +54,76 @@ const Login = ({ onLogin }) => {
       return;
     }
 
-    if (isRegistering) {
-      // Registration logic
-      const userData = {
-        username: formData.username,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: `${formData.username}@garuda.gov.in`,
-        avatar: `${formData.firstName[0]}${formData.lastName[0]}`,
-        joinDate: new Date().toLocaleDateString()
-      };
-      onLogin(userData);
-    } else {
-      // Login logic - for demo, any valid credentials work
-      const userData = {
-        username: formData.username,
-        firstName: 'Agent',
-        lastName: 'Smith',
-        email: `${formData.username}@garuda.gov.in`,
-        avatar: 'AS',
-        joinDate: '2024-01-15'
-      };
-      onLogin(userData);
+    // Backend API ka URL
+    const API_URL = 'http://localhost:4000/api/login';
+
+    // API ko bhejne wala data
+    const payload = { 
+        email: formData.email, 
+        password: formData.password 
+    };
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      
+      if (!res.ok) {
+        // Agar server se error aaye to use state me set karo
+        setApiError(data.msg || "Login failed.");
+        return;
+      }
+
+      // Login successful hone par
+      if (data.token) {
+        localStorage.setItem("token", data.token); // Token ko localStorage me save karo
+      }
+      onLogin(data.user); // Parent component ko user data bhejo
+
+    } catch (error) {
+      console.error("Error:", error);
+      setApiError("Something went wrong. Please try again.");
     }
   };
 
-  const handleResetPassword = (e) => {
+  // Password reset form submit hone par yeh function chalega
+  const handleResetPassword = async (e) => {
     e.preventDefault();
-    alert('Password reset link has been sent to your registered email address.');
-    setShowResetPassword(false);
+    setApiError('');
+    if (!resetIdentifier.trim()) {
+        setApiError('Please enter your username or email.');
+        return;
+    }
+    
+    try {
+        const res = await fetch("http://localhost:4000/api/reset-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ identifier: resetIdentifier }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            setApiError(data.msg || "Failed to send reset link.");
+            return;
+        }
+
+        alert('Password reset link has been sent to your registered email address.');
+        setShowResetPassword(false);
+        setResetIdentifier('');
+
+    } catch(error) {
+        console.error("Error:", error);
+        setApiError("Something went wrong. Please try again.");
+    }
   };
 
+  // Agar Reset Password form dikhana hai
   if (showResetPassword) {
     return (
       <div className="login-container">
@@ -102,7 +135,7 @@ const Login = ({ onLogin }) => {
             <div className="login-header">
               <Shield size={48} className="login-icon" />
               <h1>GARUDA CYBERSEC</h1>
-              <p>Government Security Portal</p>
+              <p>Reset Your Password</p>
             </div>
             
             <form onSubmit={handleResetPassword}>
@@ -115,10 +148,17 @@ const Login = ({ onLogin }) => {
                   type="text"
                   className="form-input"
                   placeholder="Enter your username or email"
+                  value={resetIdentifier}
+                  onChange={(e) => {
+                      setResetIdentifier(e.target.value);
+                      setApiError('');
+                  }}
                   required
                 />
               </div>
               
+              {apiError && <span className="error-text api-error">{apiError}</span>}
+
               <button type="submit" className="btn btn-primary w-full mb-3">
                 Send Reset Link
               </button>
@@ -126,17 +166,28 @@ const Login = ({ onLogin }) => {
               <button 
                 type="button" 
                 className="btn btn-outline w-full"
-                onClick={() => setShowResetPassword(false)}
+                onClick={() => {
+                  setShowResetPassword(false);
+                  setApiError('');
+                }}
               >
                 Back to Login
               </button>
             </form>
           </div>
         </div>
+        <style jsx>{`
+            /* Styling same as original */
+            .api-error {
+                text-align: center;
+                margin-bottom: 16px;
+            }
+        `}</style>
       </div>
     );
   }
 
+  // Login form
   return (
     <div className="login-container">
       <div className="login-background">
@@ -151,56 +202,20 @@ const Login = ({ onLogin }) => {
           </div>
           
           <form onSubmit={handleSubmit}>
-            {isRegistering && (
-              <>
-                <div className="form-group">
-                  <label className="form-label">
-                    <User size={20} />
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    className={`form-input ${errors.firstName ? 'error' : ''}`}
-                    placeholder="Enter your first name"
-                  />
-                  {errors.firstName && <span className="error-text">{errors.firstName}</span>}
-                </div>
-                
-                <div className="form-group">
-                  <label className="form-label">
-                    <User size={20} />
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    className={`form-input ${errors.lastName ? 'error' : ''}`}
-                    placeholder="Enter your last name"
-                  />
-                  {errors.lastName && <span className="error-text">{errors.lastName}</span>}
-                </div>
-              </>
-            )}
-            
             <div className="form-group">
               <label className="form-label">
                 <User size={20} />
-                Username
+                Email
               </label>
               <input
-                type="text"
-                name="username"
-                value={formData.username}
+                type="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
-                className={`form-input ${errors.username ? 'error' : ''}`}
-                placeholder="Enter your username"
+                className={`form-input ${errors.email ? 'error' : ''}`}
+                placeholder="Enter your email"
               />
-              {errors.username && <span className="error-text">{errors.username}</span>}
+              {errors.email && <span className="error-text">{errors.email}</span>}
             </div>
             
             <div className="form-group">
@@ -228,28 +243,24 @@ const Login = ({ onLogin }) => {
               {errors.password && <span className="error-text">{errors.password}</span>}
             </div>
             
-            {!isRegistering && (
-              <div className="forgot-password">
-                <button
-                  type="button"
-                  className="reset-link"
-                  onClick={() => setShowResetPassword(true)}
-                >
-                  Reset Password
-                </button>
-              </div>
-            )}
+            <div className="forgot-password">
+              <button
+                type="button"
+                className="reset-link"
+                onClick={() => {
+                  setShowResetPassword(true);
+                  setErrors({});
+                  setApiError('');
+                }}
+              >
+                Reset Password
+              </button>
+            </div>
+
+            {apiError && <span className="error-text api-error">{apiError}</span>}
             
             <button type="submit" className="btn btn-primary w-full mb-3">
-              {isRegistering ? 'Register' : 'Login'}
-            </button>
-            
-            <button 
-              type="button" 
-              className="btn btn-outline w-full"
-              onClick={() => setIsRegistering(!isRegistering)}
-            >
-              {isRegistering ? 'Already have an account? Login' : 'Need an account? Register'}
+              Login
             </button>
           </form>
         </div>
@@ -263,6 +274,7 @@ const Login = ({ onLogin }) => {
           justify-content: center;
           position: relative;
           padding: 20px;
+          font-family: 'Inter', sans-serif; /* Added a professional font */
         }
         
         .login-background {
@@ -282,24 +294,33 @@ const Login = ({ onLogin }) => {
           width: 100%;
           height: 100%;
           background-image: 
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px);
           background-size: 50px 50px;
           animation: gridMove 20s linear infinite;
         }
         
         @keyframes gridMove {
-          0% { transform: translate(0, 0); }
-          100% { transform: translate(50px, 50px); }
+          0% { background-position: 0 0; }
+          100% { background-position: 50px 50px; }
         }
         
         .login-form-container {
           max-width: 400px;
           width: 100%;
         }
+
+        .fade-in {
+            animation: fadeInAnimation 0.5s ease-in-out;
+        }
+
+        @keyframes fadeInAnimation {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
         
         .login-form {
-          background: rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.98);
           padding: 40px;
           border-radius: 20px;
           box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -319,8 +340,8 @@ const Login = ({ onLogin }) => {
         }
         
         @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
         }
         
         .login-header h1 {
@@ -334,6 +355,10 @@ const Login = ({ onLogin }) => {
           color: #64748b;
           font-size: 14px;
         }
+
+        .form-group {
+          margin-bottom: 20px;
+        }
         
         .form-label {
           display: flex;
@@ -342,6 +367,21 @@ const Login = ({ onLogin }) => {
           margin-bottom: 8px;
           font-weight: 600;
           color: #374151;
+          font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
         }
         
         .password-input {
@@ -358,6 +398,8 @@ const Login = ({ onLogin }) => {
           cursor: pointer;
           color: #6b7280;
           padding: 4px;
+          display: flex;
+          align-items: center;
         }
         
         .password-toggle:hover {
@@ -375,28 +417,66 @@ const Login = ({ onLogin }) => {
           color: #3b82f6;
           cursor: pointer;
           font-size: 14px;
-          text-decoration: underline;
         }
         
         .reset-link:hover {
+          text-decoration: underline;
           color: #1d4ed8;
         }
         
         .error-text {
-          color: #dc2626;
+          color: #ef4444;
           font-size: 12px;
           margin-top: 4px;
           display: block;
         }
+
+        .api-error {
+            text-align: center;
+            margin-bottom: 16px;
+        }
         
         .form-input.error {
-          border-color: #dc2626;
+          border-color: #ef4444;
+        }
+
+        .form-input.error:focus {
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: none;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .btn-outline {
+            background-color: transparent;
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+        .btn-outline:hover {
+            background-color: #eff6ff;
+        }
+        .w-full {
+            width: 100%;
+        }
+        .mb-3 {
+            margin-bottom: 12px;
         }
         
         @media (max-width: 480px) {
           .login-form {
             padding: 24px;
-            margin: 20px;
           }
           
           .login-header h1 {
@@ -409,3 +489,5 @@ const Login = ({ onLogin }) => {
 };
 
 export default Login;
+
+
