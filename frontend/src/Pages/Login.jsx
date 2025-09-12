@@ -5,7 +5,7 @@ import '../Styles/Login.css';
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
-    Username: '',
+    Email: '',
     password: '',
     firstName: '',
     lastName: ''
@@ -30,8 +30,8 @@ const Login = ({ onLogin }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.Username.trim()) {
-      newErrors.Username = 'Username is required';
+    if (!formData.Email.trim()) {
+      newErrors.Email = 'Email is required';
     }
     
     if (!formData.password.trim()) {
@@ -54,10 +54,10 @@ const Login = ({ onLogin }) => {
 
     // Login logic - for demo, any valid credentials work
     const userData = {
-      Username: formData.Username,
+      Email: formData.Email,
       firstName: 'Agent',
       lastName: 'Smith',
-      Email: `${formData.Username}@garuda.gov.in`,
+      email: `${formData.Email}@garuda.gov.in`,
       avatar: 'AS',
       joinDate: '2024-01-15'
     };
@@ -66,7 +66,7 @@ const Login = ({ onLogin }) => {
 
   const handleResetPassword = (e) => {
     e.preventDefault();
-    alert('Password reset link has been sent to your registered Username address.');
+    alert('Password reset link has been sent to your registered email address.');
     setShowResetPassword(false);
   };
 
@@ -88,12 +88,12 @@ const Login = ({ onLogin }) => {
               <div className="form-group">
                 <label className="form-label">
                   <User size={20} />
-                  Username or Email
+                  Email or Email
                 </label>
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Enter your Username or Email"
+                  placeholder="Enter your Email or email"
                   required
                 />
               </div>
@@ -134,17 +134,17 @@ const Login = ({ onLogin }) => {
             <div className="form-group">
               <label className="form-label">
                 <User size={20} />
-                Username
+                Email
               </label>
               <input
                 type="text"
-                name="Username"
-                value={formData.Username}
+                name="Email"
+                value={formData.Email}
                 onChange={handleChange}
-                className={`form-input ${errors.Username ? 'error' : ''}`}
-                placeholder="Enter your Username"
+                className={`form-input ${errors.Email ? 'error' : ''}`}
+                placeholder="Enter your Email"
               />
-              {errors.Username && <span className="error-text">{errors.Username}</span>}
+              {errors.Email && <span className="error-text">{errors.Email}</span>}
             </div>
             
             <div className="form-group">
