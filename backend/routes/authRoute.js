@@ -6,49 +6,104 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv")
 dotenv.config();
 
-router.post('/register', async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-        if (!name || !email || !password) {
-            return res.status(400).json({ msg: 'Please enter all fields.' });
-        }
 
-        if (await User.findOne({ email })) {
+// --- REGISTER ROUTE 
+router.post('/register', async (req, res) => {
+    const { username, email, fullName, password } = req.body;
+
+    if (!username || !email || !fullName || !password) {
+        return res.status(400).json({ msg: "Please enter all fields." });
+    }
+
+    try {
+        let userByEmail = await User.findOne({ email });
+        if (userByEmail) {
             return res.status(400).json({ msg: 'User with this email already exists.' });
         }
 
+        let userByUsername = await User.findOne({ username });
+        if (userByUsername) {
+            return res.status(400).json({ msg: 'This username is already taken.' });
+        }
+
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const passwordHash = await bcrypt.hash(password, salt);
 
-        const user = new User({
-            name, email, password: hashedPassword,
-            // role: 'citizen',
+        const newUser = new User({
+            username,
+            email,
+            fullName,
+            passwordHash: passwordHash
         });
-        await user.save();
 
-        res.status(201).json({ msg: 'Registration successful' });
+        await newUser.save();
+
+        // Success response
+        res.status(201).json({ 
+            msg: 'Registration successful!',
+            user: {
+                id: newUser.id,
+                username: newUser.username,
+                email: newUser.email
+            }
+        });
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error.message);
+        res.status(500).json({ error: 'Server Error' });
     }
 });
 
 // --- LOGIN ROUTE 
 router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
+    const { email, password } = req.body;
 
-        if (!user || !await bcrypt.compare(password, user.password)) {
+    if (!email || !password) {
+        return res.status(400).json({ msg: 'Please enter all fields.' });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
             return res.status(400).json({ msg: 'Invalid Credentials' });
         }
 
-        const payload = { user: { id: user.id, role: user.role, name: user.name, } };
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '5m' });
-        res.status(200).json({ message: "Login Successful", token });
+        const isMatch = await bcrypt.compare(password, user.passwordHash);
+
+        if (!isMatch) {
+            return res.status(400).json({ msg: 'Invalid Credentials' });
+        }
+
+        const payload = {
+            user: {
+                id: user.id,
+                username: user.username,
+                roles: user.roles
+            }
+        };
+
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: '5h' }, 
+            (err, token) => {
+                if (err) throw err;
+                res.json({ 
+                    token,
+                    user: payload.user 
+                });
+            }
+        );
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error.message);
+        res.status(500).json({ error: 'Server Error' });
     }
+});
+
+// LOGOUT ROUTE
+router.post('/logout', (req, res) => {
+    res.status(200).json({ msg: "Logout successful" });
 });
 
 module.exports = router;

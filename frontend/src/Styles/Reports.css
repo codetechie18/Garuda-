@@ -1,0 +1,436 @@
+/* Reports.css - Vanilla CSS (cleaned and formatted) */
+
+/* Theme variables */
+:root{
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --muted: #64748b;
+    --text: #1e293b;
+    --subtext: #374151;
+    --primary: #0ea5e9;
+    --primary-2: #3b82f6;
+    --accent: #eef2ff;
+    --border: #e5e7eb;
+    --shadow-1: rgba(0,0,0,0.1);
+    --shadow-2: rgba(59,130,246,0.06);
+    --shadow-3: rgba(59,130,246,0.14);
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 12px;
+    --container-max: 1200px;
+}
+
+/* Page / container */
+.reports {
+    min-height: calc(100vh - 70px);
+    background: var(--bg);
+    padding: 24px 0;
+}
+
+.reports-container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* make containers use border-box so padding doesn't cause overflow */
+.reports-container,
+.add-report-form,
+.report-card,
+.reports-list,
+.controls-section {
+    box-sizing: border-box;
+}
+
+/* Header */
+.reports-header {
+    margin-bottom: 32px;
+}
+
+.reports-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 4px 0;
+}
+
+.reports-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 16px;
+}
+
+/* Statistics grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 3px var(--shadow-1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* Controls (search, filters, actions) */
+.controls-section {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 32px;
+    align-items: center;
+}
+
+/* allow controls to wrap on smaller screens */
+.controls-section {
+    flex-wrap: wrap;
+}
+
+.search-bar {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+}
+
+/* allow the search to shrink properly inside flex */
+.search-bar { min-width: 0; }
+.search-input { min-width: 0; box-sizing: border-box; }
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px 12px 48px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+    color: var(--text);
+    box-sizing: border-box;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* let filters wrap when there's not enough space */
+.filters { flex-wrap: wrap; }
+.filter-select { min-width: 120px; }
+
+.filter-select {
+    padding: 10px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+    color: var(--text);
+}
+
+/* select with icon when showing 'All' */
+.select-with-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+.select-with-icon .select-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--muted);
+    pointer-events: none;
+}
+.select-with-icon .filter-select {
+    padding-left: 36px; /* make room for the icon */
+}
+
+/* Add report overlay & form */
+.add-report-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.5);
+}
+
+.add-report-form {
+    background: var(--card-bg);
+    padding: 32px;
+    border-radius: var(--radius-lg);
+    max-width: 600px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* keep modal content inside viewport on small screens */
+.add-report-form { max-width: calc(100% - 32px); margin: 0 16px; }
+
+/* Form layout */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Reports list & cards */
+.reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.report-card {
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 3px var(--shadow-1);
+    box-sizing: border-box;
+}
+
+/* prevent long words or content from forcing horizontal scroll */
+.report-card, .report-title, .report-description {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.report-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+/* allow header to wrap so actions don't overflow */
+.report-header { flex-wrap: wrap; }
+
+.report-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+.report-description {
+    color: var(--muted);
+    margin: 0;
+}
+
+.report-meta {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 16px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* allow meta items to wrap instead of overflowing */
+.report-meta { flex-wrap: wrap; }
+
+/* Actions */
+.report-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* let action buttons wrap and shrink if needed */
+.report-actions { flex-wrap: wrap; }
+.action-btn { white-space: nowrap; }
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: #0f172a;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.action-btn svg {
+    opacity: 0.95;
+}
+
+.action-btn:hover {
+    background: #f1f5f9;
+}
+
+.btn {
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, var(--primary), var(--primary-2));
+    color: white;
+    border: none;
+}
+
+.btn-secondary {
+    background: var(--accent);
+    color: #3730a3;
+    border: none;
+}
+
+.expand-btn {
+    background: transparent;
+    border: none;
+    color: var(--subtext);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+}
+
+.details-preview {
+    color: var(--subtext);
+}
+
+/* Pagination */
+.pagination-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.pagination-controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: #0f172a;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .12s ease;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+    background: #f1f5f9;
+    box-shadow: 0 6px 18px var(--shadow-2);
+}
+
+.pagination-controls button[aria-current="page"] {
+    background: linear-gradient(90deg, var(--primary), var(--primary-2));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 8px 24px var(--shadow-3);
+}
+
+.pagination-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--card-bg);
+}
+
+.page-size-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-size-select select {
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+    color: #0f172a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .controls-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .report-actions {
+        margin-left: 0;
+    }
+
+    .search-input {
+        padding-left: 44px; /* keep icon spacing on small screens */
+    }
+    
+    /* container padding adjustments to avoid horizontal overflow */
+    .reports-container { padding: 0 16px; }
+}
+
+/* On small screens, place actions on their own row under the header to prevent overflow */
+@media (max-width: 480px) {
+    .report-header {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .report-actions {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-end; /* keep actions aligned right */
+        gap: 8px;
+    }
+
+    .action-btn {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+}
+
+/* Small phone fixes */
+@media (max-width: 480px) {
+    .reports-container { padding: 0 12px; }
+    .search-input { padding-left: 44px; }
+    .add-report-form { margin: 0 12px; }
+}
+
+/* Prevent horizontal scroll in edge cases */
+.reports, .reports-container { overflow-x: hidden; }

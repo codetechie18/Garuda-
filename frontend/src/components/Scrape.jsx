@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
+import '../Styles/Scrape.css';
 
 const SAMPLE_RESULTS = [
   { id: 'sample-1', title: '#cybersecurity - Example post 1', excerpt: 'Dummy post excerpt about cybersecurity best practices.', source: 'example.com', url: '#' },
@@ -86,52 +87,7 @@ const Scrape = () => {
       
       </div>
 
-      <style>{`
-        .scrape-page{ min-height: calc(100vh - 70px); padding: 24px 0; background:#f8fafc }
-        .scrape-container{ max-width:1100px; margin:0 auto; background:white; padding:28px; border-radius:12px; box-shadow:0 1px 6px rgba(2,6,23,0.08) }
-
-        /* Form layout */
-        .scrape-form .form-row{ display:flex; gap:12px; align-items:center; margin-bottom:16px }
-        .form-select{ padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; background:white }
-        .form-input{ flex:1; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px }
-        .btn.btn-primary{ display:inline-flex; align-items:center; gap:8px }
-
-        /* Results layout - use grid for bigger screens */
-        .results{ margin-top:16px; display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px }
-        .result-card{ padding:14px; border:1px solid #eef2ff; border-radius:8px; background:#ffffff }
-        .result-title{ font-weight:700; color:#0ea5e9; text-decoration:none; display:block; margin-bottom:6px }
-        .result-excerpt{ color:#475569; margin-bottom:8px }
-        .result-meta{ color:#94a3b8; font-size:13px }
-
-        .integration-note{ margin-top:20px; color:#475569 }
-        .error{ color:#dc2626; margin-top:8px }
-        .empty{ color:#94a3b8 }
-
-        /* Responsive adjustments */
-        @media (max-width: 900px) {
-          .scrape-container{ padding:20px }
-          .results{ grid-template-columns: repeat(1, minmax(0,1fr)); }
-        }
-
-        @media (max-width: 640px) {
-          .scrape-container{ padding:16px; border-radius:10px }
-          .scrape-form .form-row{ flex-direction:column; align-items:stretch }
-          .form-select, .form-input, .btn.btn-primary{ width:100% }
-          .form-select, .form-input{ box-sizing:border-box }
-          .btn.btn-primary{ justify-content:center; padding:10px 12px }
-          .result-card{ padding:12px }
-          .result-title{ font-size:15px }
-          .result-excerpt{ font-size:14px }
-        }
-
-        /* Small phone tweaks */
-        @media (max-width: 380px) {
-          .scrape-container{ padding:12px }
-          .scrape-form .form-row{ gap:8px }
-          .result-title{ font-size:14px }
-          .result-meta{ font-size:12px }
-        }
-      `}</style>
+  {/* styles moved to Scrape.css */}
     </div>
   );
 };

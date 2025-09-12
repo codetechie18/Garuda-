@@ -6,6 +6,7 @@ import Reports from './components/Reports';
 import Scrape from './components/Scrape';
 import Profile from './components/Profile';
 import Navbar from './components/Navbar';
+import UserManagement from './Pages/UserManagement';
 import './App.css';
 
 
@@ -93,6 +94,14 @@ function App() {
               <Profile user={user} updateUser={updateUser} /> : 
               <Navigate to="/login" replace />
             } 
+          />
+          <Route 
+            path="/usermanagement" 
+            element={
+              isLoggedIn ? 
+              <UserManagement user={user} /> : 
+              <Navigate to="/login" replace />
+            }
           />
           <Route path="/" element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />} />
         </Routes>
