@@ -10,7 +10,6 @@ const Login = ({ onLogin }) => {
     lastName: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  // registration flow removed
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
