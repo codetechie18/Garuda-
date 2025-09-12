@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { FileText, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
-import Map from './Map';
+import Map from '../Components/Map';
 import '../Styles/Dashboard.css';
 
 const Dashboard = ({ user }) => {

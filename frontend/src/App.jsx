@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import Login from './components/Login';
-import Dashboard from './components/Dashboard';
-import Reports from './components/Reports';
-import Scrape from './components/Scrape';
-import Profile from './components/Profile';
+import Login from './Pages/Login';
+import Dashboard from './Pages/Dashboard';
+import Reports from './Pages/Reports';
+import Scrape from './Pages/Scrape';
+import Profile from './Pages/Profile';
 import Navbar from './components/Navbar';
 import UserManagement from './Pages/UserManagement';
 import './App.css';

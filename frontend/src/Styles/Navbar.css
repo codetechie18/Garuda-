@@ -383,7 +383,23 @@
 .drawer-link, .drawer-sublink { display:flex; align-items:center; gap:10px; padding:8px 10px; text-decoration:none; color:#374151; border-radius:8px }
 .drawer-link.active { background:#e6f4ff; color:#0b6ea3 }
 .drawer-section { margin-top:8px; border-top:1px solid #f3f4f6; padding-top:8px; }
-.drawer-section-title { font-weight:700; padding:6px 4px }
+
+/* Make section titles use the same link styles (no special dark-blue color) */
+.drawer-section .drawer-link {
+  font-weight: 600;
+  color: #374151; /* same as other links */
+}
+
+/* Ensure icons inside drawer links are same color and aligned */
+.drawer-link svg {
+  color: #64748b;
+  flex-shrink: 0;
+}
+.drawer-link span { display: inline-block; }
+
+/* Active and hover states should match across links */
+.drawer-link:hover { transform: translateX(6px); background: #f8fafc; box-shadow: 2px 6px 18px rgba(2,6,23,0.04); color: #1e3a8a; }
+.drawer-link.active { background: #e6f4ff; color: #0b6ea3; }
 
 /* hover/focus for drawer links */
 .drawer-link:hover, .drawer-sublink:hover {
@@ -399,6 +415,24 @@
 /* hover for brand inside drawer */
 .drawer-brand { transition: transform 160ms ease, color 120ms ease }
 .drawer-brand:hover { transform: translateX(4px); color: #153e75 }
+
+/* style for section-title links inside the drawer */
+.drawer-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  font-weight: 700;
+  color: #153e75;
+  text-decoration: none;
+  border-radius: 8px;
+}
+.drawer-section-title:hover {
+  background: #f1f5f9;
+  color: #0b6ea3;
+  transform: translateX(4px);
+}
+.drawer-section-title svg { color: #0f172a; }
 
 
 @media (max-width: 768px) {
@@ -498,9 +532,9 @@
     display: none;
   }
   
-  /* move brand icon right so it doesn't overlap the hamburger */
+  
   .navbar-brand {
-    left: 56px; /* leave room for the pinned hamburger */
+    left: 56px;
   }
 }
 
