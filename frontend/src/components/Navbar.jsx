@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, BarChart3, FileText, User, LogOut, ChevronDown, Menu, X } from 'lucide-react';
+import { Shield, BarChart3, FileText, User, LogOut, ChevronDown, Menu, X, Search, Settings, Calendar } from 'lucide-react';
 import '../Styles/Navbar.css';
 
 const Navbar = ({ user, onLogout }) => {
@@ -73,14 +73,7 @@ const Navbar = ({ user, onLogout }) => {
               <FileText size={20} />
               <span>Reports</span>
             </Link>
-            <Link 
-              to="/scrape" 
-              className={`nav-link ${isActive('/scrape') ? 'active' : ''}`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <FileText size={20} />
-              <span>Scrape</span>
-            </Link>
+            {/* Scrape removed from top nav per request */}
           </div>
 
           <span className="welcome-text">Welcome, {user?.firstName}</span>
@@ -173,7 +166,7 @@ const Navbar = ({ user, onLogout }) => {
         </>
       )}
       
-  {/* styles moved to Navbar.css */}
+ 
     </nav>
   );
 };

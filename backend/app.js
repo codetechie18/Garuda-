@@ -7,7 +7,7 @@ const connectDB = require("./db/db");
 connectDB();
 const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/authRoute");
-
+const profileRoute = require("./routes/profileRoutes")
 
 app.use(cors());
 app.use(express.json());
@@ -15,10 +15,8 @@ app.use(express.urlencoded({extended: true}))
 app.use(cookieParser());
 
 app.use("/api", authRoute);
-app.post("/api/login", (req, res) => {
-  console.log("Body received:", req.body);
-  res.send("Check console");
-});
+app.use('/api', profileRoute);
+
 
 
 module.exports=app;

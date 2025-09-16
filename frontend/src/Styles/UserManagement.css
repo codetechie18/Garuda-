@@ -14,17 +14,19 @@
   margin-bottom: 3rem;
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 2rem;
+  padding-bottom: 2.25rem; /* increase space so heading descenders aren't clipped */
 }
 
 .page-title {
   font-size: 3rem;
   font-weight: 800;
   color: #0f172a;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem; /* give more room between title and subtitle */
   letter-spacing: -0.025em;
-  line-height: 1.1;
+  line-height: 1.22; /* increased to avoid clipping of descenders like 'g' */
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  display: inline-block; /* prevent gradient/text rendering clipping */
+  padding-bottom: 0.1875rem; /* small padding to preserve descenders */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -35,6 +37,7 @@
   font-size: 1.25rem;
   font-weight: 400;
   line-height: 1.6;
+  margin-top: 0.125rem; /* small push to avoid overlapping descenders */
   max-width: 600px;
 }
 
@@ -522,7 +525,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 11000; /* raised above navbar (9999) */
   padding: 1rem;
   animation: fadeIn 0.3s ease-out;
 }
@@ -532,8 +535,9 @@
   border-radius: 1.5rem;
   max-width: 550px;
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
+  /* remove internal scrollbar: allow modal to expand and let page/backdrop handle overflow */
+  max-height: none;
+  overflow: visible;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   border: 1px solid #f1f5f9;
   animation: slideUp 0.3s ease-out;

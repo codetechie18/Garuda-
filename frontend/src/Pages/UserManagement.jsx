@@ -144,13 +144,12 @@ const UserManagement = () => {
   const filteredAndSortedUsers = useMemo(() => {
     let filtered = users.filter(user => {
       const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           user.id.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesSector = !filterSector || user.sector === filterSector;
+                           user.email.toLowerCase().includes(searchTerm.toLowerCase()) ;
+     
       const matchesStatus = !filterStatus || user.status === filterStatus;
       const matchesRole = !filterRole || user.role === filterRole;
       
-      return matchesSearch && matchesSector && matchesStatus && matchesRole;
+      return matchesSearch  && matchesStatus && matchesRole;
     });
 
     if (sortConfig.key) {
@@ -236,7 +235,7 @@ const UserManagement = () => {
       name: user.name,
       email: user.email,
       position: user.position,
-      sector: user.sector,
+     
       role: user.role,
       status: user.status
     });
@@ -251,8 +250,6 @@ const UserManagement = () => {
       user.name,
       user.email,
       user.position,
-      user.id,
-      user.sector,
       user.role,
       user.status,
       user.dateJoined,
@@ -301,16 +298,6 @@ const UserManagement = () => {
           </div>
 
           <div className="filters">
-            <select
-              value={filterSector}
-              onChange={(e) => setFilterSector(e.target.value)}
-              className="filter-select"
-            >
-              <option value="">All Sectors</option>
-              {sectors.map(sector => (
-                <option key={sector} value={sector}>{sector}</option>
-              ))}
-            </select>
 
             <select
               value={filterRole}
@@ -338,14 +325,14 @@ const UserManagement = () => {
 
         {/* Action Buttons */}
         <div className="action-buttons">
-          <button
+          {/* <button
             onClick={exportToCSV}
             className="btn btn-secondary"
           >
             <Download size={18} />
             Export CSV
           </button>
-          
+           */}
           <button
             onClick={() => setShowAddModal(true)}
             disabled={!isAdmin}
@@ -369,16 +356,11 @@ const UserManagement = () => {
               <th>Name</th>
               <th>Email</th>
               <th>Position</th>
-              <th>ID</th>
-              <th>Sector</th>
-              <th>Role</th>
+           <th>Role</th>
               {/* <th onClick={() => handleSort('status')} className="sortable">
                 Status <ArrowUpDown size={14} />
               </th> */}
-                 <th onClick={() => handleSort('dateJoined')} className="sortable">
-                Date Joined <ArrowUpDown size={14} />
-              </th> 
-                <th>Status</th>
+                 <th > Status </th> 
               <th>Last Login</th>
               <th>Actions</th>
             </tr>
@@ -390,10 +372,7 @@ const UserManagement = () => {
                 <td className="user-name">{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.position}</td>
-                <td className="user-id">{user.id}</td>
-                <td>
-                  <span className="sector-badge">{user.sector}</span>
-                </td>
+              
                 <td>
                   <span className={`role-badge role-${user.role.toLowerCase()}`}>
                     {user.role}
@@ -404,7 +383,7 @@ const UserManagement = () => {
                     {user.status}
                   </span>
                 </td>
-                <td>{user.dateJoined}</td>
+                
                 <td>{user.lastLogin}</td>
                 <td>
                   <div className="action-buttons-cell">
@@ -521,22 +500,7 @@ const UserManagement = () => {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label>Sector</label>
-                <select
-                  value={formData.sector}
-                  onChange={(e) => setFormData({...formData, sector: e.target.value})}
-                  required
-                >
-                  <option value="">Select Sector</option>
-                  <option value="Tech">Tech</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="HR">HR</option>
-                  <option value="Operations">Operations</option>
-                  <option value="Design">Design</option>
-                  <option value="Finance">Finance</option>
-                </select>
-              </div>
+             
               <div className="form-row">
                 <div className="form-group">
                   <label>Role</label>
@@ -614,19 +578,7 @@ const UserManagement = () => {
               </div>
               <div className="form-group">
                 <label>Sector</label>
-                <select
-                  value={formData.sector}
-                  onChange={(e) => setFormData({...formData, sector: e.target.value})}
-                  required
-                >
-                  <option value="">Select Sector</option>
-                  <option value="Tech">Tech</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="HR">HR</option>
-                  <option value="Operations">Operations</option>
-                  <option value="Design">Design</option>
-                  <option value="Finance">Finance</option>
-                </select>
+               
               </div>
               <div className="form-row">
                 <div className="form-group">

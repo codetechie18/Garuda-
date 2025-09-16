@@ -14,7 +14,6 @@ const INITIAL_REPORTS = [
   { id: 'SEC-003', title: 'Unauthorized Access Attempt', description: 'Failed login attempts detected on privileged accounts from unknown location.', agent: 'Agent Brown', date: '1/14/2024', time: '6 hours ago', priority: 'Medium', status: 'Investigating', category: 'Access Control', details: 'Geographic anomaly detected. Login attempts from Eastern Europe region.', fullDetails: 'Security monitoring systems detected 127 failed login attempts on administrative accounts.' },
   { id: 'SEC-004', title: 'Data Breach Investigation Complete', description: 'Investigation concluded for reported data breach incident. No sensitive data compromised.', agent: 'Agent Davis', date: '1/13/2024', time: '1 day ago', priority: 'Critical', status: 'Resolved', category: 'Data Protection', details: 'Forensic analysis confirmed no data exfiltration occurred. Security measures enhanced.', fullDetails: 'Comprehensive forensic investigation has been completed regarding the reported data breach incident.' },
   { id: 'SEC-005', title: 'Phishing Campaign Detected', description: 'Large-scale phishing email campaign targeting employee credentials identified and blocked.', agent: 'Agent Wilson', date: '1/13/2024', time: '1 day ago', priority: 'High', status: 'Active', category: 'Email Security', details: 'Over 500 malicious emails blocked. User awareness training initiated.', fullDetails: 'Our email security systems detected and blocked a sophisticated phishing campaign consisting of over 500 malicious emails.' },
-  
   { id: 'SEC-006', title: 'SQL Injection Attempt Blocked', description: 'Automated SQL injection attacks detected and successfully mitigated.', agent: 'Agent Taylor', date: '1/12/2024', time: '2 days ago', priority: 'Medium', status: 'Resolved', category: 'Web Application', details: 'Web application firewall blocked multiple injection attempts. Application patched.', fullDetails: 'Web application security monitoring detected multiple SQL injection attempts targeting our customer portal database.' }
 ];
 
@@ -96,23 +95,24 @@ const Reports = ({ user }) => {
           <div className="filters">
             <div className="select-with-icon">
               {statusFilter && statusFilter.startsWith('All') && <Calendar size={16} className="select-icon" />}
-              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="filter-select">
-                <option>All Status</option>
-                <option>New</option>
-                <option>Active</option>
-                <option>Investigating</option>
-                <option>Resolved</option>
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="filter-select" aria-label="Status filter">
+                {/* keep the option value for filtering, but show 'Social Insights' as the visible label */}
+                <option value="All Status" data-icon="calendar">Social Insights</option>
+                <option value="New" data-icon="tag">New</option>
+                <option value="Active" data-icon="tag">Active</option>
+                <option value="Investigating" data-icon="tag">Investigating</option>
+                <option value="Resolved" data-icon="tag">Resolved</option>
               </select>
             </div>
 
             <div className="select-with-icon">
               {severityFilter && severityFilter.startsWith('All') && <Tag size={16} className="select-icon" />}
-              <select value={severityFilter} onChange={e => setSeverityFilter(e.target.value)} className="filter-select">
-                <option>All Severity</option>
-                <option>Critical</option>
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
+              <select value={severityFilter} onChange={e => setSeverityFilter(e.target.value)} className="filter-select" aria-label="Severity filter">
+                <option value="All Severity" data-icon="tag">Social Insights</option>
+                <option value="Critical" data-icon="circle">Critical</option>
+                <option value="High" data-icon="circle">High</option>
+                <option value="Medium" data-icon="circle">Medium</option>
+                <option value="Low" data-icon="circle">Low</option>
               </select>
             </div>
 
