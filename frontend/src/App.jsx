@@ -7,6 +7,7 @@ import Scrape from './components/Scrape';
 import Profile from './components/Profile';
 import Navbar from './components/Navbar';
 import UserManagement from './Pages/UserManagement';
+import ReportTable from './Pages/ReportTable.jsx';
 import './App.css';
 
 
@@ -103,6 +104,10 @@ function App() {
               <Navigate to="/login" replace />
             }
           />
+          <Route 
+            path="/reportstable" 
+            element={<ReportTable />}
+          />  
           <Route path="/" element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />} />
         </Routes>
       </div>

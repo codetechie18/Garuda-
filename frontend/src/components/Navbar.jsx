@@ -148,6 +148,12 @@ const Navbar = ({ user, onLogout }) => {
                 <Link to="/social/search" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Search</Link>
                 <Link to="/scrape" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Scrape</Link>
               </div>
+              <div>
+                <Link to="/reportstable" className={`drawer-link ${isActive('/reportstable') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                  <FileText size={16} />
+                  <span>Reports Table</span>
+                </Link>
+              </div>
               <div className="drawer-section">
                 <div className="drawer-section-title">Reporting</div>
                 <Link to="/reports" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Search</Link>
