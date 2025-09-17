@@ -1,6 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.heat';
 import '../Styles/ReportTable.css';
 import { truncateText } from '../utils.js';
+
+// Helper to highlight hashtags in post text
+function highlightHashtags(text) {
+  if (!text) return '';
+  return text.split(/(#[\w]+)/g).map((part, idx) =>
+    part.startsWith && part.startsWith('#') ?
+      <span key={idx} style={{ color: '#1976d2', fontWeight: 600 }}>{part}</span> :
+      part
+  );
+}
 import { Search } from 'lucide-react';
 import '../Styles/Scrape.css';
 
@@ -111,6 +124,35 @@ const Scrape = () => {
   const [endDate, setEndDate] = useState('');
   const [platform, setPlatform] = useState('');
   const [expandedRow, setExpandedRow] = useState(null);
+
+  // --- Heatmap logic ---
+  const heatmapRef = useRef(null);
+  useEffect(() => {
+    if (!heatmapRef.current) return;
+    // Remove any previous map instance
+    if (window.heatmapLeafletMap) {
+      window.heatmapLeafletMap.remove();
+      window.heatmapLeafletMap = null;
+    }
+    // Center on India for demo
+    const map = L.map(heatmapRef.current).setView([22.9734, 78.6569], 5);
+    window.heatmapLeafletMap = map;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+    // Dummy heat points: [lat, lng, intensity]
+    const points = [
+      [19.076, 72.8777, 0.8], // Mumbai
+      [28.7041, 77.1025, 0.7], // Delhi
+      [13.0827, 80.2707, 0.6], // Chennai
+      [22.5726, 88.3639, 0.9], // Kolkata
+      [12.9716, 77.5946, 0.5], // Bangalore
+      [23.0225, 72.5714, 0.4], // Ahmedabad
+      [26.9124, 75.7873, 0.3], // Jaipur
+      [17.385, 78.4867, 0.6], // Hyderabad
+    ];
+    L.heatLayer(points, { radius: 35, blur: 25, maxZoom: 10 }).addTo(map);
+  }, []);
 
   // Note: Browsers cannot scrape arbitrary sites due to CORS and legal constraints.
   // This component simulates a search and provides instructions for backend integration.
@@ -283,8 +325,10 @@ const Scrape = () => {
                         <span className={`platform-badge platform-badge--${report.platform?.toLowerCase()}`}>{report.platform}</span>
                       </td>
                       <td className="report-table__cell report-table__cell--post">
-                        {truncateText(report.post, 80)}
-                        {report.post.length > 80 && <span style={{ color: '#1976d2', marginLeft: 6, fontWeight: 500 }}> ...more</span>}
+                        <span>
+                          {highlightHashtags(truncateText(report.post, 80))}
+                          {report.post.length > 80 && <span style={{ color: '#1976d2', marginLeft: 6, fontWeight: 500 }}> ...more</span>}
+                        </span>
                       </td>
                       <td className="report-table__cell report-table__cell--user">
                         <div className="user-details">
@@ -325,7 +369,7 @@ const Scrape = () => {
                       <tr key={`expand-${report.id}`} className="report-table__row expanded-info-row">
                         <td colSpan={10} style={{ background: '#f3f4f6', padding: '1.5rem 2rem', whiteSpace: 'normal', wordBreak: 'break-word' }}>
                           <div style={{ fontWeight: 600, marginBottom: 8 }}>Full Post:</div>
-                          <div style={{ marginBottom: 12, whiteSpace: 'pre-line' }}>{report.post}</div>
+                          <div style={{ marginBottom: 12, whiteSpace: 'pre-line' }}>{highlightHashtags(report.post)}</div>
                           <div style={{ fontWeight: 600, marginBottom: 8 }}>User Details:</div>
                           <div>Name: {report.user?.name}</div>
                           <div>Username: {report.user?.username}</div>
@@ -350,7 +394,28 @@ const Scrape = () => {
       
       </div>
 
-  {/* styles moved to Scrape.css */}
+      {/* Heat Map Section */}
+      <div style={{ margin: '48px auto 0', maxWidth: 1200, width: '100%', background: '#fff', borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.07)', padding: 32 }}>
+        <h2 style={{ color: '#1976d2', marginBottom: 24 }}>Heat Map of Reports <span style={{ fontSize: 18, color: '#888' }}>(Demo)</span></h2>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 32, width: '100%' }}>
+          <div style={{ width: '50%', minWidth: 320, height: 350, borderRadius: 8, position: 'relative', marginBottom: 0, overflow: 'hidden' }}>
+            <div ref={heatmapRef} id="heatmap-map" style={{ width: '100%', height: '100%' }}></div>
+          </div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: 350 }}>
+            <div style={{ display: 'flex', gap: 32, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+              <span title="Facebook" style={{ fontSize: 32 }}><i className="fa-brands fa-facebook" style={{ color: '#1877f2' }}></i></span>
+              <span title="Twitter" style={{ fontSize: 32 }}><i className="fa-brands fa-twitter" style={{ color: '#1da1f2' }}></i></span>
+              <span title="Instagram" style={{ fontSize: 32 }}><i className="fa-brands fa-instagram" style={{ color: '#e6683c' }}></i></span>
+              <span title="LinkedIn" style={{ fontSize: 32 }}><i className="fa-brands fa-linkedin" style={{ color: '#0077b5' }}></i></span>
+              <span title="Reddit" style={{ fontSize: 32 }}><i className="fa-brands fa-reddit" style={{ color: '#ff4500' }}></i></span>
+              <span title="YouTube" style={{ fontSize: 32 }}><i className="fa-brands fa-youtube" style={{ color: '#ff0000' }}></i></span>
+              <span title="TikTok" style={{ fontSize: 32 }}><i className="fa-brands fa-tiktok" style={{ color: '#000' }}></i></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+ 
     </div>
   );
 };

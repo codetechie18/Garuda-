@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PostModal from './PostModal.jsx';
 import ReportModal from './ReportModal.jsx';
 import { truncateText, openGoogleMaps } from '../utils.js';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Filter, X, RefreshCw, Eye, AlertTriangle } from 'lucide-react';
 import '../Styles/ReportTable.css';
 
 // Sample data 
@@ -97,8 +98,6 @@ const sampleReports = [
     user: {
       name: 'Kartik Bisen',
       username: '@kartik_bisen',
-    //   email: 'kartik.bisen@company.com',
-    //   phone: '+1-555-0167'
     },
     toxicitySeverity: 'High',
     toxicityScore: 7.9,
@@ -131,6 +130,86 @@ const ReportTable = () => {
   const [reportingPost, setReportingPost] = useState(null);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  // Search and Filter state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPlatform, setSelectedPlatform] = useState('');
+  const [selectedSeverity, setSelectedSeverity] = useState('');
+
+  // Get unique platforms and severities for filter options
+  const platforms = [...new Set(sampleReports.map(report => report.platform))];
+  const severities = [...new Set(sampleReports.map(report => report.toxicitySeverity))];
+
+  // Refresh functionality
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // In a real app, you would fetch fresh data from your API here
+    // For now, we'll just reset to first page and show a refresh animation
+    setCurrentPage(1);
+    
+    setIsRefreshing(false);
+  };
+
+  // Filter and search logic
+  const filteredReports = sampleReports.filter(report => {
+    const matchesSearch = searchTerm === '' || 
+      report.post.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.policeStation.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesPlatform = selectedPlatform === '' || report.platform === selectedPlatform;
+    const matchesSeverity = selectedSeverity === '' || report.toxicitySeverity === selectedSeverity;
+    
+    return matchesSearch && matchesPlatform && matchesSeverity;
+  });
+
+  // Calculate pagination with filtered data
+  const totalItems = filteredReports.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentReports = filteredReports.slice(startIndex, endIndex);
+
+  // Reset pagination when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedPlatform, selectedSeverity]);
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedPlatform('');
+    setSelectedSeverity('');
+    setCurrentPage(1);
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = searchTerm || selectedPlatform || selectedSeverity;
+
+  // Pagination handlers
+  const goToPage = (page) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const goToFirstPage = () => setCurrentPage(1);
+  const goToLastPage = () => setCurrentPage(totalPages);
+  const goToPreviousPage = () => setCurrentPage(prev => Math.max(1, prev - 1));
+  const goToNextPage = () => setCurrentPage(prev => Math.min(totalPages, prev + 1));
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
 
   const handlePostClick = (report) => {
     setSelectedPost(report);
@@ -143,12 +222,7 @@ const ReportTable = () => {
   };
 
   const handleLocationClick = (lat, lng) => {
-    // Option A: Open Google Maps in new tab (currently implemented)
     openGoogleMaps(lat, lng);
-    
-    // Option B: To use embedded Leaflet map instead, uncomment below and comment out the line above:
-    // setSelectedLocation({ lat, lng });
-    // setIsMapModalOpen(true);
   };
 
   const getSeverityClass = (severity) => {
@@ -156,197 +230,312 @@ const ReportTable = () => {
   };
 
   return (
-    <div className="report-table-container">
-      {/* Desktop Table View */}
-      <div className="report-table__wrapper">
-        <table className="report-table" role="table">
-          <thead>
-            <tr>
-              <th scope="col">Platform</th>
-              <th scope="col">Post</th>
-              <th scope="col">User Details</th>
-              <th scope="col">Severity</th>
-              <th scope="col">Toxicity</th>
-              <th scope="col">Post Link</th>
-              <th scope="col">Location</th>
-              <th scope="col">Police Station</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sampleReports.map((report) => (
-              <tr key={report.id} className="report-table__row">
-                <td className="report-table__cell report-table__cell--platform">
-                  <span className={`platform-badge platform-badge--${report.platform.toLowerCase()}`}>
-                    {report.platform}
-                  </span>
-                </td>
-                
-                <td className="report-table__cell report-table__cell--post">
-                  <button 
-                    className="post-preview"
-                    onClick={() => handlePostClick(report)}
-                    aria-label={`View full post: ${truncateText(report.post, 50)}`}
-                  >
-                    {truncateText(report.post, 80)}
-                  </button>
-                </td>
-
-                <td className="report-table__cell report-table__cell--user">
-                  <div className="user-details">
-                    <div className="user-details__name">{report.user.name}</div>
-                    <div className="user-details__username">{report.user.username}</div>
-                    {report.user.email && (
-                      <div className="user-details__contact">{report.user.email}</div>
-                    )}
-                    {report.user.phone && (
-                      <div className="user-details__contact">{report.user.phone}</div>
-                    )}
-                  </div>
-                </td>
-
-                <td className="report-table__cell">
-                  <span className={getSeverityClass(report.toxicitySeverity)}>
-                    {report.toxicitySeverity}
-                  </span>
-                </td>
-
-                <td className="report-table__cell report-table__cell--toxicity">
-                  <div className="toxicity-info">
-                    <div className="toxicity-info__score">{report.toxicityScore}/10</div>
-                    <div className="toxicity-info__tags">
-                      {report.toxicityTags.map((tag, index) => (
-                        <span key={index} className="toxicity-tag">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </td>
-
-                <td className="report-table__cell">
-                  <a 
-                    href={report.postLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="post-link"
-                    aria-label="Open original post in new tab"
-                  >
-                    View Post
-                  </a>
-                </td>
-
-                <td className="report-table__cell">
-                  <button
-                    className="location-coords"
-                    onClick={() => handleLocationClick(report.location.lat, report.location.lng)}
-                    aria-label={`View location ${report.location.lat}, ${report.location.lng} on map`}
-                  >
-                    {report.location.lat}, {report.location.lng}
-                  </button>
-                </td>
-
-                <td className="report-table__cell report-table__cell--police">
-                  {report.policeStation}
-                </td>
-
-                <td className="report-table__cell">
-                  <button 
-                    className="report-button"
-                    onClick={() => handleReportClick(report)}
-                    aria-label={`Report this post from ${report.platform}`}
-                  >
-                    Report
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="security-reports">
+      {/* Page Header */}
+      <div className="security-reports__header">
+        <div className="header-content">
+          <div className="header-text">
+            <h1 className="security-reports__title">Security Reports</h1>
+            <p className="security-reports__subtitle">
+              Monitor and manage reported content across social media platforms
+            </p>
+          </div>
+          <button 
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className={`refresh-btn ${isRefreshing ? 'refreshing' : ''}`}
+            title="Refresh data"
+          >
+            <RefreshCw size={20} className={`refresh-icon ${isRefreshing ? 'spinning' : ''}`} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Card View */}
-      <div className="report-cards">
-        {sampleReports.map((report) => (
-          <div key={`card-${report.id}`} className="report-card">
-            <div className="report-card__header">
-              <span className={`platform-badge platform-badge--${report.platform.toLowerCase()}`}>
-                {report.platform}
-              </span>
-              <span className={getSeverityClass(report.toxicitySeverity)}>
-                {report.toxicitySeverity}
-              </span>
-            </div>
-
-            <div className="report-card__content">
-              <div className="report-card__section">
-                <h4>Post Content</h4>
-                <button 
-                  className="post-preview"
-                  onClick={() => handlePostClick(report)}
-                >
-                  {truncateText(report.post, 120)}
-                </button>
-              </div>
-
-              <div className="report-card__section">
-                <h4>User</h4>
-                <div className="user-details">
-                  <div className="user-details__name">{report.user.name}</div>
-                  <div className="user-details__username">{report.user.username}</div>
-                  {report.user.email && (
-                    <div className="user-details__contact">{report.user.email}</div>
-                  )}
-                  {report.user.phone && (
-                    <div className="user-details__contact">{report.user.phone}</div>
-                  )}
-                </div>
-              </div>
-
-              <div className="report-card__section">
-                <h4>Toxicity</h4>
-                <div className="toxicity-info">
-                  <div className="toxicity-info__score">{report.toxicityScore}/10</div>
-                  <div className="toxicity-info__tags">
-                    {report.toxicityTags.map((tag, index) => (
-                      <span key={index} className="toxicity-tag">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="report-card__section">
-                <h4>Location</h4>
+      {/* Search and Filter Section */}
+      <div className="security-reports__filters">
+        <div className="search-filter-row">
+          <div className="search-bar">
+            <div className="search-input-wrapper">
+              <Search size={20} className="search-icon" />
+              <input
+                type="text"
+                placeholder="Search posts, users, police stations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              {searchTerm && (
                 <button
-                  className="location-coords"
-                  onClick={() => handleLocationClick(report.location.lat, report.location.lng)}
+                  onClick={() => setSearchTerm('')}
+                  className="clear-search-btn"
+                  aria-label="Clear search"
                 >
-                  {report.location.lat}, {report.location.lng}
+                  <X size={16} />
                 </button>
-                <div className="police-station">{report.policeStation}</div>
-              </div>
-
-              <div className="report-card__actions">
-                <a 
-                  href={report.postLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="post-link"
-                >
-                  View Post
-                </a>
-                <button 
-                  className="report-button"
-                  onClick={() => handleReportClick(report)}
-                >
-                  Report
-                </button>
-              </div>
+              )}
             </div>
           </div>
-        ))}
+
+          <div className="filter-controls">
+            <div className="filter-group">
+              <select
+                id="platform-filter"
+                value={selectedPlatform}
+                onChange={(e) => setSelectedPlatform(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">All Platforms</option>
+                {platforms.map(platform => (
+                  <option key={platform} value={platform}>{platform}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <select
+                id="severity-filter"
+                value={selectedSeverity}
+                onChange={(e) => setSelectedSeverity(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">All Severities</option>
+                {severities.map(severity => (
+                  <option key={severity} value={severity}>{severity}</option>
+                ))}
+              </select>
+            </div>
+
+            {hasActiveFilters && (
+              <button onClick={clearFilters} className="clear-all-btn">
+                Clear All
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Active Filters */}
+        {hasActiveFilters && (
+          <div className="active-filters">
+            {selectedPlatform && (
+              <span className="filter-tag">
+                Platform: {selectedPlatform}
+                <button onClick={() => setSelectedPlatform('')}>
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+            {selectedSeverity && (
+              <span className="filter-tag">
+                Severity: {selectedSeverity}
+                <button onClick={() => setSelectedSeverity('')}>
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Results Summary */}
+      <div className="security-reports__summary">
+        <span className="results-count">
+          {hasActiveFilters ? (
+            <>Showing {totalItems} of {sampleReports.length} reports</>
+          ) : (
+            <>Total {totalItems} reports</>
+          )}
+        </span>
+        {isRefreshing && (
+          <span className="refresh-status">
+            Refreshing data...
+          </span>
+        )}
+      </div>
+
+      {/* Reports Table */}
+      <div className="security-reports__content">
+        <div className="reports-table-wrapper">
+          <table className="reports-table">
+            <thead>
+              <tr>
+                <th>Platform</th>
+                <th>Content</th>
+                <th>User</th>
+                <th>Severity</th>
+                <th>Toxicity Score</th>
+                <th>Coordinates</th>
+                <th>Police Station</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentReports.length > 0 ? (
+                currentReports.map((report) => (
+                  <tr key={report.id} className="reports-table__row">
+                    <td>
+                      <span className={`platform-badge platform-badge--${report.platform.toLowerCase()}`}>
+                        {report.platform}
+                      </span>
+                    </td>
+                    
+                    <td className="content-cell">
+                      <button 
+                        className="content-preview"
+                        onClick={() => handlePostClick(report)}
+                      >
+                        {truncateText(report.post, 60)}
+                      </button>
+                    </td>
+
+                    <td className="user-cell">
+                      <div className="user-info">
+                        <div className="user-name">{report.user.name}</div>
+                        <div className="user-handle">{report.user.username}</div>
+                      </div>
+                    </td>
+
+                    <td>
+                      <span className={`severity-badge severity-${report.toxicitySeverity.toLowerCase()}`}>
+                        {report.toxicitySeverity}
+                      </span>
+                    </td>
+
+                    <td className="toxicity-cell">
+                      <div className="toxicity-score">{report.toxicityScore}/10</div>
+                      <div className="toxicity-tags">
+                        {report.toxicityTags.slice(0, 2).map((tag, index) => (
+                          <span key={index} className="tag">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="coordinates-cell">
+                      <button
+                        className="coordinates-btn"
+                        onClick={() => handleLocationClick(report.location.lat, report.location.lng)}
+                        title="Click to view on map"
+                      >
+                        <div className="coordinates-lat">Lat: {report.location.lat.toFixed(4)}</div>
+                        <div className="coordinates-lng">Lng: {report.location.lng.toFixed(4)}</div>
+                      </button>
+                    </td>
+
+                    <td className="station-cell">
+                      {truncateText(report.policeStation, 20)}
+                    </td>
+
+                    <td className="actions-cell">
+                      <div className="action-buttons">
+                        <button 
+                          className="btn btn-view"
+                          onClick={() => handlePostClick(report)}
+                          title="View details"
+                        >
+                          <Eye size={14} />
+                          View
+                        </button>
+                       
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="no-results">
+                    <div className="no-results-content">
+                      <p>No reports found matching your criteria</p>
+                      {hasActiveFilters && (
+                        <button onClick={clearFilters} className="btn btn-outline">
+                          Clear Filters
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {totalItems > 0 && (
+          <div className="pagination-container">
+            <div className="pagination-info">
+              <span>
+                Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems}
+              </span>
+              <select 
+                value={itemsPerPage} 
+                onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                className="items-per-page"
+              >
+                <option value={5}>5 per page</option>
+                <option value={10}>10 per page</option>
+                <option value={20}>20 per page</option>
+                <option value={50}>50 per page</option>
+              </select>
+            </div>
+
+            <div className="pagination-controls">
+              <button 
+                onClick={goToFirstPage}
+                disabled={currentPage === 1}
+                className="pagination-btn"
+              >
+                <ChevronsLeft size={16} />
+              </button>
+              
+              <button 
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+                className="pagination-btn"
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              <div className="page-numbers">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    return page === 1 || 
+                           page === totalPages || 
+                           Math.abs(page - currentPage) <= 1;
+                  })
+                  .map((page, index, array) => (
+                    <React.Fragment key={page}>
+                      {index > 0 && array[index - 1] !== page - 1 && (
+                        <span className="pagination-ellipsis">...</span>
+                      )}
+                      <button
+                        className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                        onClick={() => goToPage(page)}
+                      >
+                        {page}
+                      </button>
+                    </React.Fragment>
+                  ))}
+              </div>
+
+              <button 
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                className="pagination-btn"
+              >
+                <ChevronRight size={16} />
+              </button>
+              
+              <button 
+                onClick={goToLastPage}
+                disabled={currentPage === totalPages}
+                className="pagination-btn"
+              >
+                <ChevronsRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modals */}

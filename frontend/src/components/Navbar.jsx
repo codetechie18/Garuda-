@@ -136,31 +136,34 @@ const Navbar = ({ user, onLogout }) => {
                 <BarChart3 size={16} />
                 <span>Dashboard</span>
               </Link>
-              <div className="drawer-section">
-                <div className="drawer-section-title">Social Insights</div>
-                <Link to="/social/search" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Search</Link>
-                <Link to="/scrape" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Scrape</Link>
-              </div>
-              <div>
-                <Link to="/reportstable" className={`drawer-link ${isActive('/reportstable') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-                  <FileText size={16} />
-                  <span>Reports Table</span>
-                </Link>
-              </div>
-              <div className="drawer-section">
-                <div className="drawer-section-title">Reporting</div>
-                <Link to="/reports" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Search</Link>
-                <Link to="/reports/quick" className="drawer-sublink" onClick={() => setMobileMenuOpen(false)}>Quick Report</Link>
-              </div>
-<Link 
-  to="/usermanagement" 
-  className="drawer-link" 
-  onClick={() => setMobileMenuOpen(false)}
->
-  User Management
-</Link>
-              <Link to="/admin" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>Administration</Link>
-              <Link to="/scheduler" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>Scheduler</Link>
+              <Link to="/scrape" className={`drawer-link ${isActive('/scrape') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                <Search size={16} />
+                <span>Social Insights</span>
+              </Link>
+              <Link to="/reports" className={`drawer-link ${isActive('/reports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                <FileText size={16} />
+                <span>Reporting</span>
+              </Link>
+              <Link to="/Reportstable" className={`drawer-link ${isActive('/Reportstable') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                <FileText size={16} />
+                <span>Reportstable</span>
+              </Link>
+              <Link 
+                to="/usermanagement" 
+                className={`drawer-link ${isActive('/usermanagement') ? 'active' : ''}`} 
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <User size={16} />
+                <span>User Management</span>
+              </Link>
+              <Link to="/admin" className={`drawer-link ${isActive('/admin') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                <Settings size={16} />
+                <span>Administration</span>
+              </Link>
+              <Link to="/scheduler" className={`drawer-link ${isActive('/scheduler') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                <Calendar size={16} />
+                <span>Scheduler</span>
+              </Link>
             </nav>
           </aside>
         </>
