@@ -206,10 +206,8 @@
 }
 
 .hamburger.open {
-  left: auto;
-  right: 8px;
-  transform: translateY(-50%);
-  transition: left 220ms ease, right 220ms ease, transform 220ms ease;
+  
+  z-index: -1200;
 }
 
 .close-drawer {
