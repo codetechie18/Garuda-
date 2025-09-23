@@ -2876,7 +2876,8 @@
 .action-buttons {
   display: flex;
   gap: 0.5rem;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
 }
 
 .btn {

@@ -1069,3 +1069,205 @@
         gap: 0.75rem;
     }
 }
+
+/* Compact Search and Filter Layout */
+.search-filter-container {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.search-section-compact {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.search-inputs-row {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.search-input-group {
+  flex: 1;
+  min-width: 140px;
+}
+
+.filter-section-compact {
+  margin-top: 16px;
+}
+
+.filter-inputs-row {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.filter-input-group {
+  flex: 1;
+  min-width: 120px;
+}
+
+.compact-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.form-input-compact,
+.filter-input-compact {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input-compact:focus,
+.filter-input-compact:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.hashtag-input {
+  border-color: #3b82f6 !important;
+  background: #eff6ff !important;
+}
+
+.username-input {
+  border-color: #10b981 !important;
+  background: #ecfdf5 !important;
+}
+
+.compact-search-btn {
+  flex-shrink: 0;
+  min-width: 100px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.clear-filters-btn-compact {
+  flex-shrink: 0;
+  min-width: 110px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.clear-filters-btn-compact:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.clear-filters-btn-compact:disabled {
+  background: #f9fafb;
+  border-color: #e5e7eb;
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* Responsive Design for Compact Layout */
+@media (max-width: 1024px) {
+  .search-inputs-row,
+  .filter-inputs-row {
+    gap: 10px;
+  }
+  
+  .search-input-group,
+  .filter-input-group {
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-filter-container {
+    padding: 16px;
+    margin: 0 -8px 20px -8px;
+  }
+  
+  .search-inputs-row,
+  .filter-inputs-row {
+    gap: 8px;
+  }
+  
+  .search-input-group,
+  .filter-input-group {
+    min-width: 100px;
+    flex: 1 1 calc(50% - 4px);
+  }
+  
+  .compact-search-btn,
+  .clear-filters-btn-compact {
+    flex: 1 1 100%;
+    min-width: 100%;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-filter-container {
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  .search-inputs-row,
+  .filter-inputs-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .search-input-group,
+  .filter-input-group {
+    min-width: 100%;
+    flex: none;
+  }
+  
+  .compact-label {
+    font-size: 11px;
+  }
+  
+  .form-input-compact,
+  .filter-input-compact {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .compact-search-btn {
+    width: 100%;
+    margin-top: 4px;
+    height: 42px;
+  }
+  
+  .clear-filters-btn-compact {
+    width: 100%;
+    margin-top: 8px;
+    height: 42px;
+  }
+}

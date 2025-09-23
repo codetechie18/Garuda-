@@ -123,6 +123,7 @@ const Scrape = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [platform, setPlatform] = useState('');
+  const [severity, setSeverity] = useState('');
   const [expandedRow, setExpandedRow] = useState(null);
   const [filteredResults, setFilteredResults] = useState([]);
   const [chartData, setChartData] = useState({ pieData: [], barData: [] });
@@ -183,6 +184,13 @@ const Scrape = () => {
       );
     }
 
+    // Filter by severity
+    if (severity && severity !== '') {
+      filtered = filtered.filter(result => 
+        result.toxicitySeverity.toLowerCase() === severity.toLowerCase()
+      );
+    }
+
     // Filter by date range
     if (startDate) {
       filtered = filtered.filter(result => {
@@ -201,38 +209,9 @@ const Scrape = () => {
     }
 
     setFilteredResults(filtered);
-  }, [results, platform, location, startDate, endDate]);
+  }, [results, platform, location, severity, startDate, endDate]);
 
-  // --- Heatmap logic ---
-  const heatmapRef = useRef(null);
-  useEffect(() => {
-    if (!heatmapRef.current) return;
-    if (window.heatmapLeafletMap) {
-      window.heatmapLeafletMap.remove();
-      window.heatmapLeafletMap = null;
-    }
-    // Center on India for demo
-    const map = L.map(heatmapRef.current).setView([22.9734, 78.6569], 5);
-    window.heatmapLeafletMap = map;
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-    }).addTo(map);
-    // Dummy heat points: [lat, lng, intensity]
-    const points = [
-      [19.076, 72.8777, 0.8], // Mumbai
-      [28.7041, 77.1025, 0.7], // Delhi
-      [13.0827, 80.2707, 0.6], // Chennai
-      [22.5726, 88.3639, 0.9], // Kolkata
-      [12.9716, 77.5946, 0.5], // Bangalore
-      [23.0225, 72.5714, 0.4], // Ahmedabad
-      [26.9124, 75.7873, 0.3], // Jaipur
-      [17.385, 78.4867, 0.6], // Hyderabad
-    ];
-    L.heatLayer(points, { radius: 35, blur: 25, maxZoom: 10 }).addTo(map);
-  }, []);
-
-  // Note: Browsers cannot scrape arbitrary sites due to CORS and legal constraints.
-  // This component simulates a search and provides instructions for backend integration.
+// This component simulates a search and provides instructions for backend integration.
   const performSearch = async (e) => {
     e.preventDefault();
     setError(null);
@@ -311,82 +290,133 @@ const Scrape = () => {
         {/* <p>Search posts on the internet by hashtag or username. Note: this UI simulates searching. For real scraping, connect to a backend API that performs authorized scraping or uses official platform APIs.</p> */}
 
         <form className="scrape-form" onSubmit={performSearch}>
-          <div className="form-row">
-            <select value={type} onChange={e => setType(e.target.value)} className="form-select">
-              <option value="hashtag">Hashtag</option>
-              <option value="username">Username</option>
-            </select>
-            <input className="form-input" placeholder={type === 'hashtag' ? 'e.g. cybersecurity' : 'e.g. nasa'} value={query} onChange={e => setQuery(e.target.value)} />
-            <button className="btn btn-primary" type="submit" disabled={loading}><Search size={16} /> {loading ? 'Searching...' : 'Search'}</button>
-          </div>
-          <div className="form-row filter-row">
-            <div className="filter-group">
-              <label className="filter-label">Location Filter</label>
-              <input
-                className="filter-input-location"
-                placeholder="Location (e.g. Nagpur)"
-                value={location}
-                onChange={e => setLocation(e.target.value)}
-              />
-            </div>
-            <div className="filter-group">
-              <label className="filter-label">Starting Date</label>
-              <input
-                className="filter-input-date"
-                type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-                title="Start Date"
-                placeholder="Start Date"
-              />
-            </div>
-            <div className="filter-group">
-              <label className="filter-label">Ending Date</label>
-              <input
-                className="filter-input-date"
-                type="date"
-                value={endDate}
-                onChange={e => setEndDate(e.target.value)}
-                title="End Date"
-                placeholder="End Date"
-              />
-            </div>
-              <div className="filter-group">
-                <label className="filter-label">Platform</label>
-                <select
-                  className="filter-input-platform"
-                  value={platform}
-                  onChange={e => setPlatform(e.target.value)}
+          <div className="search-filter-container">
+            {/* Search Section */}
+            <div className="search-section-compact">
+              <div className="search-inputs-row">
+                <div className="search-input-group">
+                  <label className="compact-label">Hashtag</label>
+                  <input 
+                    className="form-input-compact hashtag-input" 
+                    placeholder="#cybersecurity" 
+                    value={type === 'hashtag' ? query : ''} 
+                    onChange={e => {
+                      setQuery(e.target.value);
+                      setType('hashtag');
+                    }} 
+                  />
+                </div>
+                
+                <div className="search-input-group">
+                  <label className="compact-label">Username</label>
+                  <input 
+                    className="form-input-compact username-input" 
+                    placeholder="@username" 
+                    value={type === 'username' ? query : ''} 
+                    onChange={e => {
+                      setQuery(e.target.value);
+                      setType('username');
+                    }} 
+                  />
+                </div>
+                
+                <button 
+                  className="btn btn-primary compact-search-btn" 
+                  type="button" 
+                  disabled={loading || !query}
+                  onClick={performSearch}
                 >
-                  <option value="">All Platforms</option>
-                  <option value="example.com">example.com</option>
-                  <option value="twitter">Twitter</option>
-                  <option value="facebook">Facebook</option>
-                  <option value="instagram">Instagram</option>
-                  <option value="linkedin">LinkedIn</option>
-                  <option value="reddit">Reddit</option>
-                </select>
+                  <Search size={14} /> Search
+                </button>
               </div>
-              {/* <div className="filter-group filter-actions">
-                <label className="filter-label">Actions</label>
+            </div>
+            
+            {/* Filter Section */}
+            <div className="filter-section-compact">
+              <div className="filter-inputs-row">
+                <div className="filter-input-group">
+                  <label className="compact-label">Location</label>
+                  <input
+                    className="filter-input-compact"
+                    placeholder="Nagpur"
+                    value={location}
+                    onChange={e => setLocation(e.target.value)}
+                  />
+                </div>
+                
+                <div className="filter-input-group">
+                  <label className="compact-label">Platform</label>
+                  <select
+                    className="filter-input-compact"
+                    value={platform}
+                    onChange={e => setPlatform(e.target.value)}
+                  >
+                    <option value="">All</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="Twitter">Twitter</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="TikTok">TikTok</option>
+                    <option value="YouTube">YouTube</option>
+                    <option value="LinkedIn">LinkedIn</option>
+                    <option value="Reddit">Reddit</option>
+                  </select>
+                </div>
+                
+                <div className="filter-input-group">
+                  <label className="compact-label">Severity</label>
+                  <select
+                    className="filter-input-compact"
+                    value={severity}
+                    onChange={e => setSeverity(e.target.value)}
+                  >
+                    <option value="">All</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                
+                <div className="filter-input-group">
+                  <label className="compact-label">Start Date</label>
+                  <input
+                    className="filter-input-compact"
+                    type="date"
+                    value={startDate}
+                    onChange={e => setStartDate(e.target.value)}
+                  />
+                </div>
+                
+                <div className="filter-input-group">
+                  <label className="compact-label">End Date</label>
+                  <input
+                    className="filter-input-compact"
+                    type="date"
+                    value={endDate}
+                    onChange={e => setEndDate(e.target.value)}
+                  />
+                </div>
+                
                 <button 
                   type="button"
-                  className="btn btn-secondary clear-filters-btn"
+                  className="btn btn-outline clear-filters-btn-compact"
                   onClick={() => {
                     setLocation('');
                     setStartDate('');
                     setEndDate('');
                     setPlatform('');
+                    setSeverity('');
                   }}
-                  disabled={!location && !startDate && !endDate && !platform}
+                  disabled={!location && !startDate && !endDate && !platform && !severity}
+                  title="Clear all filters"
                 >
-    nn             Clear Filters
+                  Clear Filters
                 </button>
-              </div> */}
+              </div>
+            </div>
           </div>
           
           {/* Filter Status */}
-          {(location || startDate || endDate || platform) && (
+          {(location || startDate || endDate || platform || severity) && (
             <div className="filter-status">
               <span className="filter-status-text">
                 Active Filters: 
@@ -394,6 +424,7 @@ const Scrape = () => {
                 {startDate && <span className="filter-tag">From: {startDate}</span>}
                 {endDate && <span className="filter-tag">To: {endDate}</span>}
                 {platform && <span className="filter-tag">Platform: {platform}</span>}
+                {severity && <span className="filter-tag">Severity: {severity}</span>}
               </span>
               <span className="results-count">
                 Showing {filteredResults.length} of {results.length} results
@@ -404,66 +435,7 @@ const Scrape = () => {
 
         {error && <div className="error">{error}</div>}
 
-        {/* Charts Section */}
-        {results.length > 0 && (
-          <div className="analytics-dashboard">
-            <h2 className="dashboard-title">
-              Analytics Dashboard
-              {(location || startDate || endDate || platform) && (
-                <span className="dashboard-filter-indicator"> (Filtered Data)</span>
-              )}
-            </h2>
-            <div className="charts-grid">
-              <div className="chart-card">
-                <div className="chart-header">
-                  <h3 className="chart-title">Toxicity Severity Distribution</h3>
-                </div>
-                <div className="chart-content">
-                  <ResponsiveContainer>
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius="70%"
-                        innerRadius="35%"
-                        paddingAngle={2}
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-              
-              <div className="chart-card">
-                <div className="chart-header">
-                  <h3 className="chart-title">Platform Analytics</h3>
-                </div>
-                <div className="chart-content">
-                  <ResponsiveContainer>
-                    <BarChart data={barData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="platform" />
-                      <YAxis yAxisId="left" />
-                      <YAxis yAxisId="right" orientation="right" />
-                      <Tooltip />
-                      <Legend />
-                      <Bar yAxisId="left" dataKey="count" fill="#3b82f6" name="Report Count" />
-                      <Bar yAxisId="right" dataKey="toxicityAvg" fill="#10b981" name="Avg Toxicity Score" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+       
 
   <div className="report-table-container">
           <div className="report-table__wrapper">

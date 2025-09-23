@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import PostModal from './PostModal.jsx';
 import ReportModal from './ReportModal.jsx';
 import { truncateText, openGoogleMaps } from '../utils.js';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Filter, X, RefreshCw, Eye, AlertTriangle, Flag } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Filter, RefreshCw, Eye, AlertTriangle, Flag } from 'lucide-react';
 import '../Styles/ReportTable.css';
+import '../Styles/Scrape.css';
 
 // Sample data 
 const sampleReports = [
@@ -137,13 +138,19 @@ const ReportTable = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
   // Search and Filter state
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('');
   const [selectedSeverity, setSelectedSeverity] = useState('');
+  
+  // New state for hashtag/username search
+  const [query, setQuery] = useState('');
+  const [type, setType] = useState('hashtag'); // 'hashtag' or 'username'
+  const [location, setLocation] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
-  // Get unique platforms and severities for filter options
-  const platforms = [...new Set(sampleReports.map(report => report.platform))];
-  const severities = [...new Set(sampleReports.map(report => report.toxicitySeverity))];
+  // Get unique platforms and severities for filter options (now using static lists)
+  // const platforms = [...new Set(sampleReports.map(report => report.platform))];
+  // const severities = [...new Set(sampleReports.map(report => report.toxicitySeverity))];
 
   // Refresh functionality
   const handleRefresh = async () => {
@@ -159,18 +166,41 @@ const ReportTable = () => {
     setIsRefreshing(false);
   };
 
+  // Search functionality
+  const performSearch = (e) => {
+    if (e) e.preventDefault();
+    // In a real app, you would make an API call here
+    // For now, we'll just show the sample data
+    console.log('Searching for:', query, 'Type:', type);
+  };
+
   // Filter and search logic
   const filteredReports = sampleReports.filter(report => {
-    const matchesSearch = searchTerm === '' || 
-      report.post.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.policeStation.toLowerCase().includes(searchTerm.toLowerCase());
+    // Hashtag/username search
+    const matchesQuery = query === '' || 
+      (type === 'hashtag' && report.post.toLowerCase().includes(query.toLowerCase())) ||
+      (type === 'username' && (
+        report.user.username.toLowerCase().includes(query.toLowerCase()) ||
+        report.user.name.toLowerCase().includes(query.toLowerCase())
+      ));
     
+    // Platform filter
     const matchesPlatform = selectedPlatform === '' || report.platform === selectedPlatform;
+    
+    // Severity filter
     const matchesSeverity = selectedSeverity === '' || report.toxicitySeverity === selectedSeverity;
     
-    return matchesSearch && matchesPlatform && matchesSeverity;
+    // Location filter
+    const matchesLocation = location === '' || 
+      report.policeStation.toLowerCase().includes(location.toLowerCase());
+    
+    // Date filters
+    const reportDate = new Date(report.reportedAt);
+    const matchesStartDate = startDate === '' || reportDate >= new Date(startDate);
+    const matchesEndDate = endDate === '' || reportDate <= new Date(endDate);
+    
+    return matchesQuery && matchesPlatform && matchesSeverity && 
+           matchesLocation && matchesStartDate && matchesEndDate;
   });
 
   // Calculate pagination with filtered data
@@ -183,18 +213,22 @@ const ReportTable = () => {
   // Reset pagination when filters change
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedPlatform, selectedSeverity]);
+  }, [selectedPlatform, selectedSeverity, query, location, startDate, endDate]);
 
   // Clear all filters
   const clearFilters = () => {
-    setSearchTerm('');
     setSelectedPlatform('');
     setSelectedSeverity('');
+    setQuery('');
+    setLocation('');
+    setStartDate('');
+    setEndDate('');
     setCurrentPage(1);
   };
 
   // Check if any filters are active
-  const hasActiveFilters = searchTerm || selectedPlatform || selectedSeverity;
+  const hasActiveFilters = selectedPlatform || selectedSeverity || 
+                          query || location || startDate || endDate;
 
   // Pagination handlers
   const goToPage = (page) => {
@@ -225,10 +259,6 @@ const ReportTable = () => {
     openGoogleMaps(lat, lng);
   };
 
-  const getSeverityClass = (severity) => {
-    return `report-table__severity report-table__severity--${severity.toLowerCase()}`;
-  };
-
   return (
     <div className="security-reports">
       {/* Page Header */}
@@ -240,102 +270,151 @@ const ReportTable = () => {
               Monitor and manage reported content across social media platforms
             </p>
           </div>
-          <button 
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className={`refresh-btn ${isRefreshing ? 'refreshing' : ''}`}
-            title="Refresh data"
-          >
-            <RefreshCw size={20} className={`refresh-icon ${isRefreshing ? 'spinning' : ''}`} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
-          </button>
         </div>
       </div>
 
       {/* Search and Filter Section */}
-      <div className="security-reports__filters">
-        <div className="search-filter-row">
-          <div className="search-bar">
-            <div className="search-input-wrapper">
-              <Search size={20} className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search posts, users, police stations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
+      <div className="search-filter-container">
+        {/* Search Section */}
+        <div className="search-section-compact">
+          <div className="search-inputs-row">
+            <div className="search-input-group">
+              <label className="compact-label">Hashtag</label>
+              <input 
+                className="form-input-compact hashtag-input" 
+                placeholder="#cybersecurity" 
+                value={type === 'hashtag' ? query : ''} 
+                onChange={e => {
+                  setQuery(e.target.value);
+                  setType('hashtag');
+                }} 
               />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="clear-search-btn"
-                  aria-label="Clear search"
-                >
-                  <X size={16} />
-                </button>
-              )}
             </div>
-          </div>
-
-          <div className="filter-controls">
-            <div className="filter-group">
-              <select
-                id="platform-filter"
-                value={selectedPlatform}
-                onChange={(e) => setSelectedPlatform(e.target.value)}
-                className="filter-select"
-              >
-                <option value="">All Platforms</option>
-                {platforms.map(platform => (
-                  <option key={platform} value={platform}>{platform}</option>
-                ))}
-              </select>
+            
+            <div className="search-input-group">
+              <label className="compact-label">Username</label>
+              <input 
+                className="form-input-compact username-input" 
+                placeholder="@username" 
+                value={type === 'username' ? query : ''} 
+                onChange={e => {
+                  setQuery(e.target.value);
+                  setType('username');
+                }} 
+              />
             </div>
-
-            <div className="filter-group">
-              <select
-                id="severity-filter"
-                value={selectedSeverity}
-                onChange={(e) => setSelectedSeverity(e.target.value)}
-                className="filter-select"
-              >
-                <option value="">All Severities</option>
-                {severities.map(severity => (
-                  <option key={severity} value={severity}>{severity}</option>
-                ))}
-              </select>
-            </div>
-
-            {hasActiveFilters && (
-              <button onClick={clearFilters} className="clear-all-btn">
-                Clear All
-              </button>
-            )}
+            
+            <button 
+              className="btn btn-primary compact-search-btn" 
+              type="button" 
+              disabled={!query}
+              onClick={performSearch}
+            >
+              <Search size={14} /> Search
+            </button>
           </div>
         </div>
+        
+        {/* Filter Section */}
+        <div className="filter-section-compact">
+          <div className="filter-inputs-row">
+            <div className="filter-input-group">
+              <label className="compact-label">Location</label>
+              <input
+                className="filter-input-compact"
+                placeholder="Nagpur"
+                value={location}
+                onChange={e => setLocation(e.target.value)}
+              />
+            </div>
+            
+            <div className="filter-input-group">
+              <label className="compact-label">Platform</label>
+              <select
+                className="filter-input-compact"
+                value={selectedPlatform}
+                onChange={e => setSelectedPlatform(e.target.value)}
+              >
+                <option value="">All</option>
+                <option value="Facebook">Facebook</option>
+                <option value="Twitter">Twitter</option>
+                <option value="Instagram">Instagram</option>
+                <option value="TikTok">TikTok</option>
+                <option value="YouTube">YouTube</option>
+                <option value="LinkedIn">LinkedIn</option>
+                <option value="Reddit">Reddit</option>
+              </select>
+            </div>
+            
+            <div className="filter-input-group">
+              <label className="compact-label">Severity</label>
+              <select
+                className="filter-input-compact"
+                value={selectedSeverity}
+                onChange={e => setSelectedSeverity(e.target.value)}
+              >
+                <option value="">All</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+            
+            <div className="filter-input-group">
+              <label className="compact-label">Start Date</label>
+              <input
+                className="filter-input-compact"
+                type="date"
+                value={startDate}
+                onChange={e => setStartDate(e.target.value)}
+              />
+            </div>
+            
+            <div className="filter-input-group">
+              <label className="compact-label">End Date</label>
+              <input
+                className="filter-input-compact"
+                type="date"
+                value={endDate}
+                onChange={e => setEndDate(e.target.value)}
+              />
+            </div>
+            
+            <button 
+              type="button"
+              className="btn btn-outline clear-filters-btn-compact"
+              onClick={clearFilters}
+              disabled={!hasActiveFilters}
+              title="Clear all filters"
+            >
+              Clear Filters
+            </button>
 
-        {/* Active Filters */}
-        {hasActiveFilters && (
-          <div className="active-filters">
-            {selectedPlatform && (
-              <span className="filter-tag">
-                Platform: {selectedPlatform}
-                <button onClick={() => setSelectedPlatform('')}>
-                  <X size={12} />
-                </button>
-              </span>
-            )}
-            {selectedSeverity && (
-              <span className="filter-tag">
-                Severity: {selectedSeverity}
-                <button onClick={() => setSelectedSeverity('')}>
-                  <X size={12} />
-                </button>
-              </span>
-            )}
+            <button 
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className={`btn btn-outline refresh-btn-compact ${isRefreshing ? 'refreshing' : ''}`}
+              title="Refresh data"
+            >
+              <RefreshCw size={16} className={`refresh-icon ${isRefreshing ? 'spinning' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            </button>
           </div>
-        )}
+        </div>
       </div>
+      
+      {/* Filter Status */}
+      {hasActiveFilters && (
+        <div className="filter-status">
+          <span className="filter-status-text">Active filters:</span>
+          {query && <span className="filter-tag">{type}: {query}</span>}
+          {selectedPlatform && <span className="filter-tag">Platform: {selectedPlatform}</span>}
+          {selectedSeverity && <span className="filter-tag">Severity: {selectedSeverity}</span>}
+          {location && <span className="filter-tag">Location: {location}</span>}
+          {startDate && <span className="filter-tag">From: {startDate}</span>}
+          {endDate && <span className="filter-tag">Until: {endDate}</span>}
+        </div>
+      )}
 
       {/* Results Summary */}
       <div className="security-reports__summary">
@@ -367,7 +446,7 @@ const ReportTable = () => {
                 <th>Coordinates</th>
                 <th>Police Station</th>
                 <th>Actions</th>
-              </tr>
+              </tr>  
             </thead>
             <tbody>
               {currentReports.length > 0 ? (
