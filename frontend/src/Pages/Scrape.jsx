@@ -4,13 +4,14 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
 import '../Styles/ReportTable.css';
 import { truncateText } from '../utils.js';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // Helper to highlight hashtags in post text
 function highlightHashtags(text) {
   if (!text) return '';
   return text.split(/(#[\w]+)/g).map((part, idx) =>
     part.startsWith && part.startsWith('#') ?
-      <span key={idx} style={{ color: '#1976d2', fontWeight: 600 }}>{part}</span> :
+      <span key={idx} className="hashtag-highlight">{part}</span> :
       part
   );
 }
@@ -18,7 +19,6 @@ import { Search } from 'lucide-react';
 import '../Styles/Scrape.css';
 
 
-// Copied from ReportTable.jsx
 const SAMPLE_RESULTS = [
   {
     id: 1,
@@ -124,12 +124,89 @@ const Scrape = () => {
   const [endDate, setEndDate] = useState('');
   const [platform, setPlatform] = useState('');
   const [expandedRow, setExpandedRow] = useState(null);
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [chartData, setChartData] = useState({ pieData: [], barData: [] });
+
+  // Update chart data when filtered results change
+  useEffect(() => {
+    const dataToUse = filteredResults.length > 0 ? filteredResults : results;
+    const severityCount = {};
+    dataToUse.forEach(result => {
+      const severity = result.toxicitySeverity || 'Unknown';
+      severityCount[severity] = (severityCount[severity] || 0) + 1;
+    });
+
+    const pieData = Object.entries(severityCount).map(([name, value]) => ({
+      name,
+      value,
+      color: name === 'High' ? '#ef4444' : name === 'Medium' ? '#f59e0b' : name === 'Low' ? '#10b981' : '#6b7280'
+    }));
+
+    const platformCount = {};
+    dataToUse.forEach(result => {
+      const platform = result.platform || 'Unknown';
+      platformCount[platform] = (platformCount[platform] || 0) + 1;
+    });
+
+    const barData = Object.entries(platformCount).map(([name, count]) => ({
+      platform: name,
+      count,
+      toxicityAvg: Math.round((dataToUse
+        .filter(r => r.platform === name)
+        .reduce((sum, r) => sum + (r.toxicityScore || 0), 0) / 
+        dataToUse.filter(r => r.platform === name).length || 0) * 10) / 10
+    }));
+
+    setChartData({ pieData, barData });
+  }, [filteredResults, results]);
+
+  const { pieData, barData } = chartData;
+
+  // Effect to filter results whenever filters change
+  useEffect(() => {
+    let filtered = results;
+
+    // Filter by platform
+    if (platform && platform !== '') {
+      filtered = filtered.filter(result => 
+        result.platform.toLowerCase() === platform.toLowerCase()
+      );
+    }
+
+    // Filter by location
+    if (location && location !== '') {
+      filtered = filtered.filter(result => 
+        result.policeStation.toLowerCase().includes(location.toLowerCase()) ||
+        (result.location && 
+         (result.location.lat.toString().includes(location) || 
+          result.location.lng.toString().includes(location)))
+      );
+    }
+
+    // Filter by date range
+    if (startDate) {
+      filtered = filtered.filter(result => {
+        const reportDate = new Date(result.reportedAt);
+        const filterStartDate = new Date(startDate);
+        return reportDate >= filterStartDate;
+      });
+    }
+
+    if (endDate) {
+      filtered = filtered.filter(result => {
+        const reportDate = new Date(result.reportedAt);
+        const filterEndDate = new Date(endDate);
+        return reportDate <= filterEndDate;
+      });
+    }
+
+    setFilteredResults(filtered);
+  }, [results, platform, location, startDate, endDate]);
 
   // --- Heatmap logic ---
   const heatmapRef = useRef(null);
   useEffect(() => {
     if (!heatmapRef.current) return;
-    // Remove any previous map instance
     if (window.heatmapLeafletMap) {
       window.heatmapLeafletMap.remove();
       window.heatmapLeafletMap = null;
@@ -168,17 +245,12 @@ const Scrape = () => {
   setResults([]);
 
     try {
-      // Simulate a network/search delay
-      await new Promise(res => setTimeout(res, 900));
+     await new Promise(res => setTimeout(res, 900));
 
-      // Simulated results - replace this block with a call to your backend scraping/search API.
-      // Use the full sampleReports as the base data
-      let simulated = [...SAMPLE_RESULTS];
+     let simulated = [...SAMPLE_RESULTS];
 
-      // Filter by location if provided
       if (location.trim()) {
         simulated = simulated.filter(r => {
-          // Accept both string and object location
           if (typeof r.location === 'string') {
             return r.location.toLowerCase().includes(location.trim().toLowerCase());
           } else if (typeof r.location === 'object' && r.policeStation) {
@@ -187,25 +259,37 @@ const Scrape = () => {
           return false;
         });
       }
-      // Filter by start date if provided
       if (startDate) {
         simulated = simulated.filter(r => {
           const date = r.reportedAt || r.date;
           return date && date >= startDate;
         });
       }
-      // Filter by end date if provided
       if (endDate) {
         simulated = simulated.filter(r => {
           const date = r.reportedAt || r.date;
           return date && date <= endDate;
         });
       }
-      // Filter by platform if provided
       if (platform) {
         simulated = simulated.filter(r =>
           (r.platform && r.platform.toLowerCase() === platform.toLowerCase())
         );
+      }
+      if (query.trim()) {
+        if (type === 'hashtag') {
+          simulated = simulated.filter(r =>
+            r.post && r.post.toLowerCase().includes(query.trim().toLowerCase())
+          );
+        } else if (type === 'username') {
+          simulated = simulated.filter(r =>
+            r.user &&
+            (
+              (r.user.username && r.user.username.toLowerCase().includes(query.trim().toLowerCase())) ||
+              (r.user.name && r.user.name.toLowerCase().includes(query.trim().toLowerCase()))
+            )
+          );
+        }
       }
 
       setResults(simulated);
@@ -217,7 +301,6 @@ const Scrape = () => {
   };
 
   useEffect(() => {
-    // show sample results on first render so user can see output immediately
     setResults(SAMPLE_RESULTS);
   }, []);
 
@@ -236,48 +319,44 @@ const Scrape = () => {
             <input className="form-input" placeholder={type === 'hashtag' ? 'e.g. cybersecurity' : 'e.g. nasa'} value={query} onChange={e => setQuery(e.target.value)} />
             <button className="btn btn-primary" type="submit" disabled={loading}><Search size={16} /> {loading ? 'Searching...' : 'Search'}</button>
           </div>
-          <div className="form-row" style={{ marginTop: 12, display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <label style={{ fontWeight: 'bold', marginBottom: 2, color: '#1976d2' }}>Location Filter</label>
+          <div className="form-row filter-row">
+            <div className="filter-group">
+              <label className="filter-label">Location Filter</label>
               <input
-                className="form-input"
+                className="filter-input-location"
                 placeholder="Location (e.g. Nagpur)"
                 value={location}
                 onChange={e => setLocation(e.target.value)}
-                style={{ minWidth: 160 }}
               />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <label style={{ fontWeight: 'bold', marginBottom: 2, color: '#1976d2' }}>Starting Date</label>
+            <div className="filter-group">
+              <label className="filter-label">Starting Date</label>
               <input
-                className="form-input"
+                className="filter-input-date"
                 type="date"
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
-                style={{ minWidth: 140 }}
                 title="Start Date"
                 placeholder="Start Date"
               />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <label style={{ fontWeight: 'bold', marginBottom: 2, color: '#1976d2' }}>Ending Date</label>
+            <div className="filter-group">
+              <label className="filter-label">Ending Date</label>
               <input
-                className="form-input"
+                className="filter-input-date"
                 type="date"
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
-                style={{ minWidth: 140 }}
                 title="End Date"
                 placeholder="End Date"
               />
             </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={{ fontWeight: 'bold', marginBottom: 2, color: '#1976d2' }}>Platform</label>
+              <div className="filter-group">
+                <label className="filter-label">Platform</label>
                 <select
-                  className="form-select"
+                  className="filter-input-platform"
                   value={platform}
                   onChange={e => setPlatform(e.target.value)}
-                  style={{ minWidth: 160, height: 36 }}
                 >
                   <option value="">All Platforms</option>
                   <option value="example.com">example.com</option>
@@ -288,14 +367,107 @@ const Scrape = () => {
                   <option value="reddit">Reddit</option>
                 </select>
               </div>
+              {/* <div className="filter-group filter-actions">
+                <label className="filter-label">Actions</label>
+                <button 
+                  type="button"
+                  className="btn btn-secondary clear-filters-btn"
+                  onClick={() => {
+                    setLocation('');
+                    setStartDate('');
+                    setEndDate('');
+                    setPlatform('');
+                  }}
+                  disabled={!location && !startDate && !endDate && !platform}
+                >
+    nn             Clear Filters
+                </button>
+              </div> */}
           </div>
+          
+          {/* Filter Status */}
+          {(location || startDate || endDate || platform) && (
+            <div className="filter-status">
+              <span className="filter-status-text">
+                Active Filters: 
+                {location && <span className="filter-tag">Location: {location}</span>}
+                {startDate && <span className="filter-tag">From: {startDate}</span>}
+                {endDate && <span className="filter-tag">To: {endDate}</span>}
+                {platform && <span className="filter-tag">Platform: {platform}</span>}
+              </span>
+              <span className="results-count">
+                Showing {filteredResults.length} of {results.length} results
+              </span>
+            </div>
+          )}
         </form>
 
         {error && <div className="error">{error}</div>}
 
-  <div className="report-table-container" style={{ marginTop: 32, maxWidth: '150vw', width: '100%' }}>
-          <div className="report-table__wrapper" style={{ overflowX: 'visible' }}>
-            <table className="report-table" role="table" style={{ tableLayout: 'auto', width: '100%' }}>
+        {/* Charts Section */}
+        {results.length > 0 && (
+          <div className="analytics-dashboard">
+            <h2 className="dashboard-title">
+              Analytics Dashboard
+              {(location || startDate || endDate || platform) && (
+                <span className="dashboard-filter-indicator"> (Filtered Data)</span>
+              )}
+            </h2>
+            <div className="charts-grid">
+              <div className="chart-card">
+                <div className="chart-header">
+                  <h3 className="chart-title">Toxicity Severity Distribution</h3>
+                </div>
+                <div className="chart-content">
+                  <ResponsiveContainer>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius="70%"
+                        innerRadius="35%"
+                        paddingAngle={2}
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              
+              <div className="chart-card">
+                <div className="chart-header">
+                  <h3 className="chart-title">Platform Analytics</h3>
+                </div>
+                <div className="chart-content">
+                  <ResponsiveContainer>
+                    <BarChart data={barData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="platform" />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip />
+                      <Legend />
+                      <Bar yAxisId="left" dataKey="count" fill="#3b82f6" name="Report Count" />
+                      <Bar yAxisId="right" dataKey="toxicityAvg" fill="#10b981" name="Avg Toxicity Score" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+  <div className="report-table-container">
+          <div className="report-table__wrapper">
+            <table className="report-table" role="table">
               <thead>
                 <tr>
                   <th scope="col">Platform</th>
@@ -311,14 +483,15 @@ const Scrape = () => {
                 </tr>
               </thead>
               <tbody>
-                {results.length === 0 && !loading ? (
-                  <tr><td colSpan={10} className="empty">No results yet. Try a search above.</td></tr>
+                {filteredResults.length === 0 && !loading ? (
+                  <tr><td colSpan={10} className="empty">
+                    {results.length === 0 ? 'No results yet. Try a search above.' : 'No results match the current filters.'}
+                  </td></tr>
                 ) : (
-                  results.map((report) => ([
+                  filteredResults.map((report) => ([
                     <tr
                       key={report.id}
-                      className={`report-table__row${expandedRow === report.id ? ' expanded' : ''}`}
-                      style={{ cursor: 'pointer' }}
+                      className={`report-table__row${expandedRow === report.id ? ' expanded' : ''} clickable-row`}
                       onClick={() => setExpandedRow(expandedRow === report.id ? null : report.id)}
                     >
                       <td className="report-table__cell report-table__cell--platform">
@@ -327,7 +500,7 @@ const Scrape = () => {
                       <td className="report-table__cell report-table__cell--post">
                         <span>
                           {highlightHashtags(truncateText(report.post, 80))}
-                          {report.post.length > 80 && <span style={{ color: '#1976d2', marginLeft: 6, fontWeight: 500 }}> ...more</span>}
+                          {report.post.length > 80 && <span className="more-link"> ...more</span>}
                         </span>
                       </td>
                       <td className="report-table__cell report-table__cell--user">
@@ -367,19 +540,19 @@ const Scrape = () => {
                     </tr>,
                     expandedRow === report.id && (
                       <tr key={`expand-${report.id}`} className="report-table__row expanded-info-row">
-                        <td colSpan={10} style={{ background: '#f3f4f6', padding: '1.5rem 2rem', whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                          <div style={{ fontWeight: 600, marginBottom: 8 }}>Full Post:</div>
-                          <div style={{ marginBottom: 12, whiteSpace: 'pre-line' }}>{highlightHashtags(report.post)}</div>
-                          <div style={{ fontWeight: 600, marginBottom: 8 }}>User Details:</div>
+                        <td colSpan={10} className="expanded-info-cell">
+                          <div className="expanded-info-title">Full Post:</div>
+                          <div className="expanded-info-content">{highlightHashtags(report.post)}</div>
+                          <div className="expanded-info-title">User Details:</div>
                           <div>Name: {report.user?.name}</div>
                           <div>Username: {report.user?.username}</div>
                           {report.user?.email && <div>Email: {report.user.email}</div>}
                           {report.user?.phone && <div>Phone: {report.user.phone}</div>}
-                          <div style={{ fontWeight: 600, margin: '12px 0 8px' }}>Toxicity Tags:</div>
+                          <div className="expanded-info-title spaced">Toxicity Tags:</div>
                           <div>{Array.isArray(report.toxicityTags) ? report.toxicityTags.join(', ') : ''}</div>
-                          <div style={{ fontWeight: 600, margin: '12px 0 8px' }}>Police Station:</div>
+                          <div className="expanded-info-title spaced">Police Station:</div>
                           <div>{report.policeStation}</div>
-                          <div style={{ fontWeight: 600, margin: '12px 0 8px' }}>Reported At:</div>
+                          <div className="expanded-info-title spaced">Reported At:</div>
                           <div>{report.reportedAt}</div>
                         </td>
                       </tr>
@@ -394,28 +567,28 @@ const Scrape = () => {
       
       </div>
 
-      {/* Heat Map Section */}
-      <div style={{ margin: '48px auto 0', maxWidth: 1200, width: '100%', background: '#fff', borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.07)', padding: 32 }}>
-        <h2 style={{ color: '#1976d2', marginBottom: 24 }}>Heat Map of Reports <span style={{ fontSize: 18, color: '#888' }}>(Demo)</span></h2>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 32, width: '100%' }}>
-          <div style={{ width: '50%', minWidth: 320, height: 350, borderRadius: 8, position: 'relative', marginBottom: 0, overflow: 'hidden' }}>
-            <div ref={heatmapRef} id="heatmap-map" style={{ width: '100%', height: '100%' }}></div>
+      {/* Heat Map Section
+      <div className="heatmap-section">
+        <h2 className="heatmap-title">Heat Map of Reports <span className="heatmap-demo-label">(Demo)</span></h2>
+        <div className="heatmap-flex-row">
+          <div className="heatmap-map-container">
+            <div ref={heatmapRef} id="heatmap-map" className="heatmap-map-inner"></div>
           </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: 350 }}>
-            <div style={{ display: 'flex', gap: 32, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-              <span title="Facebook" style={{ fontSize: 32 }}><i className="fa-brands fa-facebook" style={{ color: '#1877f2' }}></i></span>
-              <span title="Twitter" style={{ fontSize: 32 }}><i className="fa-brands fa-twitter" style={{ color: '#1da1f2' }}></i></span>
-              <span title="Instagram" style={{ fontSize: 32 }}><i className="fa-brands fa-instagram" style={{ color: '#e6683c' }}></i></span>
-              <span title="LinkedIn" style={{ fontSize: 32 }}><i className="fa-brands fa-linkedin" style={{ color: '#0077b5' }}></i></span>
-              <span title="Reddit" style={{ fontSize: 32 }}><i className="fa-brands fa-reddit" style={{ color: '#ff4500' }}></i></span>
-              <span title="YouTube" style={{ fontSize: 32 }}><i className="fa-brands fa-youtube" style={{ color: '#ff0000' }}></i></span>
-              <span title="TikTok" style={{ fontSize: 32 }}><i className="fa-brands fa-tiktok" style={{ color: '#000' }}></i></span>
+          <div className="heatmap-icons-container">
+            <div className="heatmap-icons-row">
+              <span title="Facebook" className="heatmap-icon"><i className="fa-brands fa-facebook heatmap-facebook"></i></span>
+              <span title="Twitter" className="heatmap-icon"><i className="fa-brands fa-twitter heatmap-twitter"></i></span>
+              <span title="Instagram" className="heatmap-icon"><i className="fa-brands fa-instagram heatmap-instagram"></i></span>
+              <span title="LinkedIn" className="heatmap-icon"><i className="fa-brands fa-linkedin heatmap-linkedin"></i></span>
+              <span title="Reddit" className="heatmap-icon"><i className="fa-brands fa-reddit heatmap-reddit"></i></span>
+              <span title="YouTube" className="heatmap-icon"><i className="fa-brands fa-youtube heatmap-youtube"></i></span>
+              <span title="TikTok" className="heatmap-icon"><i className="fa-brands fa-tiktok heatmap-tiktok"></i></span>
             </div>
           </div>
         </div>
       </div>
 
- 
+  */}
     </div>
   );
 };

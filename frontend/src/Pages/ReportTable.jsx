@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PostModal from './PostModal.jsx';
 import ReportModal from './ReportModal.jsx';
 import { truncateText, openGoogleMaps } from '../utils.js';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Filter, X, RefreshCw, Eye, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Filter, X, RefreshCw, Eye, AlertTriangle, Flag } from 'lucide-react';
 import '../Styles/ReportTable.css';
 
 // Sample data 
@@ -436,6 +436,15 @@ const ReportTable = () => {
                         >
                           <Eye size={14} />
                           View
+                        </button>
+                        
+                        <button 
+                          className="btn btn-report"
+                          onClick={() => handleReportClick(report)}
+                          title="Report this content"
+                        >
+                          <Flag size={14} />
+                          Report
                         </button>
                        
                       </div>

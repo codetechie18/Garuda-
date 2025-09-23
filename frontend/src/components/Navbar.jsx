@@ -11,7 +11,7 @@ const Navbar = ({ user, onLogout }) => {
   const profileRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event) => { 1.68
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfileMenu(false);
       }
@@ -83,7 +83,7 @@ const Navbar = ({ user, onLogout }) => {
               onClick={() => setShowProfileMenu(!showProfileMenu)}
             >
               <div className="nav-profile-avatar">
-                {user?.avatar && typeof user.avatar === 'string' && (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) ? (
+                {user?.avatar && typeof user.avatar === 'string' && (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) ? ( 
                   <img src={user.avatar} alt={`${user?.firstName || ''} avatar`} className="profile-img" />
                 ) : (
                   (user?.avatar) ? user.avatar : ((user?.firstName?.[0] || '') + (user?.lastName?.[0] || ''))
@@ -140,10 +140,10 @@ const Navbar = ({ user, onLogout }) => {
                 <Search size={16} />
                 <span>Social Insights</span>
               </Link>
-              <Link to="/reports" className={`drawer-link ${isActive('/reports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+              {/* <Link to="/reports" className={`drawer-link ${isActive('/reports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                 <FileText size={16} />
                 <span>Reporting</span>
-              </Link>
+              </Link> */}
               <Link to="/Reportstable" className={`drawer-link ${isActive('/Reportstable') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                 <FileText size={16} />
                 <span>Reportstable</span>
