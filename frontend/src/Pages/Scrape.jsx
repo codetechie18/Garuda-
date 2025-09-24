@@ -127,6 +127,70 @@ const Scrape = () => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [filteredResults, setFilteredResults] = useState([]);
   const [chartData, setChartData] = useState({ pieData: [], barData: [] });
+  const [editingPoliceStation, setEditingPoliceStation] = useState(null);
+  const [policeStationValue, setPoliceStationValue] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+
+  // Available police stations for dropdown
+  const policeStations = [
+    'Hingna Police Station',
+    'NYPD 1st Precinct',
+    'Nagpur Central Division',
+    'Metropolitan Police - Westminster',
+    'SFPD Central Station',
+    'Chicago Police Department - District 1',
+    'Toronto Police Service - 52 Division',
+    'Mumbai Police - Bandra Division',
+    'Delhi Police - CP District',
+    'Bangalore City Police'
+  ];
+
+  const handleEditPoliceStation = (reportId, currentStation) => {
+    setEditingPoliceStation(reportId);
+    setPoliceStationValue(currentStation || '');
+    setShowSuggestions(false);
+    setFilteredSuggestions([]);
+  };
+
+  const handleInputChange = (value) => {
+    setPoliceStationValue(value);
+    
+    if (value.length > 0) {
+      const filtered = policeStations.filter(station =>
+        station.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setFilteredSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setPoliceStationValue(suggestion);
+    setShowSuggestions(false);
+    setFilteredSuggestions([]);
+  };
+
+  const handleSavePoliceStation = (reportId) => {
+    // Update the results array with new police station
+    setResults(prev => prev.map(report => 
+      report.id === reportId 
+        ? { ...report, policeStation: policeStationValue }
+        : report
+    ));
+    setEditingPoliceStation(null);
+    setPoliceStationValue('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPoliceStation(null);
+    setPoliceStationValue('');
+    setShowSuggestions(false);
+    setFilteredSuggestions([]);
+  };
 
   // Update chart data when filtered results change
   useEffect(() => {
@@ -136,12 +200,6 @@ const Scrape = () => {
       const severity = result.toxicitySeverity || 'Unknown';
       severityCount[severity] = (severityCount[severity] || 0) + 1;
     });
-
-    const pieData = Object.entries(severityCount).map(([name, value]) => ({
-      name,
-      value,
-      color: name === 'High' ? '#ef4444' : name === 'Medium' ? '#f59e0b' : name === 'Low' ? '#10b981' : '#6b7280'
-    }));
 
     const platformCount = {};
     dataToUse.forEach(result => {
@@ -457,7 +515,7 @@ const Scrape = () => {
               <tbody>
                 {filteredResults.length === 0 && !loading ? (
                   <tr><td colSpan={10} className="empty">
-                    {results.length === 0 ? 'No results yet. Try a search above.' : 'No results match the current filters.'}
+                    {results.length === 0 ? 'No results yet. Try a search above.' : `No results match the current filters. (${results.length} total results available)`}
                   </td></tr>
                 ) : (
                   filteredResults.map((report) => ([
@@ -465,6 +523,8 @@ const Scrape = () => {
                       key={report.id}
                       className={`report-table__row${expandedRow === report.id ? ' expanded' : ''} clickable-row`}
                       onClick={() => setExpandedRow(expandedRow === report.id ? null : report.id)}
+                      style={{ cursor: 'pointer', backgroundColor: expandedRow === report.id ? '#f8f9fa' : 'transparent' }}
+                      title="Click to expand details"
                     >
                       <td className="report-table__cell report-table__cell--platform">
                         <span className={`platform-badge platform-badge--${report.platform?.toLowerCase()}`}>{report.platform}</span>
@@ -507,7 +567,70 @@ const Scrape = () => {
                         {report.location?.lat && report.location?.lng ? `${report.location.lat}, ${report.location.lng}` : ''}
                       </td>
                       <td className="report-table__cell report-table__cell--police">
-                        {report.policeStation}
+                        {editingPoliceStation === report.id ? (
+                          <div className="police-station-edit-form-inline">
+                            <div className="autocomplete-container">
+                              <input 
+                                type="text" 
+                                value={policeStationValue} 
+                                onChange={(e) => handleInputChange(e.target.value)}
+                                placeholder="Enter police station name"
+                                className="police-station-input-inline"
+                                autoFocus
+                              />
+                              {showSuggestions && filteredSuggestions.length > 0 && (
+                                <div className="suggestions-dropdown">
+                                  {filteredSuggestions.map((suggestion, idx) => (
+                                    <div
+                                      key={idx}
+                                      className="suggestion-item"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleSuggestionClick(suggestion);
+                                      }}
+                                    >
+                                      {suggestion}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSavePoliceStation(report.id);
+                              }}
+                              className="btn-save-inline"
+                              title="Save"
+                            >
+                              ✓
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCancelEdit();
+                              }}
+                              className="btn-cancel-inline"
+                              title="Cancel"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="police-station-display-inline">
+                            <span>{report.policeStation}</span>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditPoliceStation(report.id, report.policeStation);
+                              }}
+                              className="btn-edit-inline"
+                              title="Edit Police Station"
+                            >
+                              ✏️
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>,
                     expandedRow === report.id && (
