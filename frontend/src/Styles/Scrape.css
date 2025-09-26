@@ -1,3 +1,9 @@
+/* Unify all button border-radius to match end date box */
+.btn,
+.btn.btn-primary,
+.clear-filters-btn {
+  border-radius: 12px !important;
+}
 @media (max-width: 430px) {
     .filter-row {
         padding: 16px 12px 12px 12px;
@@ -1098,6 +1104,21 @@
   min-width: 140px;
 }
 
+/* Make Username smaller and place Location beside it */
+.search-inputs-row .username-group { flex: 0 0 25%; min-width: 150px; }
+.search-inputs-row .location-group { flex: 0 0 25%; min-width: 200px; }
+.search-inputs-row .search-input-group:first-child { flex: 1 1 auto; }
+
+@media (max-width: 1024px) {
+  .search-inputs-row .username-group,
+  .search-inputs-row .location-group { flex: 1 1 calc(50% - 6px); min-width: 0; }
+}
+
+@media (max-width: 768px) {
+  .search-inputs-row .username-group,
+  .search-inputs-row .location-group { flex: 1 1 100%; }
+}
+
 .filter-section-compact {
   margin-top: 16px;
 }
@@ -1111,7 +1132,241 @@
 
 .filter-input-group {
   flex: 1;
-  min-width: 120px;
+  min-width: 150px;
+}
+
+.react-select-container {
+  width: 100%;
+}
+
+/* --- Universal Input Sizing --- */
+.filter-input-compact,
+.react-select__control,
+.react-datepicker__input-container input {
+  height: 40px !important;
+  min-height: 40px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.react-select__value-container {
+  height: 100% !important;
+}
+
+.react-datepicker__input-container input {
+  padding-left: 12px !important;
+}
+
+.react-select__control {
+  background-color: #fff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease;
+}
+
+.react-select__value-container {
+  display: flex;
+  align-items: center;
+  padding: 0 8px !important;
+}
+
+.react-select__control--is-focused {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.react-select__placeholder {
+  color: #9ca3af !important;
+}
+
+.react-select__menu {
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+.react-select__option {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.react-select__option--is-focused {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+}
+
+.react-select__option--is-selected {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  position: relative;
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+  padding: 8px 40px 8px 12px; /* Increased right padding */
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  font-size: 14px;
+  background: #ffffff !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.react-datepicker__input-container input:focus {
+  outline: none;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.react-datepicker__close-icon {
+  position: absolute;
+  right: 30px; /* Position clear icon to the left of calendar icon */
+  top: 50%;
+  transform: translateY(-50%);
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
+  opacity: 0.7;
+}
+
+.react-datepicker__close-icon::after {
+  content: "×";
+  font-size: 20px;
+  color: #6b7280;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.react-datepicker__close-icon:hover {
+  opacity: 1;
+}
+
+.react-datepicker__input-container::after {
+  content: '';
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3e%3cpath fill-rule='evenodd' d='M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z' clip-rule='evenodd'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.react-datepicker__input-container:focus-within::after,
+.react-datepicker-wrapper:hover .react-datepicker__input-container::after {
+  opacity: 1;
+}
+
+.react-datepicker__input-container input:focus + .react-datepicker__input-container::after {
+    opacity: 1;
+}
+
+.react-datepicker-popper {
+  z-index: 1010 !important; /* Ensure date picker is above other elements */
+}
+
+/* Enhanced React-Datepicker Calendar Styles */
+.react-datepicker {
+  font-family: 'Inter', sans-serif !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+  background-color: #ffffff !important;
+}
+
+.react-datepicker__header {
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
+  padding-top: 12px !important;
+}
+
+.react-datepicker__current-month {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+}
+
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  color: #374151 !important;
+  font-weight: 500 !important;
+  width: 2rem !important;
+  line-height: 2rem !important;
+  margin: 0.25rem !important;
+}
+
+.react-datepicker__day {
+  border-radius: 50% !important;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.react-datepicker__day:hover {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-selecting-range,
+.react-datepicker__day--in-range {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.react-datepicker__day--selected:hover,
+.react-datepicker__day--in-selecting-range:hover,
+.react-datepicker__day--in-range:hover {
+  background-color: #2563eb !important;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+}
+
+.react-datepicker__day--today {
+  font-weight: 700 !important;
+  color: #3b82f6 !important;
+  background-color: #e0f2fe !important;
+}
+
+.react-datepicker__day--disabled {
+  color: #9ca3af !important;
+  opacity: 0.6;
+}
+
+.react-datepicker__navigation {
+  top: 12px !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #6b7280 !important;
+  border-width: 2px 2px 0 0 !important;
+}
+
+.react-datepicker__triangle {
+  display: none !important;
 }
 
 .compact-label {
@@ -1155,35 +1410,69 @@
 .compact-search-btn {
   flex-shrink: 0;
   min-width: 100px;
-  height: 38px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  color: #ffffff;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.compact-search-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.compact-search-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+}
+
+.compact-search-btn:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .clear-filters-btn-compact {
   flex-shrink: 0;
   min-width: 110px;
-  height: 38px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   background: #ffffff;
-  border: 1px solid #d1d5db;
+  border: 2px solid #e5e7eb;
   color: #6b7280;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
 }
 
 .clear-filters-btn-compact:hover:not(:disabled) {
   background: #f9fafb;
-  border-color: #9ca3af;
-  color: #374151;
+  border-color: #dc2626;
+  color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+}
+
+.clear-filters-btn-compact:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(220, 38, 38, 0.1);
 }
 
 .clear-filters-btn-compact:disabled {
@@ -1191,6 +1480,7 @@
   border-color: #e5e7eb;
   color: #d1d5db;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* Responsive Design for Compact Layout */
@@ -1298,6 +1588,9 @@
   flex: 1;
   font-weight: 500;
   color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .btn-edit-small {
@@ -1473,7 +1766,7 @@
   background-color: #c82333;
 }
 
-/* Autocomplete Suggestions */
+/* Enhanced Autocomplete Suggestions */
 .autocomplete-container {
   position: relative;
   flex: 1;
@@ -1481,30 +1774,95 @@
 
 .suggestions-dropdown {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 4px);
   left: 0;
   right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  max-height: 200px;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
+  max-height: 240px;
   overflow-y: auto;
   z-index: 1000;
+  animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .suggestion-item {
-  padding: 8px 12px;
+  padding: 12px 16px;
   cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 12px;
-  transition: background-color 0.2s;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
 }
 
 .suggestion-item:hover {
-  background-color: #f8f9fa;
+  background-color: #f8fafc;
+  color: #1f2937;
+  transform: translateX(2px);
+  border-left: 3px solid #3b82f6;
+  padding-left: 13px;
+}
+
+.suggestion-item:active {
+  background-color: #f1f5f9;
+  transform: translateX(1px);
 }
 
 .suggestion-item:last-child {
   border-bottom: none;
+  border-radius: 0 0 6px 6px;
+}
+
+.suggestion-item:first-child {
+  border-radius: 6px 6px 0 0;
+}
+
+/* Enhanced scrollbar for suggestions */
+.suggestions-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+/* This rule targets all input/button elements in the filter rows */
+.search-inputs-row .form-input-compact,
+.filter-inputs-row .filter-input-compact,
+.filter-inputs-row .react-select-container .react-select__control,
+.filter-inputs-row .react-datepicker-wrapper input,
+.search-inputs-row .compact-search-btn,
+.filter-inputs-row .clear-filters-btn-compact {
+  height: 40px !important; /* Force a consistent height */
+  min-height: 40px !important; /* Override any min-height from libraries */
+  box-sizing: border-box !important; /* Ensure padding/border are included in height */
+  display: flex !important; /* Use flex to enable vertical alignment */
+  align-items: center !important; /* Vertically center the content inside */
+}
+
+/* Specific adjustment for react-select's inner container */
+.react-select__value-container {
+  height: 100% !important;
 }

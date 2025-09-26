@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.heat';
+import { useState, useEffect } from 'react';
 import '../Styles/ReportTable.css';
 import { truncateText } from '../utils.js';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import Select from 'react-select';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 // Helper to highlight hashtags in post text
 function highlightHashtags(text) {
@@ -18,6 +17,22 @@ function highlightHashtags(text) {
 import { Search } from 'lucide-react';
 import '../Styles/Scrape.css';
 
+
+const platformOptions = [
+  { value: 'Facebook', label: 'Facebook' },
+  { value: 'Twitter', label: 'Twitter' },
+  { value: 'Instagram', label: 'Instagram' },
+  { value: 'TikTok', label: 'TikTok' },
+  { value: 'YouTube', label: 'YouTube' },
+  { value: 'LinkedIn', label: 'LinkedIn' },
+  { value: 'Reddit', label: 'Reddit' }
+];
+
+const severityOptions = [
+  { value: 'High', label: 'High' },
+  { value: 'Medium', label: 'Medium' },
+  { value: 'Low', label: 'Low' }
+];
 
 const SAMPLE_RESULTS = [
   {
@@ -119,11 +134,11 @@ const Scrape = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
   const [error, setError] = useState(null);
-  const [location, setLocation] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [platform, setPlatform] = useState('');
-  const [severity, setSeverity] = useState('');
+  const [platform, setPlatform] = useState(null);
+  const [severity, setSeverity] = useState(null);
+  const [location, setLocation] = useState('');
   const [expandedRow, setExpandedRow] = useState(null);
   const [filteredResults, setFilteredResults] = useState([]);
   const [chartData, setChartData] = useState({ pieData: [], barData: [] });
@@ -216,36 +231,26 @@ const Scrape = () => {
         dataToUse.filter(r => r.platform === name).length || 0) * 10) / 10
     }));
 
-    setChartData({ pieData, barData });
+    setChartData({ barData });
   }, [filteredResults, results]);
 
-  const { pieData, barData } = chartData;
+  const { barData } = chartData;
 
   // Effect to filter results whenever filters change
   useEffect(() => {
     let filtered = results;
 
     // Filter by platform
-    if (platform && platform !== '') {
+    if (platform && platform.value) {
       filtered = filtered.filter(result => 
-        result.platform.toLowerCase() === platform.toLowerCase()
-      );
-    }
-
-    // Filter by location
-    if (location && location !== '') {
-      filtered = filtered.filter(result => 
-        result.policeStation.toLowerCase().includes(location.toLowerCase()) ||
-        (result.location && 
-         (result.location.lat.toString().includes(location) || 
-          result.location.lng.toString().includes(location)))
+        result.platform.toLowerCase() === platform.value.toLowerCase()
       );
     }
 
     // Filter by severity
-    if (severity && severity !== '') {
+    if (severity && severity.value) {
       filtered = filtered.filter(result => 
-        result.toxicitySeverity.toLowerCase() === severity.toLowerCase()
+        result.toxicitySeverity.toLowerCase() === severity.value.toLowerCase()
       );
     }
 
@@ -365,7 +370,7 @@ const Scrape = () => {
                   />
                 </div>
                 
-                <div className="search-input-group">
+                <div className="search-input-group username-group">
                   <label className="compact-label">Username</label>
                   <input 
                     className="form-input-compact username-input" 
@@ -375,6 +380,16 @@ const Scrape = () => {
                       setQuery(e.target.value);
                       setType('username');
                     }} 
+                  />
+                </div>
+                
+                <div className="search-input-group location-group">
+                  <label className="compact-label">Location</label>
+                  <input
+                    className="form-input-compact location-input"
+                    placeholder="City, police station, or coords"
+                    value={location}
+                    onChange={e => setLocation(e.target.value)}
                   />
                 </div>
                 
@@ -393,64 +408,48 @@ const Scrape = () => {
             <div className="filter-section-compact">
               <div className="filter-inputs-row">
                 <div className="filter-input-group">
-                  <label className="compact-label">Location</label>
-                  <input
-                    className="filter-input-compact"
-                    placeholder="Nagpur"
-                    value={location}
-                    onChange={e => setLocation(e.target.value)}
+                  <label className="compact-label">Platform</label>
+                  <Select
+                    className="react-select-container"
+                    classNamePrefix="react-select"
+                    options={platformOptions}
+                    value={platform}
+                    onChange={setPlatform}
+                    isClearable
+                    placeholder="All Platforms"
                   />
                 </div>
                 
                 <div className="filter-input-group">
-                  <label className="compact-label">Platform</label>
-                  <select
-                    className="filter-input-compact"
-                    value={platform}
-                    onChange={e => setPlatform(e.target.value)}
-                  >
-                    <option value="">All</option>
-                    <option value="Facebook">Facebook</option>
-                    <option value="Twitter">Twitter</option>
-                    <option value="Instagram">Instagram</option>
-                    <option value="TikTok">TikTok</option>
-                    <option value="YouTube">YouTube</option>
-                    <option value="LinkedIn">LinkedIn</option>
-                    <option value="Reddit">Reddit</option>
-                  </select>
-                </div>
-                
-                <div className="filter-input-group">
                   <label className="compact-label">Severity</label>
-                  <select
-                    className="filter-input-compact"
+                  <Select
+                    className="react-select-container"
+                    classNamePrefix="react-select"
+                    options={severityOptions}
                     value={severity}
-                    onChange={e => setSeverity(e.target.value)}
-                  >
-                    <option value="">All</option>
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                  </select>
+                    onChange={setSeverity}
+                    isClearable
+                    placeholder="All Severities"
+                  />
                 </div>
                 
                 <div className="filter-input-group">
                   <label className="compact-label">Start Date</label>
-                  <input
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
                     className="filter-input-compact"
-                    type="date"
-                    value={startDate}
-                    onChange={e => setStartDate(e.target.value)}
+                    placeholderText="Select start date"
                   />
                 </div>
                 
                 <div className="filter-input-group">
                   <label className="compact-label">End Date</label>
-                  <input
+                  <DatePicker
+                    selected={endDate}
+                    onChange={(date) => setEndDate(date)}
                     className="filter-input-compact"
-                    type="date"
-                    value={endDate}
-                    onChange={e => setEndDate(e.target.value)}
+                    placeholderText="Select end date"
                   />
                 </div>
                 
@@ -458,13 +457,12 @@ const Scrape = () => {
                   type="button"
                   className="btn btn-outline clear-filters-btn-compact"
                   onClick={() => {
-                    setLocation('');
                     setStartDate('');
                     setEndDate('');
-                    setPlatform('');
-                    setSeverity('');
+                    setPlatform(null);
+                    setSeverity(null);
                   }}
-                  disabled={!location && !startDate && !endDate && !platform && !severity}
+                  disabled={!startDate && !endDate && !platform && !severity}
                   title="Clear all filters"
                 >
                   Clear Filters
@@ -474,15 +472,14 @@ const Scrape = () => {
           </div>
           
           {/* Filter Status */}
-          {(location || startDate || endDate || platform || severity) && (
+          {(startDate || endDate || platform || severity) && (
             <div className="filter-status">
               <span className="filter-status-text">
                 Active Filters: 
-                {location && <span className="filter-tag">Location: {location}</span>}
-                {startDate && <span className="filter-tag">From: {startDate}</span>}
-                {endDate && <span className="filter-tag">To: {endDate}</span>}
-                {platform && <span className="filter-tag">Platform: {platform}</span>}
-                {severity && <span className="filter-tag">Severity: {severity}</span>}
+                {startDate && <span className="filter-tag">From: {startDate.toLocaleDateString()}</span>}
+                {endDate && <span className="filter-tag">To: {endDate.toLocaleDateString()}</span>}
+                {platform && <span className="filter-tag">Platform: {platform.label}</span>}
+                {severity && <span className="filter-tag">Severity: {severity.label}</span>}
               </span>
               <span className="results-count">
                 Showing {filteredResults.length} of {results.length} results
@@ -508,13 +505,12 @@ const Scrape = () => {
                   <th scope="col">Hashtags</th>
                   <th scope="col">Date</th>
                   <th scope="col">Post Link</th>
-                  <th scope="col">Location</th>
                   <th scope="col">Police Station</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredResults.length === 0 && !loading ? (
-                  <tr><td colSpan={10} className="empty">
+                  <tr><td colSpan={9} className="empty">
                     {results.length === 0 ? 'No results yet. Try a search above.' : `No results match the current filters. (${results.length} total results available)`}
                   </td></tr>
                 ) : (
@@ -562,9 +558,6 @@ const Scrape = () => {
                       </td>
                       <td className="report-table__cell">
                         <a href={report.postLink} target="_blank" rel="noopener noreferrer" className="post-link">View Post</a>
-                      </td>
-                      <td className="report-table__cell">
-                        {report.location?.lat && report.location?.lng ? `${report.location.lat}, ${report.location.lng}` : ''}
                       </td>
                       <td className="report-table__cell report-table__cell--police">
                         {editingPoliceStation === report.id ? (
@@ -635,7 +628,7 @@ const Scrape = () => {
                     </tr>,
                     expandedRow === report.id && (
                       <tr key={`expand-${report.id}`} className="report-table__row expanded-info-row">
-                        <td colSpan={10} className="expanded-info-cell">
+                        <td colSpan={9} className="expanded-info-cell">
                           <div className="expanded-info-title">Full Post:</div>
                           <div className="expanded-info-content">{highlightHashtags(report.post)}</div>
                           <div className="expanded-info-title">User Details:</div>

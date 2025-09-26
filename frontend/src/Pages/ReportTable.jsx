@@ -3,6 +3,9 @@ import PostModal from './PostModal.jsx';
 import ReportModal from './ReportModal.jsx';
 import { truncateText, openGoogleMaps } from '../utils.js';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Filter, RefreshCw, Eye, AlertTriangle, Flag } from 'lucide-react';
+import Select from 'react-select';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import '../Styles/ReportTable.css';
 import '../Styles/Scrape.css';
 
@@ -138,8 +141,22 @@ const ReportTable = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
   // Search and Filter state
-  const [selectedPlatform, setSelectedPlatform] = useState('');
-  const [selectedSeverity, setSelectedSeverity] = useState('');
+  const platformOptions = [
+    { value: 'Facebook', label: 'Facebook' },
+    { value: 'Twitter', label: 'Twitter' },
+    { value: 'Instagram', label: 'Instagram' },
+    { value: 'TikTok', label: 'TikTok' },
+    { value: 'YouTube', label: 'YouTube' },
+    { value: 'LinkedIn', label: 'LinkedIn' },
+    { value: 'Reddit', label: 'Reddit' }
+  ];
+  const severityOptions = [
+    { value: 'High', label: 'High' },
+    { value: 'Medium', label: 'Medium' },
+    { value: 'Low', label: 'Low' }
+  ];
+  const [selectedPlatform, setSelectedPlatform] = useState(null);
+  const [selectedSeverity, setSelectedSeverity] = useState(null);
   
   // New state for hashtag/username search
   const [query, setQuery] = useState('');
@@ -183,22 +200,22 @@ const ReportTable = () => {
         report.user.username.toLowerCase().includes(query.toLowerCase()) ||
         report.user.name.toLowerCase().includes(query.toLowerCase())
       ));
-    
-    // Platform filter
-    const matchesPlatform = selectedPlatform === '' || report.platform === selectedPlatform;
-    
-    // Severity filter
-    const matchesSeverity = selectedSeverity === '' || report.toxicitySeverity === selectedSeverity;
-    
+
+    // Platform filter (handle null/cleared value)
+    const matchesPlatform = !selectedPlatform || (selectedPlatform.value && report.platform === selectedPlatform.value);
+
+    // Severity filter (handle null/cleared value)
+    const matchesSeverity = !selectedSeverity || (selectedSeverity.value && report.toxicitySeverity === selectedSeverity.value);
+
     // Location filter
     const matchesLocation = location === '' || 
       report.policeStation.toLowerCase().includes(location.toLowerCase());
-    
+
     // Date filters
     const reportDate = new Date(report.reportedAt);
     const matchesStartDate = startDate === '' || reportDate >= new Date(startDate);
     const matchesEndDate = endDate === '' || reportDate <= new Date(endDate);
-    
+
     return matchesQuery && matchesPlatform && matchesSeverity && 
            matchesLocation && matchesStartDate && matchesEndDate;
   });
@@ -210,15 +227,20 @@ const ReportTable = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentReports = filteredReports.slice(startIndex, endIndex);
 
-  // Reset pagination when filters change
+  // Reset or fix pagination when filters change
   React.useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedPlatform, selectedSeverity, query, location, startDate, endDate]);
+    if (currentPage > 1 && (currentPage > Math.ceil(filteredReports.length / itemsPerPage))) {
+      setCurrentPage(Math.max(1, Math.ceil(filteredReports.length / itemsPerPage)));
+    } else if (currentPage === 1 && filteredReports.length === 0) {
+      setCurrentPage(1);
+    }
+    // If filters change and currentPage is valid, do nothing
+  }, [selectedPlatform, selectedSeverity, query, location, startDate, endDate, filteredReports.length, itemsPerPage]);
 
   // Clear all filters
   const clearFilters = () => {
-    setSelectedPlatform('');
-    setSelectedSeverity('');
+    setSelectedPlatform(null);
+    setSelectedSeverity(null);
     setQuery('');
     setLocation('');
     setStartDate('');
@@ -227,7 +249,7 @@ const ReportTable = () => {
   };
 
   // Check if any filters are active
-  const hasActiveFilters = selectedPlatform || selectedSeverity || 
+  const hasActiveFilters = (selectedPlatform && selectedPlatform.value) || (selectedSeverity && selectedSeverity.value) || 
                           query || location || startDate || endDate;
 
   // Pagination handlers
@@ -290,8 +312,8 @@ const ReportTable = () => {
                 }} 
               />
             </div>
-            
-            <div className="search-input-group">
+
+            <div className="search-input-group username-group">
               <label className="compact-label">Username</label>
               <input 
                 className="form-input-compact username-input" 
@@ -303,7 +325,17 @@ const ReportTable = () => {
                 }} 
               />
             </div>
-            
+
+            <div className="search-input-group location-group">
+              <label className="compact-label">Location</label>
+              <input
+                className="form-input-compact location-input"
+                placeholder="City, police station, or coords"
+                value={location}
+                onChange={e => setLocation(e.target.value)}
+              />
+            </div>
+
             <button 
               className="btn btn-primary compact-search-btn" 
               type="button" 
@@ -318,65 +350,55 @@ const ReportTable = () => {
         {/* Filter Section */}
         <div className="filter-section-compact">
           <div className="filter-inputs-row">
-            <div className="filter-input-group">
-              <label className="compact-label">Location</label>
-              <input
-                className="filter-input-compact"
-                placeholder="Nagpur"
-                value={location}
-                onChange={e => setLocation(e.target.value)}
-              />
-            </div>
+           
             
             <div className="filter-input-group">
               <label className="compact-label">Platform</label>
-              <select
-                className="filter-input-compact"
+              <Select
+                className="react-select-container"
+                classNamePrefix="react-select"
+                options={platformOptions}
                 value={selectedPlatform}
-                onChange={e => setSelectedPlatform(e.target.value)}
-              >
-                <option value="">All</option>
-                <option value="Facebook">Facebook</option>
-                <option value="Twitter">Twitter</option>
-                <option value="Instagram">Instagram</option>
-                <option value="TikTok">TikTok</option>
-                <option value="YouTube">YouTube</option>
-                <option value="LinkedIn">LinkedIn</option>
-                <option value="Reddit">Reddit</option>
-              </select>
-            </div>
-            
-            <div className="filter-input-group">
-              <label className="compact-label">Severity</label>
-              <select
-                className="filter-input-compact"
-                value={selectedSeverity}
-                onChange={e => setSelectedSeverity(e.target.value)}
-              >
-                <option value="">All</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-            </div>
-            
-            <div className="filter-input-group">
-              <label className="compact-label">Start Date</label>
-              <input
-                className="filter-input-compact"
-                type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
+                onChange={setSelectedPlatform}
+                isClearable
+                placeholder="All Platforms"
               />
             </div>
-            
+
+            <div className="filter-input-group">
+              <label className="compact-label">Severity</label>
+              <Select
+                className="react-select-container"
+                classNamePrefix="react-select"
+                options={severityOptions}
+                value={selectedSeverity}
+                onChange={setSelectedSeverity}
+                isClearable
+                placeholder="All Severities"
+              />
+            </div>
+
+            <div className="filter-input-group">
+              <label className="compact-label">Start Date</label>
+              <DatePicker
+                selected={startDate ? new Date(startDate) : null}
+                onChange={date => setStartDate(date ? date.toISOString().slice(0, 10) : '')}
+                className="filter-input-compact"
+                placeholderText="Select start date"
+                dateFormat="yyyy-MM-dd"
+                isClearable
+              />
+            </div>
+
             <div className="filter-input-group">
               <label className="compact-label">End Date</label>
-              <input
+              <DatePicker
+                selected={endDate ? new Date(endDate) : null}
+                onChange={date => setEndDate(date ? date.toISOString().slice(0, 10) : '')}
                 className="filter-input-compact"
-                type="date"
-                value={endDate}
-                onChange={e => setEndDate(e.target.value)}
+                placeholderText="Select end date"
+                dateFormat="yyyy-MM-dd"
+                isClearable
               />
             </div>
             
@@ -408,8 +430,8 @@ const ReportTable = () => {
         <div className="filter-status">
           <span className="filter-status-text">Active filters:</span>
           {query && <span className="filter-tag">{type}: {query}</span>}
-          {selectedPlatform && <span className="filter-tag">Platform: {selectedPlatform}</span>}
-          {selectedSeverity && <span className="filter-tag">Severity: {selectedSeverity}</span>}
+          {selectedPlatform && selectedPlatform.value && <span className="filter-tag">Platform: {selectedPlatform.label}</span>}
+          {selectedSeverity && selectedSeverity.value && <span className="filter-tag">Severity: {selectedSeverity.label}</span>}
           {location && <span className="filter-tag">Location: {location}</span>}
           {startDate && <span className="filter-tag">From: {startDate}</span>}
           {endDate && <span className="filter-tag">Until: {endDate}</span>}
@@ -584,7 +606,7 @@ const ReportTable = () => {
                 <ChevronLeft size={16} />
               </button>
 
-              <div className="page-numbers">
+              <div className="pagination-numbers">
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .filter(page => {
                     return page === 1 || 
