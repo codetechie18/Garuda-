@@ -629,19 +629,34 @@ const Scrape = () => {
                     expandedRow === report.id && (
                       <tr key={`expand-${report.id}`} className="report-table__row expanded-info-row">
                         <td colSpan={9} className="expanded-info-cell">
-                          <div className="expanded-info-title">Full Post:</div>
-                          <div className="expanded-info-content">{highlightHashtags(report.post)}</div>
-                          <div className="expanded-info-title">User Details:</div>
-                          <div>Name: {report.user?.name}</div>
-                          <div>Username: {report.user?.username}</div>
-                          {report.user?.email && <div>Email: {report.user.email}</div>}
-                          {report.user?.phone && <div>Phone: {report.user.phone}</div>}
-                          <div className="expanded-info-title spaced">Toxicity Tags:</div>
-                          <div>{Array.isArray(report.toxicityTags) ? report.toxicityTags.join(', ') : ''}</div>
-                          <div className="expanded-info-title spaced">Police Station:</div>
-                          <div>{report.policeStation}</div>
-                          <div className="expanded-info-title spaced">Reported At:</div>
-                          <div>{report.reportedAt}</div>
+                          <div className="expanded-info-grid">
+                            <div className="expanded-info-section post-details">
+                              <h4 className="expanded-info-heading">Full Post Content</h4>
+                              <p className="expanded-info-text">{highlightHashtags(report.post)}</p>
+                            </div>
+                            <div className="expanded-info-section user-details-exp">
+                              <h4 className="expanded-info-heading">User Details</h4>
+                              <div className="info-grid">
+                                <div className="info-item"><strong>Name:</strong><span>{report.user?.name}</span></div>
+                                <div className="info-item"><strong>Username:</strong><span>{report.user?.username}</span></div>
+                                {report.user?.email && <div className="info-item"><strong>Email:</strong><span>{report.user.email}</span></div>}
+                                {report.user?.phone && <div className="info-item"><strong>Phone:</strong><span>{report.user.phone}</span></div>}
+                              </div>
+                            </div>
+                            <div className="expanded-info-section toxicity-details">
+                              <h4 className="expanded-info-heading">Toxicity Analysis</h4>
+                              <div className="info-grid">
+                                <div className="info-item"><strong>Tags:</strong><span>{Array.isArray(report.toxicityTags) ? report.toxicityTags.join(', ') : 'N/A'}</span></div>
+                              </div>
+                            </div>
+                            <div className="expanded-info-section report-meta">
+                              <h4 className="expanded-info-heading">Report Metadata</h4>
+                              <div className="info-grid">
+                                <div className="info-item"><strong>Police Station:</strong><span>{report.policeStation}</span></div>
+                                <div className="info-item"><strong>Reported At:</strong><span>{new Date(report.reportedAt).toLocaleString()}</span></div>
+                              </div>
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     )
