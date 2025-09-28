@@ -1,0 +1,53 @@
+/* Scheduler page small helpers aligned with light theme */
+.scheduler-page { padding: 16px 20px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.page-title { margin: 0; }
+.page-subtitle { color: #64748b; margin-top: 4px; }
+.content-preview-static { text-align: left; color: #1f2937; }
+.content-meta { margin-top: 6px; font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 8px; }
+.link-btn { color: #3b82f6; background: transparent; border: none; padding: 0; cursor: pointer; }
+.link-btn:hover { text-decoration: underline; }
+.scheduled-section { margin-top: 12px; }
+.scheduled-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.scheduled-title { display: flex; align-items: center; gap: 8px; margin: 0 0 6px 0; }
+.when-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 999px; background: #eff6ff; color: #1f2937; font-size: 12px; }
+.btn-danger { background: #ef4444; color: #fff; border: none; }
+/* Tighten buttons inside scheduler tables */
+.scheduler-page .reports-table .btn { height: 32px; padding: 0 10px; border-radius: 8px; font-size: 12px; }
+.scheduler-page .reports-table .btn-outline { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+.scheduler-page .reports-table .btn-outline:hover { border-color: #9ca3af; background: #f9fafb; }
+.scheduler-page .reports-table .btn-danger { background: #ef4444; color: #fff; border: 1px solid transparent; }
+.scheduler-page .reports-table .btn-danger:hover { background: #dc2626; }
+/* Namespaced modal */
+.scheduler-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: grid; place-items: center; z-index: 1000; }
+.scheduler-modal-card { width: min(680px, 92vw); background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 20px 30px rgba(0,0,0,0.15); }
+.scheduler-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
+.scheduler-modal-body { padding: 16px; }
+.scheduler-modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 12px 16px 16px 16px; }
+.scheduler-icon-btn { background: transparent; border: none; color: #374151; cursor: pointer; }
+.scheduler-modal-report-text { color: #1f2937; }
+.scheduler-modal-report-meta { display: flex; gap: 8px; align-items: center; color: #6b7280; }
+.datetime-picker { margin-top: 10px; }
+/* Modal footer buttons smaller */
+.scheduler-modal-footer .btn { height: 36px; border-radius: 10px; padding: 0 14px; font-size: 13px; }
+/* Improve primary/outline in modal */
+.scheduler-modal-footer .btn.btn-primary { background: #2563eb; border: 1px solid #1d4ed8; }
+.scheduler-modal-footer .btn.btn-primary:disabled { background: #93c5fd; border-color: #93c5fd; cursor: not-allowed; }
+.scheduler-modal-footer .btn.btn-outline { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+.scheduler-modal-footer .btn.btn-outline:hover { background: #f9fafb; }
+/* Inline icon in date-time input */
+.datetime-input-wrapper { position: relative; display: inline-flex; width: 100%; }
+.datetime-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #64748b; pointer-events: none; }
+.datetime-input { padding-left: 34px !important; }
+/* Quick preset chips */
+.quick-presets { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+.preset-chip { background: #f3f4f6; border: 1px solid #e5e7eb; color: #111827; border-radius: 999px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+.preset-chip:hover { background: #e5e7eb; }
+
+/* New scheduled card container and heading styling */
+.scheduled-card { margin-top: 16px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.scheduled-card__header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
+.scheduled-card__title { display: inline-flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; color: #111827; margin: 0; }
+.scheduled-card__title svg { color: #2563eb; }
+.count-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; font-size: 12px; font-weight: 600; color: #1f2937; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 999px; }
+.scheduled-card .reports-table-wrapper { padding: 8px 12px 14px 12px; }

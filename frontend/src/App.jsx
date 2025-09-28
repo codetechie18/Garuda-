@@ -8,6 +8,7 @@ import Profile from './Pages/Profile';
 import Navbar from './components/Navbar';
 import UserManagement from './Pages/UserManagement';
 import ReportTable from './Pages/ReportTable.jsx';
+import Scheduler from './Pages/Scheduler.jsx';
 import './App.css';
 
 
@@ -101,6 +102,14 @@ function App() {
             element={
               isLoggedIn ? 
               <UserManagement user={user} /> : 
+              <Navigate to="/login" replace />
+            }
+          />
+          <Route 
+            path="/scheduler" 
+            element={
+              isLoggedIn ? 
+              <Scheduler /> : 
               <Navigate to="/login" replace />
             }
           />
