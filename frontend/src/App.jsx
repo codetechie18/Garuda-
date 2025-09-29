@@ -4,6 +4,7 @@ import Login from './Pages/Login';
 import Dashboard from './Pages/Dashboard';
 // import Reports from './Pages/Reports';
 import Scrape from './Pages/Scrape';
+import SearchPosts from './Pages/SearchPosts';
 import Profile from './Pages/Profile';
 import Navbar from './components/Navbar';
 import UserManagement from './Pages/UserManagement';
@@ -86,6 +87,14 @@ function App() {
             element={
               isLoggedIn ? 
               <Scrape user={user} /> : 
+              <Navigate to="/login" replace />
+            } 
+          />
+          <Route 
+            path="/searchposts" 
+            element={
+              isLoggedIn ? 
+              <SearchPosts /> : 
               <Navigate to="/login" replace />
             } 
           />

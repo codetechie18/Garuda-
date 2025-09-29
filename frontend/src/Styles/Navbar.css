@@ -414,6 +414,59 @@
 .drawer-brand { transition: transform 160ms ease, color 120ms ease }
 .drawer-brand:hover { transform: translateX(4px); color: #153e75 }
 
+/* Navigation section with submenu styles */
+.nav-section {
+  margin: 4px 0;
+}
+
+.nav-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 8px 10px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 6px;
+}
+
+.nav-section-header svg {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.nav-submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 20px;
+}
+
+.drawer-sublink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: #6b7280;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.drawer-sublink:hover {
+  background: #f8fafc;
+  color: #1e3a8a;
+  transform: translateX(4px);
+}
+
+.drawer-sublink.active {
+  background: #e6f4ff;
+  color: #0b6ea3;
+  font-weight: 500;
+}
+
 /* style for section-title links inside the drawer */
 .drawer-section-title {
   display: flex;

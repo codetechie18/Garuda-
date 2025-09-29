@@ -1,19 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
   Plus, 
   Edit, 
   Trash2, 
-  Eye, 
-  Download, 
   ChevronLeft, 
   ChevronRight,
-  ArrowUpDown,
-  Filter,
   X,
   Save,
   UserPlus
 } from 'lucide-react';
+import Select from 'react-select';
 import '../Styles/UserManagement.css';
 
 // Mock data
@@ -110,11 +107,12 @@ const initialUsers = [
 
 const UserManagement = () => {
   const [users, setUsers] = useState(initialUsers);
-  const [currentUser, setCurrentUser] = useState({ role: 'Admin' }); // Mock current user as Admin
+  const [currentUser] = useState({ role: 'Admin' }); // Mock current user as Admin
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterSector, setFilterSector] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
-  const [filterRole, setFilterRole] = useState('');
+  const [roleFilter, setRoleFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
+
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -129,27 +127,38 @@ const UserManagement = () => {
     name: '',
     email: '',
     position: '',
-    area: '',
+    sector: '',
     role: 'User',
     status: 'Active'
   });
 
-  // Get unique values for filters
-    
-  const sectors = [...new Set(users.map(user => user.sector))];
-  const roles = [...new Set(users.map(user => user.role))];
-  const statuses = ['Active', 'Inactive'];
+  // react-select options
+  const roleSelectOptions = useMemo(() => ([
+    { value: 'All', label: 'All Roles' },
+    { value: 'Admin', label: 'Admin' },
+    { value: 'User', label: 'User' },
+    { value: 'Guest', label: 'Guest' },
+  ]), []);
 
-  // Filter and sort users
+  const statusSelectOptions = useMemo(() => ([
+    { value: 'All', label: 'All Status' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' },
+  ]), []);
+
+  // Filter and sort users - only search functionality
   const filteredAndSortedUsers = useMemo(() => {
     let filtered = users.filter(user => {
-      const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           user.email.toLowerCase().includes(searchTerm.toLowerCase()) ;
-     
-      const matchesStatus = !filterStatus || user.status === filterStatus;
-      const matchesRole = !filterRole || user.role === filterRole;
+      const q = searchTerm.trim().toLowerCase();
+      const matchesSearch = !q ||
+        user.name.toLowerCase().includes(q) ||
+        user.email.toLowerCase().includes(q) ||
+        (user.id && user.id.toLowerCase().includes(q));
+
+      const matchesRole = roleFilter === 'All' || user.role === roleFilter;
+      const matchesStatus = statusFilter === 'All' || user.status === statusFilter;
       
-      return matchesSearch  && matchesStatus && matchesRole;
+      return matchesSearch && matchesRole && matchesStatus;
     });
 
     if (sortConfig.key) {
@@ -164,10 +173,11 @@ const UserManagement = () => {
     }
 
     return filtered;
-  }, [users, searchTerm, filterSector, filterStatus, filterRole, sortConfig]);
+  }, [users, searchTerm, roleFilter, statusFilter, sortConfig]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredAndSortedUsers.length / itemsPerPage);
+  const totalPagesRaw = Math.ceil(filteredAndSortedUsers.length / itemsPerPage);
+  const totalPages = Math.max(1, totalPagesRaw);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedUsers = filteredAndSortedUsers.slice(startIndex, startIndex + itemsPerPage);
 
@@ -178,6 +188,11 @@ const UserManagement = () => {
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
   };
+
+  // Reset to first page when filters or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, roleFilter, statusFilter, itemsPerPage]);
 
   // User actions
   const handleAddUser = (e) => {
@@ -235,7 +250,7 @@ const UserManagement = () => {
       name: user.name,
       email: user.email,
       position: user.position,
-     
+      sector: user.sector || '',
       role: user.role,
       status: user.status
     });
@@ -250,6 +265,8 @@ const UserManagement = () => {
       user.name,
       user.email,
       user.position,
+      user.id,
+      user.sector || '',
       user.role,
       user.status,
       user.dateJoined,
@@ -298,41 +315,47 @@ const UserManagement = () => {
           </div>
 
           <div className="filters">
+            <div className="rs-select">
+              <Select
+                options={roleSelectOptions}
+                value={roleSelectOptions.find(o => o.value === roleFilter)}
+                onChange={(opt) => setRoleFilter(opt?.value || 'All')}
+                classNamePrefix="rs"
+                placeholder="Role"
+                aria-label="Filter by role"
+              />
+            </div>
 
-            <select
-              value={filterRole}
-              onChange={(e) => setFilterRole(e.target.value)}
-              className="filter-select"
-            >
-              <option value="">All Roles</option>
-              {roles.map(role => (
-                <option key={role} value={role}>{role}</option>
-              ))}
-            </select>
+            <div className="rs-select">
+              <Select
+                options={statusSelectOptions}
+                value={statusSelectOptions.find(o => o.value === statusFilter)}
+                onChange={(opt) => setStatusFilter(opt?.value || 'All')}
+                classNamePrefix="rs"
+                placeholder="Status"
+                aria-label="Filter by status"
+              />
+            </div>
 
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="filter-select"
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => { setRoleFilter('All'); setStatusFilter('All'); setSearchTerm(''); }}
             >
-              <option value="">All Status</option>
-              {statuses.map(status => (
-                <option key={status} value={status}>{status}</option>
-              ))}
-            </select>
+              Clear Filters
+            </button>
           </div>
+
         </div>
 
         {/* Action Buttons */}
         <div className="action-buttons">
-          {/* <button
+          <button
             onClick={exportToCSV}
             className="btn btn-secondary"
           >
-            <Download size={18} />
             Export CSV
           </button>
-           */}
           <button
             onClick={() => setShowAddModal(true)}
             disabled={!isAdmin}
@@ -353,14 +376,21 @@ const UserManagement = () => {
               {/* <th onClick={() => handleSort('name')} className="sortable">
                 Name <ArrowUpDown size={14} />
               </th> */}
-              <th>Name</th>
+              <th onClick={() => handleSort('name')} className="sortable">
+                Name {sortConfig.key === 'name' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+              </th>
               <th>Email</th>
               <th>Position</th>
-           <th>Role</th>
+              <th>Sector</th>
+              <th onClick={() => handleSort('role')} className="sortable">
+                Role {sortConfig.key === 'role' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+              </th>
               {/* <th onClick={() => handleSort('status')} className="sortable">
                 Status <ArrowUpDown size={14} />
               </th> */}
-                 <th > Status </th> 
+              <th onClick={() => handleSort('status')} className="sortable">
+                Status {sortConfig.key === 'status' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+              </th>
               <th>Last Login</th>
               <th>Actions</th>
             </tr>
@@ -372,6 +402,7 @@ const UserManagement = () => {
                 <td className="user-name">{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.position}</td>
+                <td>{user.sector}</td>
               
                 <td>
                   <span className={`role-badge role-${user.role.toLowerCase()}`}>
@@ -500,6 +531,14 @@ const UserManagement = () => {
                   required
                 />
               </div>
+              <div className="form-group">
+                <label>Sector</label>
+                <input
+                  type="text"
+                  value={formData.sector}
+                  onChange={(e) => setFormData({...formData, sector: e.target.value})}
+                />
+              </div>
              
               <div className="form-row">
                 <div className="form-group">
@@ -578,7 +617,11 @@ const UserManagement = () => {
               </div>
               <div className="form-group">
                 <label>Sector</label>
-               
+                <input
+                  type="text"
+                  value={formData.sector}
+                  onChange={(e) => setFormData({...formData, sector: e.target.value})}
+                />
               </div>
               <div className="form-row">
                 <div className="form-group">

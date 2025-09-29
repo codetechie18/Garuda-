@@ -136,10 +136,22 @@ const Navbar = ({ user, onLogout }) => {
                 <BarChart3 size={16} />
                 <span>Dashboard</span>
               </Link>
-              <Link to="/scrape" className={`drawer-link ${isActive('/scrape') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-                <Search size={16} />
-                <span>Social Insights</span>
-              </Link>
+              
+              {/* Social Insights Section with Submenu */}
+              <div className="nav-section">
+                <div className="nav-section-header">
+                  <Search size={16} />
+                  <span>Social Insights</span>
+                </div>
+                <div className="nav-submenu">
+                  <Link to="/scrape" className={`drawer-sublink ${isActive('/scrape') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    <span>Scrape</span>
+                  </Link>
+                  <Link to="/searchposts" className={`drawer-sublink ${isActive('/searchposts') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    <span>Search Posts</span>
+                  </Link>
+                </div>
+              </div>
               {/* <Link to="/reports" className={`drawer-link ${isActive('/reports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                 <FileText size={16} />
                 <span>Reporting</span>

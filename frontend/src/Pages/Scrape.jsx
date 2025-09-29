@@ -349,7 +349,7 @@ const Scrape = () => {
   return (
     <div className="scrape-page">
       <div className="scrape-container">
-        <h1>Scrape/Search Posts</h1>
+        <h1>Scrape</h1>
         {/* <p>Search posts on the internet by hashtag or username. Note: this UI simulates searching. For real scraping, connect to a backend API that performs authorized scraping or uses official platform APIs.</p> */}
 
         <form className="scrape-form" onSubmit={performSearch}>

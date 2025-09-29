@@ -57,8 +57,10 @@
 
 .search-filters {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
 }
 
 .search-box {
@@ -105,7 +107,9 @@
 
 .filters {
   display: flex;
-  gap: 1.25rem;
+  gap: 1rem;
+  flex: 1;
+  align-items: center;
   flex-wrap: wrap;
 }
 
@@ -130,6 +134,26 @@
     0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
+
+/* react-select theming */
+.rs-select { min-width: 180px; }
+.rs__control {
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 0.75rem !important;
+  background: #fafafa !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  padding: 2px 2px !important;
+}
+.rs__control--is-focused {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+}
+.rs__single-value { font-weight: 600; color: #1f2937; }
+.rs__placeholder { color: #94a3b8 !important; font-weight: 500; }
+.rs__menu { border-radius: 0.75rem; overflow: hidden; }
+.rs__option { font-weight: 500; }
+.rs__option--is-focused { background: #eff6ff !important; }
+.rs__option--is-selected { background: #dbeafe !important; color: #1d4ed8 !important; }
 
 .action-buttons {
   display: flex;
@@ -323,6 +347,7 @@
 
 .users-table th.sortable {
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -336,10 +361,9 @@
   transform: scaleX(1);
 }
 
+/* Use normal table layout for headers; avoid flex to keep headings aligned */
 .users-table th.sortable {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  display: table-cell;
 }
 
 .users-table td {
@@ -521,6 +545,7 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
