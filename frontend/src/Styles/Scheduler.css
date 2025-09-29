@@ -18,6 +18,10 @@
 .scheduler-page .reports-table .btn-outline:hover { border-color: #9ca3af; background: #f9fafb; }
 .scheduler-page .reports-table .btn-danger { background: #ef4444; color: #fff; border: 1px solid transparent; }
 .scheduler-page .reports-table .btn-danger:hover { background: #dc2626; }
+/* Action buttons spacing and layout */
+.action-buttons-group { display: flex; gap: 12px; align-items: center; }
+.btn-reschedule { min-width: 80px; }
+.btn-cancel { min-width: 65px; }
 /* Namespaced modal */
 .scheduler-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: grid; place-items: center; z-index: 1000; }
 .scheduler-modal-card { width: min(680px, 92vw); background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 20px 30px rgba(0,0,0,0.15); }
@@ -39,10 +43,33 @@
 .datetime-input-wrapper { position: relative; display: inline-flex; width: 100%; }
 .datetime-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #64748b; pointer-events: none; }
 .datetime-input { padding-left: 34px !important; }
-/* Quick preset chips */
-.quick-presets { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
-.preset-chip { background: #f3f4f6; border: 1px solid #e5e7eb; color: #111827; border-radius: 999px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
-.preset-chip:hover { background: #e5e7eb; }
+/* Enhanced date/time picker interface */
+.datetime-picker { margin-top: 10px; }
+.datetime-section, .time-section { margin-bottom: 16px; }
+.date-input-wrapper, .time-input-wrapper { position: relative; display: inline-flex; width: 100%; }
+.date-icon, .time-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #64748b; pointer-events: none; }
+.date-input, .time-input { padding-left: 34px !important; width: 100%; }
+/* Simple time input styles */
+.simple-time-input { padding: 16px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; }
+.time-input-group { display: flex; gap: 12px; align-items: flex-start; }
+.time-field { flex: 2; }
+.period-field { flex: 1; min-width: 80px; }
+.time-label { display: block; font-size: 12px; color: #6b7280; margin-bottom: 6px; font-weight: 500; }
+.time-text-input { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; font-family: 'Courier New', monospace; height: 42px; box-sizing: border-box; }
+.time-text-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+.period-toggle { display: flex; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 42px; }
+.period-btn { flex: 1; border: none; background: #ffffff; color: #6b7280; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border-right: 1px solid #d1d5db; }
+.period-btn:last-child { border-right: none; }
+.period-btn:hover { background: #f9fafb; }
+.period-btn.active { background: #2563eb; color: #ffffff; }
+.period-btn:focus { outline: none; box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.2); }
+.time-hint { display: block; margin-top: 4px; font-size: 11px; color: #9ca3af; }
+/* Quick preset chips with better styling */
+.quick-presets { margin-top: 16px; }
+.presets-label { display: block; font-size: 12px; color: #6b7280; margin-bottom: 8px; font-weight: 500; }
+.presets-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.preset-chip { background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; border-radius: 8px; padding: 8px 12px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; transition: all 0.2s ease; }
+.preset-chip:hover { background: #e2e8f0; border-color: #cbd5e1; color: #334155; transform: translateY(-1px); }
 
 /* New scheduled card container and heading styling */
 .scheduled-card { margin-top: 16px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import { Search, RefreshCw, Clock, Calendar as CalendarIcon } from 'lucide-react';
@@ -7,6 +8,109 @@ import '../Styles/ReportTable.css';
 import '../Styles/Scrape.css';
 import '../Styles/Scheduler.css';
 import { truncateText, openGoogleMaps, formatDate } from '../utils.js';
+
+// Simple Time Input Component
+const SimpleTimeInput = ({ selectedTime, onChange }) => {
+	const [timeInput, setTimeInput] = useState('');
+	const [period, setPeriod] = useState('AM');
+	
+	// Initialize time input from selectedTime
+	useEffect(() => {
+		if (selectedTime) {
+			const hours = selectedTime.getHours();
+			const minutes = selectedTime.getMinutes();
+			const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+			const displayMinute = minutes.toString().padStart(2, '0');
+			setTimeInput(`${displayHour}:${displayMinute}`);
+			setPeriod(hours >= 12 ? 'PM' : 'AM');
+		} else {
+			setTimeInput('9:00');
+			setPeriod('AM');
+		}
+	}, [selectedTime]);
+	
+	const handleTimeChange = (newTimeInput, newPeriod = period) => {
+		// Validate time format (H:MM or HH:MM)
+		const timeRegex = /^(\d{1,2}):(\d{2})$/;
+		const match = newTimeInput.match(timeRegex);
+		
+		if (match) {
+			let hour = parseInt(match[1]);
+			const minute = parseInt(match[2]);
+			
+			// Validate hour and minute ranges
+			if (hour >= 1 && hour <= 12 && minute >= 0 && minute <= 59) {
+				// Convert to 24-hour format
+				if (newPeriod === 'PM' && hour !== 12) {
+					hour += 12;
+				} else if (newPeriod === 'AM' && hour === 12) {
+					hour = 0;
+				}
+				
+				const newDateTime = new Date(selectedTime || new Date());
+				newDateTime.setHours(hour, minute, 0, 0);
+				onChange(newDateTime);
+			}
+		}
+	};
+	
+	const handleInputChange = (e) => {
+		const value = e.target.value;
+		setTimeInput(value);
+		handleTimeChange(value, period);
+	};
+	
+	const handlePeriodChange = (e) => {
+		const newPeriod = e.target.value;
+		setPeriod(newPeriod);
+		if (timeInput) {
+			handleTimeChange(timeInput, newPeriod);
+		}
+	};
+	
+	return (
+		<div className="simple-time-input">
+			<div className="time-input-group">
+				<div className="time-field">
+					<label className="time-label">Time</label>
+					<input
+						type="text"
+						value={timeInput}
+						onChange={handleInputChange}
+						placeholder="9:00"
+						className="time-text-input"
+						maxLength="5"
+					/>
+					<small className="time-hint">Format: H:MM</small>
+				</div>
+				<div className="period-field">
+					<label className="time-label">Period</label>
+					<div className="period-toggle">
+						<button
+							type="button"
+							className={`period-btn ${period === 'AM' ? 'active' : ''}`}
+							onClick={() => handlePeriodChange({ target: { value: 'AM' } })}
+						>
+							AM
+						</button>
+						<button
+							type="button"
+							className={`period-btn ${period === 'PM' ? 'active' : ''}`}
+							onClick={() => handlePeriodChange({ target: { value: 'PM' } })}
+						>
+							PM
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+SimpleTimeInput.propTypes = {
+	selectedTime: PropTypes.instanceOf(Date),
+	onChange: PropTypes.func.isRequired,
+};
 
 const sampleReports = [
 	{ id: 1, platform: 'Facebook', post: 'Hate content example...', user: { name: 'Satish Kumar', username: '@satish_k' }, toxicitySeverity: 'High', toxicityScore: 8.7, toxicityTags: ['hate','harassment'], postLink: '#', location:{lat:12.97,lng:77.59}, policeStation:'Hingna Police Station', reportedAt:'2025-01-05T10:30:00Z' },
@@ -55,6 +159,16 @@ const Scheduler = () => {
 		try { const raw = localStorage.getItem('garudaScheduledReports'); return raw ? JSON.parse(raw) : []; } catch { return []; }
 	});
 	const [scheduledSearch, setScheduledSearch] = useState('');
+	
+	// Auto-remove completed scheduled items
+	useEffect(() => {
+		const interval = setInterval(() => {
+			const now = new Date();
+			setScheduledItems(prev => prev.filter(item => new Date(item.when) > now));
+		}, 60000); // Check every minute
+		return () => clearInterval(interval);
+	}, []);
+	
 	useEffect(() => { localStorage.setItem('garudaScheduledReports', JSON.stringify(scheduledItems)); }, [scheduledItems]);
 
 	const hasActiveFilters = (selectedPlatform && selectedPlatform.value) || (selectedSeverity && selectedSeverity.value) || query || location || startDate || endDate;
@@ -91,9 +205,7 @@ const Scheduler = () => {
 		d.setMinutes(rounded);
 		return d;
 	};
-	const startOfDay = (date) => { const d = new Date(date); d.setHours(0,0,0,0); return d; };
-	const endOfDay = (date) => { const d = new Date(date); d.setHours(23,45,0,0); return d; };
-	const isSameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
 	const inHours = (hours) => { const d = roundToNextQuarter(new Date()); d.setHours(d.getHours() + hours); return d; };
 	const tomorrowAt = (hour = 9, minute = 0) => { const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(hour, minute, 0, 0); return d; };
 	const nextMondayAt = (hour = 9, minute = 0) => { const d = new Date(); const day = d.getDay(); const diff = (8 - day) % 7 || 7; d.setDate(d.getDate() + diff); d.setHours(hour, minute, 0, 0); return d; };
@@ -216,8 +328,10 @@ const Scheduler = () => {
 										<span className={`platform-badge platform-badge--${item.report.platform.toLowerCase()}`}>{item.report.platform}</span>
 									</td>
 									<td className="actions-cell">
-										<button className="btn btn-outline" onClick={() => openScheduleModal(item.report, new Date(item.when))}>Reschedule</button>
-										<button className="btn btn-danger" onClick={() => removeScheduled(item.id)}>Cancel</button>
+										<div className="action-buttons-group">
+											<button className="btn btn-outline btn-reschedule" onClick={() => openScheduleModal(item.report, new Date(item.when))}>Reschedule</button>
+											<button className="btn btn-danger btn-cancel" onClick={() => removeScheduled(item.id)}>Cancel</button>
+										</div>
 									</td>
 								</tr>
 							)) : (
@@ -333,30 +447,52 @@ const Scheduler = () => {
 								</div>
 							)}
 							<div className="datetime-picker">
-								<label className="compact-label">Pick date & time</label>
-								<div className="datetime-input-wrapper">
-									<Clock size={16} className="datetime-icon" />
-									<DatePicker
-										selected={scheduleDateTime}
-										onChange={(date) => setScheduleDateTime(date)}
-										showTimeSelect
-										timeIntervals={15}
-										timeCaption="Time"
-										dateFormat="MMM d, yyyy h:mm aa"
-										className="filter-input-compact datetime-input"
-										placeholderText="Select date & time"
-										withPortal
-										popperPlacement="bottom"
-										shouldCloseOnSelect={false}
-										minDate={new Date()}
-										minTime={(scheduleDateTime && isSameDay(scheduleDateTime, new Date())) ? roundToNextQuarter(new Date()) : startOfDay(scheduleDateTime || new Date())}
-										maxTime={endOfDay(scheduleDateTime || new Date())}
+								<div className="datetime-section">
+									<label className="compact-label">Select Date</label>
+									<div className="date-input-wrapper">
+										<CalendarIcon size={16} className="date-icon" />
+										<DatePicker
+											selected={scheduleDateTime}
+											onChange={(date) => {
+												if (date) {
+													const currentTime = scheduleDateTime || roundToNextQuarter(new Date());
+													const newDateTime = new Date(date);
+													newDateTime.setHours(currentTime.getHours(), currentTime.getMinutes(), 0, 0);
+													setScheduleDateTime(newDateTime);
+												} else {
+													setScheduleDateTime(null);
+												}
+											}}
+											dateFormat="MMM d, yyyy"
+											className="filter-input-compact date-input"
+											placeholderText="Choose date"
+											minDate={new Date()}
+											showPopperArrow={false}
+										/>
+									</div>
+								</div>
+								
+								<div className="time-section">
+									<label className="compact-label">Select Time</label>
+									<SimpleTimeInput
+										selectedTime={scheduleDateTime}
+										onChange={setScheduleDateTime}
 									/>
 								</div>
+								
 								<div className="quick-presets" aria-label="Quick schedule presets">
-									<button type="button" className="preset-chip" onClick={() => setScheduleDateTime(inHours(1))}>In 1 hour</button>
-									<button type="button" className="preset-chip" onClick={() => setScheduleDateTime(tomorrowAt(9,0))}>Tomorrow 9:00 AM</button>
-									<button type="button" className="preset-chip" onClick={() => setScheduleDateTime(nextMondayAt(9,0))}>Next Monday 9:00 AM</button>
+									<span className="presets-label">Quick Options:</span>
+									<div className="presets-grid">
+										<button type="button" className="preset-chip" onClick={() => setScheduleDateTime(inHours(1))}>
+											<Clock size={12} />In 1 hour
+										</button>
+										<button type="button" className="preset-chip" onClick={() => setScheduleDateTime(tomorrowAt(9,0))}>
+											<CalendarIcon size={12} />Tomorrow 9 AM
+										</button>
+										<button type="button" className="preset-chip" onClick={() => setScheduleDateTime(nextMondayAt(9,0))}>
+											<CalendarIcon size={12} />Next Monday 9 AM
+										</button>
+									</div>
 								</div>
 							</div>
 						</div>
