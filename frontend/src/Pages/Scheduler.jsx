@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
-import { Search, RefreshCw, Clock, Calendar as CalendarIcon } from 'lucide-react';
+import { Clock, Calendar as CalendarIcon } from 'lucide-react';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../Styles/ReportTable.css';
 import '../Styles/Scrape.css';
@@ -143,7 +143,6 @@ const Scheduler = () => {
 	const [location, setLocation] = useState('');
 	const [startDate, setStartDate] = useState('');
 	const [endDate, setEndDate] = useState('');
-	const [isRefreshing, setIsRefreshing] = useState(false);
 
 	// Pagination
 	const [currentPage, setCurrentPage] = useState(1);
@@ -173,7 +172,6 @@ const Scheduler = () => {
 
 	const hasActiveFilters = (selectedPlatform && selectedPlatform.value) || (selectedSeverity && selectedSeverity.value) || query || location || startDate || endDate;
 
-	const handleRefresh = async () => { setIsRefreshing(true); await new Promise(r => setTimeout(r, 600)); setIsRefreshing(false); };
 	const clearFilters = () => { setSelectedPlatform(null); setSelectedSeverity(null); setQuery(''); setLocation(''); setStartDate(''); setEndDate(''); setCurrentPage(1); };
 
 	// Filtering logic (mirrors Reports)
@@ -255,7 +253,7 @@ const Scheduler = () => {
 							<input className="form-input-compact location-input" placeholder="City, police station, or coords" value={location} onChange={(e)=> setLocation(e.target.value)} />
 						</div>
 						<button className="btn btn-primary compact-search-btn" type="button" disabled={!query}>
-							<Search size={14} /> Search
+							<CalendarIcon size={14} /> Schedule
 						</button>
 					</div>
 				</div>
@@ -277,13 +275,7 @@ const Scheduler = () => {
 							<label className="compact-label">End Date</label>
 							<DatePicker selected={endDate ? new Date(endDate) : null} onChange={(d)=> setEndDate(d ? d.toISOString().slice(0,10) : '')} className="filter-input-compact" placeholderText="Select end date" dateFormat="yyyy-MM-dd" isClearable />
 						</div>
-						<div style={{display:'flex', gap:8}}>
-							<button type="button" className="btn btn-outline clear-filters-btn-compact" onClick={clearFilters} disabled={!hasActiveFilters}>Clear Filters</button>
-							<button onClick={handleRefresh} disabled={isRefreshing} className={`btn btn-outline refresh-btn-compact ${isRefreshing ? 'refreshing' : ''}`} title="Refresh data">
-								<RefreshCw size={16} className={`refresh-icon ${isRefreshing ? 'spinning' : ''}`} />
-								{isRefreshing ? 'Refreshing...' : 'Refresh'}
-							</button>
-						</div>
+						<button type="button" className="btn btn-outline clear-filters-btn-compact" onClick={clearFilters} disabled={!hasActiveFilters}>Clear Filters</button>
 					</div>
 				</div>
 			</div>
@@ -351,7 +343,6 @@ const Scheduler = () => {
 			{/* Results summary */}
 			<div className="security-reports__summary">
 				<span className="results-count">{hasActiveFilters ? <>Showing {totalItems} of {sampleReports.length} reports</> : <>Total {totalItems} reports</>}</span>
-				{isRefreshing && (<span className="refresh-status">Refreshing data...</span>)}
 			</div>
 
 			{/* Reports table for scheduling */}
