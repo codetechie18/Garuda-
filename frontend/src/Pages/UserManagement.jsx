@@ -294,12 +294,15 @@ const UserManagement = () => {
 
   return (
     <div className="user-management-container">
-      <div className="user-management-header">
-        <h1 className="page-title">User Management</h1>
-        <p className="page-subtitle">Manage users, roles, and permissions</p>
-      </div>
+      <div className="user-management-inner">
+        <div className="user-management-header">
+          <div className="header-card">
+            <h1 className="page-title">User Management</h1>
+            <p className="page-subtitle">Manage users, roles, and permissions</p>
+          </div>
+        </div>
 
-      {/* Controls Section */}
+  {/* Controls Section */}
       <div className="controls-section">
         {/* Search and Filters */}
         <div className="search-filters">
@@ -336,15 +339,15 @@ const UserManagement = () => {
                 aria-label="Filter by status"
               />
             </div>
-
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => { setRoleFilter('All'); setStatusFilter('All'); setSearchTerm(''); }}
-            >
-              Clear Filters
-            </button>
           </div>
+
+          <button
+            type="button"
+            className="btn btn-secondary clear-filters-btn"
+            onClick={() => { setRoleFilter('All'); setStatusFilter('All'); setSearchTerm(''); }}
+          >
+            Clear Filters
+          </button>
 
         </div>
 
@@ -448,7 +451,7 @@ const UserManagement = () => {
         </table>
       </div>
 
-      {/* Pagination */}
+  {/* Pagination */}
       <div className="pagination-container">
         <div className="pagination-info">
           <span>
@@ -493,7 +496,7 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* Add User Modal */}
+  {/* Add User Modal */}
       {showAddModal && (
         <div className="modal-overlay">
           <div className="modal">
@@ -577,7 +580,7 @@ const UserManagement = () => {
         </div>
       )}
 
-      {/* Edit User Modal */}
+  {/* Edit User Modal */}
       {showEditModal && (
         <div className="modal-overlay">
           <div className="modal">
@@ -660,7 +663,7 @@ const UserManagement = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+  {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="modal-overlay">
           <div className="modal modal-small">
@@ -686,6 +689,7 @@ const UserManagement = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

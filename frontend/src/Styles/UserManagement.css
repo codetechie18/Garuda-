@@ -9,12 +9,33 @@
     "Helvetica Neue", Arial, sans-serif;
 }
 
+/* Inner width container to match Reports/Search/Scrape (1200px) */
+.user-management-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
 /* Header Section */
 .user-management-header {
   margin-bottom: 3rem;
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
   padding-bottom: 2.25rem; /* increase space so heading descenders aren't clipped */
+}
+/* Gradient header card like Reports */
+.user-management-header {
+  margin-bottom: 20px;
+  border-bottom: none; /* remove old border when using header card */
+  padding-bottom: 0; /* spacing handled by card padding */
+}
+
+.user-management-header .header-card {
+  background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%);
+  color: #fff;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
 }
 
 .page-title {
@@ -31,6 +52,18 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+/* Title/subtitle styles when used inside gradient header card */
+.user-management-header .header-card .page-title {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0;
+  color: #fff;
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: initial;
+}
 
 .page-subtitle {
   color: #64748b;
@@ -39,6 +72,10 @@
   line-height: 1.6;
   margin-top: 0.125rem; /* small push to avoid overlapping descenders */
   max-width: 600px;
+}
+.user-management-header .header-card .page-subtitle {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* Controls Section */
@@ -61,6 +98,11 @@
   align-items: center;
   gap: 1.25rem;
   flex-wrap: wrap;
+}
+
+/* push clear button to the end of the row */
+.clear-filters-btn {
+  margin-left: auto;
 }
 
 .search-box {
@@ -110,7 +152,7 @@
   gap: 1rem;
   flex: 1;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* keep selects side by side on desktop */
 }
 
 .filter-select {
@@ -737,7 +779,12 @@
   }
 
   .filters {
-    grid-template-columns: 1fr;
+    flex-wrap: wrap; /* allow wrap on small screens */
+  }
+
+  .clear-filters-btn {
+    margin-left: 0;
+    width: 100%;
   }
 
   .filter-select {

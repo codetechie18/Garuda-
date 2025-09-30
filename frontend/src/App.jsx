@@ -86,7 +86,7 @@ function App() {
             path="/scrape" 
             element={
               isLoggedIn ? 
-              <Scrape user={user} /> : 
+              <SearchPosts /> : 
               <Navigate to="/login" replace />
             } 
           />
@@ -94,7 +94,7 @@ function App() {
             path="/searchposts" 
             element={
               isLoggedIn ? 
-              <SearchPosts /> : 
+              <Scrape user={user} /> : 
               <Navigate to="/login" replace />
             } 
           />
