@@ -87,9 +87,13 @@ const Profile = ({ user, updateUser }) => {
   return (
     <div className="profile">
       <div className="profile-container">
-        <div className="profile-header fade-in">
-          <h1>Profile Settings</h1>
-          <p>Manage your account information and security settings</p>
+        <div className="security-reports__header fade-in">
+          <div className="header-content">
+            <div className="header-text">
+              <h1 className="security-reports__title">Profile Settings</h1>
+              <p className="security-reports__subtitle">Manage your account information and security settings</p>
+            </div>
+          </div>
         </div>
 
         <div className="profile-content">

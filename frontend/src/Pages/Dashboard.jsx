@@ -94,18 +94,20 @@ const Dashboard = ({ user }) => {
   return (
     <div className="dashboard">
       <div className="dashboard-container">
-        <div className="dashboard-header fade-in">
-          <div>
-            <h1>Security Dashboard</h1>
-            <p>Monitor and manage cybersecurity incidents</p>
-          </div>
-          <div className="dashboard-time">
+        <div className="security-reports__header fade-in">
+          <div className="header-content">
+            <div className="header-text">
+              <h1 className="security-reports__title">Security Dashboard</h1>
+              <p className="security-reports__subtitle">Monitor and manage cybersecurity incidents</p>
+            </div>
+            <div className="dashboard-time">
             <span>{new Date().toLocaleDateString('en-US', { 
               weekday: 'long', 
               year: 'numeric', 
               month: 'long', 
               day: 'numeric' 
             })}</span>
+            </div>
           </div>
         </div>
 

@@ -295,10 +295,12 @@ const UserManagement = () => {
   return (
     <div className="user-management-container">
       <div className="user-management-inner">
-        <div className="user-management-header">
-          <div className="header-card">
-            <h1 className="page-title">User Management</h1>
-            <p className="page-subtitle">Manage users, roles, and permissions</p>
+        <div className="security-reports__header">
+          <div className="header-content">
+            <div className="header-text">
+              <h1 className="security-reports__title">User Management</h1>
+              <p className="security-reports__subtitle">Manage users, roles, and permissions</p>
+            </div>
           </div>
         </div>
 

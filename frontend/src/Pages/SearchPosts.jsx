@@ -83,15 +83,17 @@ const SearchPosts = () => {
 
   return (
     <div className="search-posts-page">
-      <div className="page-header">
+      <div className="security-reports__header">
         <div className="header-content">
-          <h1 className="page-title">
-            <Search size={24} />
-            Search Posts
-          </h1>
-          <p className="page-description">
-            Search across social media platforms for specific content, hashtags, or users
-          </p>
+          <div className="header-text">
+            <h1 className="security-reports__title">
+              <Search size={24} />
+              Scrape
+            </h1>
+            <p className="security-reports__subtitle">
+              Search across social media platforms for specific content, hashtags, or users
+            </p>
+          </div>
         </div>
       </div>
 

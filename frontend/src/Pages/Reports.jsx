@@ -81,7 +81,14 @@ const Reports = ({ user }) => {
   return (
     <div className="reports">
       <div className="reports-container">
-        <div className="reports-header fade-in"><div><h1>Security Reports</h1><p>Monitor and manage security incidents and reports</p></div></div>
+        <div className="security-reports__header fade-in">
+          <div className="header-content">
+            <div className="header-text">
+              <h1 className="security-reports__title">Security Reports</h1>
+              <p className="security-reports__subtitle">Monitor and manage security incidents and reports</p>
+            </div>
+          </div>
+        </div>
 
         <div className="stats-grid fade-in">
           <div className="stat-card"><div className="stat-content"><span className="stat-number">{stats.new}</span><span className="stat-label">New Reports</span></div><div className="stat-icon new">📋</div></div>

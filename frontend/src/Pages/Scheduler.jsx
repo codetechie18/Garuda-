@@ -229,10 +229,12 @@ const Scheduler = () => {
 
 	return (
 		<div className="scheduler-page">
-			<div className="page-header">
-				<div className="header-left">
-					<h1 className="page-title">Scheduler</h1>
-					<p className="page-subtitle">Manage scheduled follow-ups and create new schedules from reports</p>
+			<div className="security-reports__header">
+				<div className="header-content">
+					<div className="header-text">
+						<h1 className="security-reports__title">Scheduler</h1>
+						<p className="security-reports__subtitle">Manage scheduled follow-ups and create new schedules from reports</p>
+					</div>
 				</div>
 			</div>
 

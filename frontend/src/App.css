@@ -15,6 +15,44 @@ body {
   min-height: 100vh;
 }
 
+/* Shared page header styles (matching Reports Table header) */
+.security-reports__header {
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-text {
+  flex: 1;
+}
+
+.security-reports__title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.security-reports__title svg {
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.security-reports__subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
 /* Loading Screen */
 .loading-screen {
   display: flex;
