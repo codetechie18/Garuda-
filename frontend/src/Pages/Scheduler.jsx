@@ -88,16 +88,16 @@ const platformOptions = [
 	{ value: 'Reddit', label: 'Reddit' },
 ];
 
-const severityOptions = [
-	{ value: 'High', label: 'High' },
-	{ value: 'Medium', label: 'Medium' },
-	{ value: 'Low', label: 'Low' },
-];
+// const severityOptions = [
+// 	{ value: 'High', label: 'High' },
+// 	{ value: 'Medium', label: 'Medium' },
+// 	{ value: 'Low', label: 'Low' },
+// ];
 
 const Scheduler = () => {
 	// Filters
 	const [selectedPlatform, setSelectedPlatform] = useState(null);
-	const [selectedSeverity, setSelectedSeverity] = useState(null);
+	// const [selectedSeverity, setSelectedSeverity] = useState(null);
 	const [query, setQuery] = useState('');
 	const [type, setType] = useState('hashtag');
 	const [location, setLocation] = useState('');
@@ -116,9 +116,9 @@ const Scheduler = () => {
 
 
 
-	const hasActiveFilters = (selectedPlatform && selectedPlatform.value) || (selectedSeverity && selectedSeverity.value) || query || location || startDate || endDate;
+	const hasActiveFilters = (selectedPlatform && selectedPlatform.value) || /* (selectedSeverity && selectedSeverity.value) || */ query || location || startDate || endDate;
 
-	const clearFilters = () => { setSelectedPlatform(null); setSelectedSeverity(null); setQuery(''); setLocation(''); setStartDate(''); setEndDate(''); setCurrentPage(1); };
+	const clearFilters = () => { setSelectedPlatform(null); /* setSelectedSeverity(null); */ setQuery(''); setLocation(''); setStartDate(''); setEndDate(''); setCurrentPage(1); };
 
 	// Schedule handlers
 	const roundToNextQuarter = (date) => {
@@ -153,13 +153,13 @@ const Scheduler = () => {
 	const filteredReports = useMemo(() => sampleReports.filter(report => {
 		const matchesQuery = query === '' || (type === 'hashtag' && report.post.toLowerCase().includes(query.toLowerCase())) || (type === 'username' && (report.user.username.toLowerCase().includes(query.toLowerCase()) || report.user.name.toLowerCase().includes(query.toLowerCase())));
 		const matchesPlatform = !selectedPlatform || (selectedPlatform.value && report.platform === selectedPlatform.value);
-		const matchesSeverity = !selectedSeverity || (selectedSeverity.value && report.toxicitySeverity === selectedSeverity.value);
+		// const matchesSeverity = !selectedSeverity || (selectedSeverity.value && report.toxicitySeverity === selectedSeverity.value);
 		const matchesLocation = location === '' || report.policeStation.toLowerCase().includes(location.toLowerCase());
 		const rDate = new Date(report.reportedAt);
 		const matchesStart = startDate === '' || rDate >= new Date(startDate);
 		const matchesEnd = endDate === '' || rDate <= new Date(endDate);
-		return matchesQuery && matchesPlatform && matchesSeverity && matchesLocation && matchesStart && matchesEnd;
-	}), [query, type, selectedPlatform, selectedSeverity, location, startDate, endDate]);
+		return matchesQuery && matchesPlatform /* && matchesSeverity */ && matchesLocation && matchesStart && matchesEnd;
+	}), [query, type, selectedPlatform, location, startDate, endDate]);
 
 	useEffect(() => { const tp = Math.max(1, Math.ceil(filteredReports.length / itemsPerPage)); if (currentPage > tp) setCurrentPage(tp); }, [filteredReports.length, itemsPerPage, currentPage]);
 
@@ -210,8 +210,8 @@ const Scheduler = () => {
 							<Select className="react-select-container" classNamePrefix="react-select" options={platformOptions} value={selectedPlatform} onChange={setSelectedPlatform} isClearable placeholder="All Platforms" />
 						</div>
 						<div className="filter-input-group">
-							<label className="compact-label">Severity</label>
-							<Select className="react-select-container" classNamePrefix="react-select" options={severityOptions} value={selectedSeverity} onChange={setSelectedSeverity} isClearable placeholder="All Severities" />
+							{/* <label className="compact-label">Severity</label>
+							<Select className="react-select-container" classNamePrefix="react-select" options={severityOptions} value={selectedSeverity} onChange={setSelectedSeverity} isClearable placeholder="All Severities" /> */}
 						</div>
 						<div className="filter-input-group">
 							<label className="compact-label">Start Date</label>
@@ -263,8 +263,8 @@ const Scheduler = () => {
 								</th>
 								<th>Platform</th>
 								<th>Content</th>
-								<th>User</th>
-								<th>Severity</th>
+								{/* <th>User</th>
+								<th>Severity</th> */}
 								<th>Toxicity Score</th>
 								<th>Coordinates</th>
 								<th>Police Station</th>
@@ -298,7 +298,7 @@ const Scheduler = () => {
 										</div>
 									</td>
 
-									<td className="user-cell">
+									{/* <td className="user-cell">
 										<div className="user-info">
 											<div className="user-name">{report.user.name}</div>
 											<div className="user-handle">{report.user.username}</div>
@@ -309,7 +309,7 @@ const Scheduler = () => {
 										<span className={`severity-badge severity-${report.toxicitySeverity.toLowerCase()}`}>
 											{report.toxicitySeverity}
 										</span>
-									</td>
+									</td> */}
 
 									<td className="toxicity-cell">
 										<div className="toxicity-score">{report.toxicityScore}/10</div>
@@ -339,7 +339,7 @@ const Scheduler = () => {
 								</tr>
 							)) : (
 								<tr>
-									<td colSpan="8" className="no-results">
+									<td colSpan="6" className="no-results">
 										<div className="no-results-content">
 											<p>No reports found matching your criteria</p>
 											{hasActiveFilters && (
