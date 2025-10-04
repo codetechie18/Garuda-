@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Search, RefreshCw } from 'lucide-react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
@@ -18,75 +18,6 @@ const SearchPosts = () => {
   const [query, setQuery] = useState('');
   const [type, setType] = useState('hashtag'); // 'hashtag' or 'username'
   const [location, setLocation] = useState('');
-  
-  // Scheduled reports state
-  const [scheduledReports] = useState([
-    {
-      id: 1,
-      date: '2025-10-02T09:30:00Z',
-      userName: 'John Doe',
-      filters: {
-        platform: 'Twitter',
-        severity: 'High',
-        hashtag: '#cybersecurity',
-        location: 'Mumbai',
-        dateRange: '2025-09-01 to 2025-09-30'
-      },
-      status: 'Scheduled'
-    },
-    {
-      id: 2,
-      date: '2025-10-02T11:15:00Z',
-      userName: 'Jane Smith',
-      filters: {
-        platform: 'Facebook',
-        severity: 'Medium',
-        username: '@security_expert',
-        location: 'Delhi',
-        dateRange: '2025-09-15 to 2025-10-02'
-      },
-      status: 'In Progress'
-    },
-    {
-      id: 3,
-      date: '2025-10-01T16:45:00Z',
-      userName: 'Mike Johnson',
-      filters: {
-        platform: 'Instagram',
-        severity: 'Low',
-        hashtag: '#staysafe',
-        location: 'Bangalore',
-        dateRange: '2025-09-20 to 2025-09-30'
-      },
-      status: 'Completed'
-    },
-    {
-      id: 4,
-      date: '2025-10-02T14:20:00Z',
-      userName: 'Sarah Wilson',
-      filters: {
-        platform: 'LinkedIn',
-        severity: 'High',
-        hashtag: '#datasecurity',
-        location: 'Pune',
-        dateRange: '2025-09-25 to 2025-10-02'
-      },
-      status: 'Failed'
-    },
-    {
-      id: 5,
-      date: '2025-10-02T08:00:00Z',
-      userName: 'Alex Kumar',
-      filters: {
-        platform: 'Twitter',
-        severity: 'Medium',
-        username: '@techsafety',
-        location: 'Hyderabad',
-        dateRange: '2025-09-28 to 2025-10-02'
-      },
-      status: 'Scheduled'
-    }
-  ]);
 
   // Filter options
   const platformOptions = [
@@ -105,62 +36,7 @@ const SearchPosts = () => {
     { value: 'Low', label: 'Low' }
   ];
 
-  // Filtered scheduled reports using existing search and filter states
-  const filteredReports = useMemo(() => {
-    let filtered = [...scheduledReports];
 
-    // Apply search filter (hashtag or username query)
-    if (query.trim()) {
-      const searchTerm = query.toLowerCase();
-      filtered = filtered.filter(report => 
-        report.userName.toLowerCase().includes(searchTerm) ||
-        report.status.toLowerCase().includes(searchTerm) ||
-        Object.values(report.filters).some(filter => 
-          filter && filter.toString().toLowerCase().includes(searchTerm)
-        )
-      );
-    }
-
-    // Apply platform filter
-    if (selectedPlatform) {
-      filtered = filtered.filter(report => 
-        report.filters.platform && 
-        report.filters.platform.toLowerCase() === selectedPlatform.label.toLowerCase()
-      );
-    }
-
-    // Apply severity filter
-    if (selectedSeverity) {
-      filtered = filtered.filter(report => 
-        report.filters.severity && 
-        report.filters.severity === selectedSeverity.value
-      );
-    }
-
-    // Apply location filter
-    if (location.trim()) {
-      const locationTerm = location.toLowerCase();
-      filtered = filtered.filter(report => 
-        report.filters.location && 
-        report.filters.location.toLowerCase().includes(locationTerm)
-      );
-    }
-
-    // Apply date range filter
-    if (startDate || endDate) {
-      filtered = filtered.filter(report => {
-        const reportDate = new Date(report.date);
-        const start = startDate ? new Date(startDate) : null;
-        const end = endDate ? new Date(endDate) : null;
-        
-        if (start && reportDate < start) return false;
-        if (end && reportDate > end) return false;
-        return true;
-      });
-    }
-
-    return filtered;
-  }, [scheduledReports, query, selectedPlatform, selectedSeverity, location, startDate, endDate]);
 
   // Sample search results for demonstration
   const sampleResults = [
@@ -466,130 +342,7 @@ const SearchPosts = () => {
         )}
       </div>
 
-      {/* Scheduled Reports Table - Only show when filters are applied */}
-      {hasActiveFilters && (
-        <div className="scheduled-reports-section">
-          <div className="scheduled-reports-header">
-            <h2 className="scheduled-reports-title">
-              Scheduled Reports
-            </h2>
-          </div>
 
-          {/* Results Summary */}
-          <div className="reports-filter-summary">
-            <span className="results-count">
-              {filteredReports.length} of {scheduledReports.length} reports
-            </span>
-          </div>
-        
-        <div className="scheduled-reports-table-container">
-          <table className="scheduled-reports-table">
-            <thead>
-              <tr>
-                <th className="sr-no-header">Sr. No.</th>
-                <th className="date-header">Date Scheduled</th>
-                <th className="user-header">User Name</th>
-                <th className="filters-header">Applied Filters</th>
-                <th className="status-header">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredReports.map((report, index) => (
-                <tr key={report.id} className="scheduled-report-row">
-                  <td className="sr-no-cell">
-                    {index + 1}
-                  </td>
-                  
-                  <td className="date-cell">
-                    <div className="date-main">
-                      {new Date(report.date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </div>
-                    <div className="date-time">
-                      {new Date(report.date).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </div>
-                  </td>
-
-                  <td className="user-cell">
-                    <div className="user-name">{report.userName}</div>
-                  </td>
-
-                  <td className="filters-cell">
-                    <div className="filter-chips-simple">
-                      {report.filters.platform && (
-                        <span className="filter-chip platform">
-                          {report.filters.platform}
-                        </span>
-                      )}
-                      {report.filters.severity && (
-                        <span className="filter-chip severity">
-                          {report.filters.severity}
-                        </span>
-                      )}
-                      {report.filters.hashtag && (
-                        <span className="filter-chip hashtag">
-                          {report.filters.hashtag}
-                        </span>
-                      )}
-                      {report.filters.username && (
-                        <span className="filter-chip username">
-                          {report.filters.username}
-                        </span>
-                      )}
-                      {report.filters.location && (
-                        <span className="filter-chip location">
-                          {report.filters.location}
-                        </span>
-                      )}
-                      {report.filters.dateRange && (
-                        <span className="filter-chip date">
-                          {report.filters.dateRange}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-
-                  <td className="status-cell">
-                    <span className={`status-badge status-${report.status.toLowerCase().replace(' ', '-')}`}>
-                      {report.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              
-              {filteredReports.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="no-results">
-                    <div className="no-results-content">
-                      <p className="no-results-text">
-                        {scheduledReports.length === 0 
-                          ? 'No scheduled reports'
-                          : 'No matching reports'
-                        }
-                      </p>
-                      {scheduledReports.length > 0 && filteredReports.length === 0 && (
-                        <button 
-                          onClick={clearFilters}
-                          className="clear-search-btn"
-                        >
-                          Clear Filters
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        </div>
-      )}
     </div>
   );
 };
