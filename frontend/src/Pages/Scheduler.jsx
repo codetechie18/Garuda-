@@ -88,16 +88,20 @@ const platformOptions = [
 	{ value: 'Reddit', label: 'Reddit' },
 ];
 
-// const severityOptions = [
-// 	{ value: 'High', label: 'High' },
-// 	{ value: 'Medium', label: 'Medium' },
-// 	{ value: 'Low', label: 'Low' },
-// ];
+
+const statusOptions = [
+	{ value: 'Scheduled', label: 'Scheduled' },
+	{ value: 'In Progress', label: 'In Progress' },
+	{ value: 'Completed', label: 'Completed' },
+	{ value: 'Failed', label: 'Failed' },
+];
+
 
 const Scheduler = () => {
 	// Filters
 	const [selectedPlatform, setSelectedPlatform] = useState(null);
 	// const [selectedSeverity, setSelectedSeverity] = useState(null);
+	const [selectedStatus, setSelectedStatus] = useState(null);
 	const [query, setQuery] = useState('');
 	const [type, setType] = useState('hashtag');
 	const [location, setLocation] = useState('');
@@ -185,9 +189,19 @@ const Scheduler = () => {
 
 
 
-	const hasActiveFilters = (selectedPlatform && selectedPlatform.value) || /* (selectedSeverity && selectedSeverity.value) || */ query || location || startDate || endDate;
 
-	const clearFilters = () => { setSelectedPlatform(null); /* setSelectedSeverity(null); */ setQuery(''); setLocation(''); setStartDate(''); setEndDate(''); setCurrentPage(1); };
+	const hasActiveFilters = (selectedPlatform && selectedPlatform.value) || /* (selectedSeverity && selectedSeverity.value) || */ (selectedStatus && selectedStatus.value) || query || location || startDate || endDate;
+
+	const clearFilters = () => {
+		setSelectedPlatform(null);
+		/* setSelectedSeverity(null); */
+		setSelectedStatus(null);
+		setQuery('');
+		setLocation('');
+		setStartDate('');
+		setEndDate('');
+		setCurrentPage(1);
+	};
 
 	// Schedule handlers
 	const roundToNextQuarter = (date) => {
@@ -218,6 +232,7 @@ const Scheduler = () => {
 		alert(`Successfully scheduled ${selectedReports.length} report${selectedReports.length !== 1 ? 's' : ''} for ${scheduleDateTime.toLocaleString()}`);
 	};
 
+
 	// Filtering logic (mirrors Reports)
 	const filteredReports = useMemo(() => sampleReports.filter(report => {
 		const matchesQuery = query === '' || (type === 'hashtag' && report.post.toLowerCase().includes(query.toLowerCase())) || (type === 'username' && (report.user.username.toLowerCase().includes(query.toLowerCase()) || report.user.name.toLowerCase().includes(query.toLowerCase())));
@@ -227,8 +242,10 @@ const Scheduler = () => {
 		const rDate = new Date(report.reportedAt);
 		const matchesStart = startDate === '' || rDate >= new Date(startDate);
 		const matchesEnd = endDate === '' || rDate <= new Date(endDate);
+		// No status for sampleReports, so skip status filter here
 		return matchesQuery && matchesPlatform /* && matchesSeverity */ && matchesLocation && matchesStart && matchesEnd;
 	}), [query, type, selectedPlatform, location, startDate, endDate]);
+
 
 	// Scheduled Reports filtering using existing search and filter states
 	const filteredScheduledReports = useMemo(() => {
@@ -254,6 +271,13 @@ const Scheduler = () => {
 			);
 		}
 
+		// Apply status filter
+		if (selectedStatus) {
+			filtered = filtered.filter(report => 
+				report.status && report.status.toLowerCase() === selectedStatus.value.toLowerCase()
+			);
+		}
+
 		// Apply location filter
 		if (location.trim()) {
 			const locationTerm = location.toLowerCase();
@@ -269,7 +293,6 @@ const Scheduler = () => {
 				const reportDate = new Date(report.date);
 				const start = startDate ? new Date(startDate) : null;
 				const end = endDate ? new Date(endDate) : null;
-				
 				if (start && reportDate < start) return false;
 				if (end && reportDate > end) return false;
 				return true;
@@ -277,7 +300,7 @@ const Scheduler = () => {
 		}
 
 		return filtered;
-	}, [scheduledReports, query, selectedPlatform, location, startDate, endDate]);
+	}, [scheduledReports, query, selectedPlatform, selectedStatus, location, startDate, endDate]);
 
 	useEffect(() => { const tp = Math.max(1, Math.ceil(filteredReports.length / itemsPerPage)); if (currentPage > tp) setCurrentPage(tp); }, [filteredReports.length, itemsPerPage, currentPage]);
 
@@ -328,8 +351,8 @@ const Scheduler = () => {
 							<Select className="react-select-container" classNamePrefix="react-select" options={platformOptions} value={selectedPlatform} onChange={setSelectedPlatform} isClearable placeholder="All Platforms" />
 						</div>
 						<div className="filter-input-group">
-							{/* <label className="compact-label">Severity</label>
-							<Select className="react-select-container" classNamePrefix="react-select" options={severityOptions} value={selectedSeverity} onChange={setSelectedSeverity} isClearable placeholder="All Severities" /> */}
+							<label className="compact-label">Status</label>
+							<Select className="react-select-container" classNamePrefix="react-select" options={statusOptions} value={selectedStatus} onChange={setSelectedStatus} isClearable placeholder="All Statuses" />
 						</div>
 						<div className="filter-input-group">
 							<label className="compact-label">Start Date</label>
@@ -340,7 +363,6 @@ const Scheduler = () => {
 							<DatePicker selected={endDate ? new Date(endDate) : null} onChange={(d)=> setEndDate(d ? d.toISOString().slice(0,10) : '')} className="filter-input-compact" placeholderText="Select end date" dateFormat="yyyy-MM-dd" isClearable />
 						</div>
 						<button type="button" className="btn btn-outline clear-filters-btn-compact" onClick={clearFilters} disabled={!hasActiveFilters}>Clear Filters</button>
-						
 						<button 
 							type="button"
 							className="btn btn-primary"
@@ -355,154 +377,9 @@ const Scheduler = () => {
 				</div>
 			</div>
 
-			{/* Results summary */}
-			<div className="security-reports__summary">
-				<span className="results-count">{hasActiveFilters ? <>Showing {totalItems} of {sampleReports.length} reports</> : <>Total {totalItems} reports</>}</span>
-			</div>
 
-			{/* Reports table for scheduling */}
-			<div className="security-reports__content">
-				<div className="reports-table-wrapper">
-					<table className="reports-table">
-						<thead>
-							<tr>
-								<th>
-									<input 
-										type="checkbox" 
-										onChange={(e) => {
-											if (e.target.checked) {
-												setSelectedReports(currentReports.map(r => r.id));
-											} else {
-												setSelectedReports([]);
-											}
-										}}
-										checked={selectedReports.length === currentReports.length && currentReports.length > 0}
-									/>
-								</th>
-								<th>Platform</th>
-								<th>Content</th>
-								{/* <th>User</th>
-								<th>Severity</th> */}
-								<th>Toxicity Score</th>
-								<th>Coordinates</th>
-								<th>Police Station</th>
-							</tr>
-						</thead>
-						<tbody>
-							{currentReports.length ? currentReports.map(report => (
-								<tr key={report.id} className="reports-table__row">
-									<td>
-										<input 
-											type="checkbox" 
-											checked={selectedReports.includes(report.id)}
-											onChange={(e) => {
-												if (e.target.checked) {
-													setSelectedReports(prev => [...prev, report.id]);
-												} else {
-													setSelectedReports(prev => prev.filter(id => id !== report.id));
-												}
-											}}
-										/>
-									</td>
-									<td>
-										<span className={`platform-badge platform-badge--${report.platform.toLowerCase()}`}>
-											{report.platform}
-										</span>
-									</td>
-									
-									<td className="content-cell">
-										<div className="content-preview-static" title={report.post}>
-											{truncateText(report.post, 60)}
-										</div>
-									</td>
 
-									{/* <td className="user-cell">
-										<div className="user-info">
-											<div className="user-name">{report.user.name}</div>
-											<div className="user-handle">{report.user.username}</div>
-										</div>
-									</td>
 
-									<td>
-										<span className={`severity-badge severity-${report.toxicitySeverity.toLowerCase()}`}>
-											{report.toxicitySeverity}
-										</span>
-									</td> */}
-
-									<td className="toxicity-cell">
-										<div className="toxicity-score">{report.toxicityScore}/10</div>
-										<div className="toxicity-tags">
-											{report.toxicityTags.slice(0, 2).map((tag, index) => (
-												<span key={index} className="tag">
-													{tag}
-												</span>
-											))}
-										</div>
-									</td>
-
-									<td className="coordinates-cell">
-										<button
-											className="coordinates-btn"
-											onClick={() => openGoogleMaps(report.location.lat, report.location.lng)}
-											title="Click to view on map"
-										>
-											<div className="coordinates-lat">Lat: {report.location.lat.toFixed(4)}</div>
-											<div className="coordinates-lng">Lng: {report.location.lng.toFixed(4)}</div>
-										</button>
-									</td>
-
-									<td className="station-cell">
-										{truncateText(report.policeStation, 20)}
-									</td>
-								</tr>
-							)) : (
-								<tr>
-									<td colSpan="6" className="no-results">
-										<div className="no-results-content">
-											<p>No reports found matching your criteria</p>
-											{hasActiveFilters && (
-												<button onClick={clearFilters} className="btn btn-outline">
-													Clear Filters
-												</button>
-											)}
-										</div>
-									</td>
-								</tr>
-							)}
-						</tbody>
-					</table>
-				</div>
-
-				{/* Pagination */}
-				{totalItems > 0 && (
-					<div className="pagination-container">
-						<div className="pagination-info">
-							<span>Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems}</span>
-							<select value={itemsPerPage} onChange={(e)=>{ setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }} className="items-per-page">
-								<option value={5}>5 per page</option>
-								<option value={10}>10 per page</option>
-								<option value={20}>20 per page</option>
-							</select>
-						</div>
-						<div className="pagination-controls">
-							<button onClick={()=> setCurrentPage(1)} disabled={currentPage === 1} className="pagination-btn">«</button>
-							<button onClick={()=> setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1} className="pagination-btn">‹</button>
-							<div className="pagination-numbers">
-								{Array.from({ length: totalPages }, (_, i) => i + 1)
-									.filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
-														.map((page, index, array) => (
-															<React.Fragment key={page}>
-																{index > 0 && array[index - 1] !== page - 1 && (<span className="pagination-ellipsis">...</span>)}
-																<button className={`pagination-btn ${currentPage === page ? 'active' : ''}`} onClick={() => setCurrentPage(page)}>{page}</button>
-															</React.Fragment>
-														))}
-							</div>
-							<button onClick={()=> setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage === totalPages} className="pagination-btn">›</button>
-							<button onClick={()=> setCurrentPage(totalPages)} disabled={currentPage === totalPages} className="pagination-btn">»</button>
-						</div>
-					</div>
-				)}
-			</div>
 
 			{/* Scheduled Reports Table - Only show when filters are applied */}
 			{hasActiveFilters && (
