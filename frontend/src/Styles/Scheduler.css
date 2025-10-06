@@ -1,3 +1,36 @@
+.ampm-toggle {
+  display: flex;
+  gap: 0;
+  min-width: 100px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+  background: #f3f4f6;
+  height: 40px;
+  margin-left: 8px;
+}
+.ampm-toggle .period-btn {
+  flex: 1 1 50px;
+  min-width: 50px;
+  border: none;
+  background: transparent;
+  color: #374151;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  padding: 0 10px;
+  box-sizing: border-box;
+  height: 40px;
+  transition: background 0.2s, color 0.2s;
+}
+.ampm-toggle .period-btn.active {
+  background: #2563eb;
+  color: #fff;
+}
+.ampm-toggle .period-btn:focus {
+  outline: none;
+  background: #e0e7ff;
+}
 /* ========================================
    SCHEDULER PAGE STYLES
    ======================================== */
@@ -151,6 +184,12 @@
   box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
 }
 
+/* Compact modal tweaks for a shorter, cleaner look */
+.scheduler-modal-card.compact {
+  width: min(520px, 94vw);
+  border-radius: 10px;
+}
+
 .scheduler-modal-header {
   display: flex;
   align-items: center;
@@ -162,6 +201,32 @@
 .scheduler-modal-body {
   padding: 16px;
 }
+
+.scheduler-modal-body.compact {
+  padding: 12px 14px;
+}
+
+/* AM/PM toggle styling */
+.ampm-toggle {
+  display: flex;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 38px;
+}
+.ampm-toggle .period-btn {
+  flex: 1;
+  border: none;
+  background: #fff;
+  color: #374151;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ampm-toggle .period-btn.active {
+  background: #2563eb;
+  color: #fff;
+}
+.ampm-toggle .period-btn:focus { outline: none; }
 
 .scheduler-modal-footer {
   display: flex;
@@ -224,6 +289,26 @@
   margin-top: 10px;
 }
 
+/* compact date/time layout */
+.datetime-section .compact-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.date-input-wrapper .date-input,
+.time-input {
+  height: 38px;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+.ampm-select {
+  height: 38px;
+  border-radius: 8px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+}
+
 /* Date/Time Input Wrappers */
 .datetime-input-wrapper,
 .date-input-wrapper,
@@ -236,6 +321,54 @@
 .datetime-section,
 .time-section {
   margin-bottom: 16px;
+}
+
+.date-time-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-select {
+  width: 100%;
+  height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.time-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 6px 18px rgba(37,99,235,0.08);
+}
+
+/* Typeable time input */
+.time-input {
+  width: 110px;
+  height: 40px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1.15em;
+  color: #0f172a;
+  background: #fff;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 6px 18px rgba(37,99,235,0.08);
+}
+
+/* datalist suggestions appearance is browser-native; ensure input matches look */
+.time-input::-webkit-calendar-picker-indicator {
+  display: none;
 }
 
 /* Icons */

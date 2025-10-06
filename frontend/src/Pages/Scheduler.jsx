@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
-import { Calendar as CalendarIcon, SearchCheckIcon, SearchCodeIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, SearchCodeIcon } from 'lucide-react';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../Styles/ReportTable.css';
 import '../Styles/Scrape.css';
 import '../Styles/Scheduler.css';
-import { truncateText, openGoogleMaps } from '../utils.js';
+// utils not currently used in this file
 
 
 
@@ -110,12 +110,32 @@ const Scheduler = () => {
 
 	// Pagination
 	const [currentPage, setCurrentPage] = useState(1);
-	const [itemsPerPage, setItemsPerPage] = useState(5);
+	const [itemsPerPage] = useState(5);
 
 	// Scheduling
 	const [selectedReports, setSelectedReports] = useState([]);
 	const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
 	const [scheduleDateTime, setScheduleDateTime] = useState(null);
+
+	// controlled time input state (hh:mm in 12-hour) and AM/PM
+	const [timeInput, setTimeInput] = useState('');
+	const [ampm, setAmpm] = useState('AM');
+
+	// Derived display helpers for time input
+	// keep timeInput and ampm in sync with scheduleDateTime
+	useEffect(() => {
+		if (!scheduleDateTime) {
+			setTimeInput('');
+			setAmpm('AM');
+			return;
+		}
+		const d = new Date(scheduleDateTime);
+		let h = d.getHours();
+		const m = d.getMinutes();
+		const displayH = h % 12 === 0 ? 12 : h % 12;
+		setTimeInput(`${String(displayH).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+		setAmpm(h >= 12 ? 'PM' : 'AM');
+	}, [scheduleDateTime]);
 
 	// Scheduled reports state
 	const [scheduledReports] = useState([
@@ -213,6 +233,24 @@ const Scheduler = () => {
 		return d;
 	};
 
+	// Set AM/PM using controlled timeInput (keeps scheduleDateTime in sync)
+	const handleSetAmpm = (val) => {
+		setAmpm(val);
+		const trimmed = (timeInput || '').trim();
+		if (!trimmed) return;
+		const parts = trimmed.split(':');
+		if (parts.length !== 2) return;
+		let hh = Number(parts[0]);
+		let mm = Number(parts[1]);
+		if (Number.isNaN(hh) || Number.isNaN(mm)) return;
+		if (val === 'PM' && hh < 12) hh = hh + 12;
+		if (val === 'AM' && hh === 12) hh = 0;
+		const base = scheduleDateTime ? new Date(scheduleDateTime) : new Date();
+		const d = new Date(base);
+		d.setHours(hh, mm, 0, 0);
+		setScheduleDateTime(d);
+	};
+
 	const closeScheduleModal = () => {
 		setScheduleModalOpen(false);
 		setScheduleDateTime(null);
@@ -247,11 +285,10 @@ const Scheduler = () => {
 	}), [query, type, selectedPlatform, location, startDate, endDate]);
 
 
+
 	// Scheduled Reports filtering using existing search and filter states
 	const filteredScheduledReports = useMemo(() => {
 		let filtered = [...scheduledReports];
-
-		// Apply search filter (hashtag or username query) 
 		if (query.trim()) {
 			const searchTerm = query.toLowerCase();
 			filtered = filtered.filter(report => 
@@ -262,23 +299,17 @@ const Scheduler = () => {
 				)
 			);
 		}
-
-		// Apply platform filter
 		if (selectedPlatform) {
 			filtered = filtered.filter(report => 
 				report.filters.platform && 
 				report.filters.platform.toLowerCase() === selectedPlatform.label.toLowerCase()
 			);
 		}
-
-		// Apply status filter
 		if (selectedStatus) {
 			filtered = filtered.filter(report => 
 				report.status && report.status.toLowerCase() === selectedStatus.value.toLowerCase()
 			);
 		}
-
-		// Apply location filter
 		if (location.trim()) {
 			const locationTerm = location.toLowerCase();
 			filtered = filtered.filter(report => 
@@ -286,8 +317,6 @@ const Scheduler = () => {
 				report.filters.location.toLowerCase().includes(locationTerm)
 			);
 		}
-
-		// Apply date range filter
 		if (startDate || endDate) {
 			filtered = filtered.filter(report => {
 				const reportDate = new Date(report.date);
@@ -298,17 +327,22 @@ const Scheduler = () => {
 				return true;
 			});
 		}
-
 		return filtered;
 	}, [scheduledReports, query, selectedPlatform, selectedStatus, location, startDate, endDate]);
 
+	// Pagination for scheduled reports
+	const [scheduledCurrentPage, setScheduledCurrentPage] = useState(1);
+	const [scheduledItemsPerPage, setScheduledItemsPerPage] = useState(5);
+	const scheduledTotalItems = filteredScheduledReports.length;
+	const scheduledTotalPages = Math.max(1, Math.ceil(scheduledTotalItems / scheduledItemsPerPage));
+	const scheduledStartIndex = (scheduledCurrentPage - 1) * scheduledItemsPerPage;
+	const scheduledEndIndex = scheduledStartIndex + scheduledItemsPerPage;
+	const scheduledCurrentReports = filteredScheduledReports.slice(scheduledStartIndex, scheduledEndIndex);
+
 	useEffect(() => { const tp = Math.max(1, Math.ceil(filteredReports.length / itemsPerPage)); if (currentPage > tp) setCurrentPage(tp); }, [filteredReports.length, itemsPerPage, currentPage]);
 
-	const totalItems = filteredReports.length;
-	const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
-	const startIndex = (currentPage - 1) * itemsPerPage;
-	const endIndex = startIndex + itemsPerPage;
-	const currentReports = filteredReports.slice(startIndex, endIndex);
+	// Removed unused variable: totalItems
+	// Removed unused variables: totalPages, startIndex, endIndex, currentReports
 
 
 
@@ -381,135 +415,180 @@ const Scheduler = () => {
 
 
 
-			{/* Scheduled Reports Table - Only show when filters are applied */}
-			{hasActiveFilters && (
-				<div className="scheduled-reports-section">
-					<div className="scheduled-reports-header">
-						<h2 className="scheduled-reports-title">
-							Scheduled Reports
-						</h2>
-					</div>
 
-					{/* Results Summary */}
-					<div className="reports-filter-summary">
-						<span className="results-count">
-							{filteredScheduledReports.length} of {scheduledReports.length} reports
-						</span>
-					</div>
-				
-					<div className="scheduled-reports-table-container">
-						<table className="scheduled-reports-table">
-							<thead>
-								<tr>
-									<th className="sr-no-header">Sr. No.</th>
-									<th className="date-header">Date Scheduled</th>
-									<th className="user-header">User Name</th>
-									<th className="filters-header">Applied Filters</th>
-									<th className="status-header">Status</th>
-								</tr>
-							</thead>
-							<tbody>
-								{filteredScheduledReports.map((report, index) => (
-									<tr key={report.id} className="scheduled-report-row">
-										<td className="sr-no-cell">
-											{index + 1}
-										</td>
-										
-										<td className="date-cell">
-											<div className="date-main">
-												{new Date(report.date).toLocaleDateString('en-US', {
-													year: 'numeric',
-													month: 'short',
-													day: 'numeric'
-												})}
-											</div>
-											<div className="date-time">
-												{new Date(report.date).toLocaleTimeString('en-US', {
-													hour: '2-digit',
-													minute: '2-digit'
-												})}
-											</div>
-										</td>
-
-										<td className="user-cell">
-											<div className="user-name">{report.userName}</div>
-										</td>
-
-										<td className="filters-cell">
-											<div className="filter-chips-simple">
-												{report.filters.platform && (
-													<span className="filter-chip platform">
-														{report.filters.platform}
-													</span>
-												)}
-												{report.filters.severity && (
-													<span className="filter-chip severity">
-														{report.filters.severity}
-													</span>
-												)}
-												{report.filters.hashtag && (
-													<span className="filter-chip hashtag">
-														{report.filters.hashtag}
-													</span>
-												)}
-												{report.filters.username && (
-													<span className="filter-chip username">
-														{report.filters.username}
-													</span>
-												)}
-												{report.filters.location && (
-													<span className="filter-chip location">
-														{report.filters.location}
-													</span>
-												)}
-												{report.filters.dateRange && (
-													<span className="filter-chip date">
-														{report.filters.dateRange}
-													</span>
-												)}
-											</div>
-										</td>
-
-										<td className="status-cell">
-											<span className={`status-badge status-${report.status.toLowerCase().replace(' ', '-')}`}>
-												{report.status}
-											</span>
-										</td>
-									</tr>
-								))}
-								
-								{filteredScheduledReports.length === 0 && (
-									<tr>
-										<td colSpan="5" className="no-results">
-											<div className="no-results-content">
-												<p className="no-results-text">
-													{scheduledReports.length === 0 
-														? 'No scheduled reports'
-														: 'No matching reports'
-													}
-												</p>
-												{scheduledReports.length > 0 && filteredScheduledReports.length === 0 && (
-													<button 
-														onClick={clearFilters}
-														className="clear-search-btn"
-													>
-														Clear Filters
-													</button>
-												)}
-											</div>
-										</td>
-									</tr>
-								)}
-							</tbody>
-						</table>
-					</div>
+			{/* Scheduled Reports Table - Always visible with pagination and scheduling */} 
+			<div className="scheduled-reports-section">
+				<div className="scheduled-reports-header">
+					<h2 className="scheduled-reports-title">
+						Scheduled Reports
+					</h2>
 				</div>
-			)}
+				{/* Results Summary */}
+				<div className="reports-filter-summary">
+					<span className="results-count">
+						Showing {scheduledTotalItems} of {scheduledReports.length} scheduled reports
+					</span>
+				</div>
+				<div className="scheduled-reports-table-container">
+					<table className="scheduled-reports-table">
+						<thead>
+							<tr>
+								<th>
+									<input
+										type="checkbox"
+										onChange={e => {
+											if (e.target.checked) {
+												setSelectedReports(scheduledCurrentReports.map(r => r.id));
+											} else {
+												setSelectedReports([]);
+											}
+										}}
+										checked={selectedReports.length === scheduledCurrentReports.length && scheduledCurrentReports.length > 0}
+									/>
+								</th>
+								<th className="sr-no-header">Sr. No.</th>
+								<th className="date-header">Date Scheduled</th>
+								<th className="user-header">User Name</th>
+								<th className="filters-header">Applied Filters</th>
+								<th className="status-header">Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							{scheduledCurrentReports.map((report, index) => (
+								<tr key={report.id} className="scheduled-report-row">
+									<td>
+										<input
+											type="checkbox"
+											checked={selectedReports.includes(report.id)}
+											onChange={e => {
+												if (e.target.checked) {
+													setSelectedReports(prev => [...prev, report.id]);
+												} else {
+													setSelectedReports(prev => prev.filter(id => id !== report.id));
+												}
+											}}
+										/>
+									</td>
+									<td className="sr-no-cell">{scheduledStartIndex + index + 1}</td>
+									<td className="date-cell">
+										<div className="date-main">
+											{new Date(report.date).toLocaleDateString('en-US', {
+												year: 'numeric',
+												month: 'short',
+												day: 'numeric'
+											})}
+										</div>
+										<div className="date-time">
+											{new Date(report.date).toLocaleTimeString('en-US', {
+												hour: '2-digit',
+												minute: '2-digit'
+											})}
+										</div>
+									</td>
+									<td className="user-cell">
+										<div className="user-name">{report.userName}</div>
+									</td>
+									<td className="filters-cell">
+										<div className="filter-chips-simple">
+											{report.filters.platform && (
+												<span className="filter-chip platform">
+													{report.filters.platform}
+												</span>
+											)}
+											{report.filters.severity && (
+												<span className="filter-chip severity">
+													{report.filters.severity}
+												</span>
+											)}
+											{report.filters.hashtag && (
+												<span className="filter-chip hashtag">
+													{report.filters.hashtag}
+												</span>
+											)}
+											{report.filters.username && (
+												<span className="filter-chip username">
+													{report.filters.username}
+												</span>
+											)}
+											{report.filters.location && (
+												<span className="filter-chip location">
+													{report.filters.location}
+												</span>
+											)}
+											{report.filters.dateRange && (
+												<span className="filter-chip date">
+													{report.filters.dateRange}
+												</span>
+											)}
+										</div>
+									</td>
+									<td className="status-cell">
+										<span className={`status-badge status-${report.status.toLowerCase().replace(' ', '-')}`}>
+											{report.status}
+										</span>
+									</td>
+								</tr>
+							))}
+							{scheduledCurrentReports.length === 0 && (
+								<tr>
+									<td colSpan="6" className="no-results">
+										<div className="no-results-content">
+											<p className="no-results-text">
+												{scheduledReports.length === 0
+													? 'No scheduled reports'
+													: 'No matching reports'}
+											</p>
+											{scheduledReports.length > 0 && scheduledCurrentReports.length === 0 && (
+												<button
+													onClick={clearFilters}
+													className="clear-search-btn"
+												>
+													Clear Filters
+												</button>
+											)}
+										</div>
+									</td>
+								</tr>
+							)}
+						</tbody>
+					</table>
+				</div>
+				{/* Pagination for scheduled reports */}
+				{scheduledTotalItems > 0 && (
+					<div className="pagination-container">
+						<div className="pagination-info">
+							<span>Showing {scheduledStartIndex + 1}-{Math.min(scheduledEndIndex, scheduledTotalItems)} of {scheduledTotalItems}</span>
+							<select value={scheduledItemsPerPage} onChange={e => { setScheduledItemsPerPage(Number(e.target.value)); setScheduledCurrentPage(1); }} className="items-per-page">
+								<option value={5}>5 per page</option>
+								<option value={10}>10 per page</option>
+								<option value={20}>20 per page</option>
+							</select>
+						</div>
+						<div className="pagination-controls">
+							<button onClick={() => setScheduledCurrentPage(1)} disabled={scheduledCurrentPage === 1} className="pagination-btn">«</button>
+							<button onClick={() => setScheduledCurrentPage(p => Math.max(1, p - 1))} disabled={scheduledCurrentPage === 1} className="pagination-btn">‹</button>
+							<div className="pagination-numbers">
+								{Array.from({ length: scheduledTotalPages }, (_, i) => i + 1)
+									.filter(page => page === 1 || page === scheduledTotalPages || Math.abs(page - scheduledCurrentPage) <= 1)
+									.map((page, index, array) => (
+										<React.Fragment key={page}>
+											{index > 0 && array[index - 1] !== page - 1 && (<span className="pagination-ellipsis">...</span>)}
+											<button className={`pagination-btn ${scheduledCurrentPage === page ? 'active' : ''}`} onClick={() => setScheduledCurrentPage(page)}>{page}</button>
+										</React.Fragment>
+									))}
+							</div>
+							<button onClick={() => setScheduledCurrentPage(p => Math.min(scheduledTotalPages, p + 1))} disabled={scheduledCurrentPage === scheduledTotalPages} className="pagination-btn">›</button>
+							<button onClick={() => setScheduledCurrentPage(scheduledTotalPages)} disabled={scheduledCurrentPage === scheduledTotalPages} className="pagination-btn">»</button>
+						</div>
+					</div>
+				)}
+				{/* Removed Schedule Selected button as requested */}
+			</div>
 
 			{/* Schedule Modal */}
 			{scheduleModalOpen && (
 				<div className="scheduler-modal-backdrop" role="dialog" aria-modal>
-					<div className="scheduler-modal-card">
+					<div className="scheduler-modal-card compact">
 						<div className="scheduler-modal-header">
 							<h3><CalendarIcon size={16}/> Schedule Reports</h3>
 							<button className="scheduler-icon-btn" onClick={closeScheduleModal}>✕</button>
@@ -518,61 +597,116 @@ const Scheduler = () => {
 							<div className="selected-reports-info">
 								<p>Scheduling <strong>{selectedReports.length}</strong> selected report{selectedReports.length !== 1 ? 's' : ''}</p>
 							</div>
-							
+
 							<div className="datetime-picker">
 								<div className="datetime-section">
-									<label className="compact-label">Select Date & Time</label>
-									<div className="date-input-wrapper">
-										<CalendarIcon size={16} className="date-icon" />
-										<DatePicker
-											selected={scheduleDateTime}
-											onChange={(date) => setScheduleDateTime(date)}
-											showTimeSelect
-											timeFormat="HH:mm"
-											timeIntervals={15}
-											dateFormat="MMM d, yyyy h:mm aa"
-											className="filter-input-compact date-input"
-											placeholderText="Choose date and time"
-											minDate={new Date()}
-											showPopperArrow={false}
-										/>
+									<div style={{marginBottom: '6px'}}>
+										<span className="compact-label" style={{fontWeight:600}}>Date</span>
 									</div>
-								</div>
-								
-								<div className="quick-presets" aria-label="Quick schedule presets">
-									<span className="presets-label">Quick Options:</span>
-									<div className="presets-grid">
-										<button type="button" className="preset-chip" onClick={() => {
-											const d = roundToNextQuarter(new Date());
-											d.setHours(d.getHours() + 1);
-											setScheduleDateTime(d);
-										}}>
-											<CalendarIcon size={12} />In 1 hour
-										</button>
-										<button type="button" className="preset-chip" onClick={() => {
-											const d = new Date();
-											d.setDate(d.getDate() + 1);
-											d.setHours(9, 0, 0, 0);
-											setScheduleDateTime(d);
-										}}>
-											<CalendarIcon size={12} />Tomorrow 9 AM
-										</button>
-										<button type="button" className="preset-chip" onClick={() => {
-											const d = new Date();
-											const day = d.getDay();
-											const diff = (8 - day) % 7 || 7;
-											d.setDate(d.getDate() + diff);
-											d.setHours(9, 0, 0, 0);
-											setScheduleDateTime(d);
-										}}>
-											<CalendarIcon size={12} />Next Monday 9 AM
-										</button>
+									<div className="date-time-row">
+										<div className="date-input-wrapper" style={{flex: 1}}>
+											<CalendarIcon size={16} className="date-icon" />
+											<DatePicker
+												selected={scheduleDateTime}
+												onChange={(date) => {
+												if (!date) { setScheduleDateTime(null); return; }
+												const base = scheduleDateTime ? new Date(scheduleDateTime) : new Date();
+												const newDate = new Date(date);
+												if (scheduleDateTime) {
+													newDate.setHours(base.getHours(), base.getMinutes(), 0, 0);
+												}
+												setScheduleDateTime(newDate);
+											}}
+												dateFormat="MMM d, yyyy"
+												className="filter-input-compact date-input"
+												placeholderText="Choose date"
+												minDate={new Date()}
+												showPopperArrow={false}
+											/>
+										</div>
+									</div>
+
+									<div style={{marginTop: '12px', marginBottom: '6px'}}>
+										<span className="compact-label" style={{fontWeight:600}}>Time</span>
+									</div>
+									<div className="time-row" style={{marginTop:0, display:'flex', alignItems:'center', gap:8}}>
+										<div style={{display:'flex', alignItems:'center', gap:6, width:'fit-content', minWidth:0}}>
+											<input
+												type="text"
+												className="time-input"
+												placeholder="12:00"
+												maxLength={5}
+												value={timeInput}
+												pattern="^(0[1-9]|1[0-2]):[0-5][0-9]$"
+												onChange={(e) => {
+													let val = e.target.value.replace(/[^0-9:]/g, '');
+													// Only allow one colon
+													const colonCount = (val.match(/:/g) || []).length;
+													if (colonCount > 1) val = val.replace(/:(?=.*:)/g, '');
+													// Auto-insert colon after 2 digits
+													if (/^\d{3,}$/.test(val) && val[2] !== ':') {
+														val = val.slice(0,2) + ':' + val.slice(2,4);
+													}
+													// Only allow up to 5 chars (hh:mm)
+													if (val.length > 5) val = val.slice(0,5);
+													setTimeInput(val);
+													// Validate format
+													if (!/^([0]?[1-9]|1[0-2]):[0-5][0-9]$/.test(val)) { setScheduleDateTime(null); return; }
+													const [hhStr, mmStr] = val.split(':');
+													let hh = Number(hhStr);
+													let mm = Number(mmStr);
+													if (Number.isNaN(hh) || Number.isNaN(mm)) return;
+													// convert to 24-hour using ampm state
+													if (ampm === 'PM' && hh < 12) hh = hh + 12;
+													if (ampm === 'AM' && hh === 12) hh = 0;
+													const base = scheduleDateTime ? new Date(scheduleDateTime) : new Date();
+													const d = new Date(base);
+													d.setHours(hh, mm, 0, 0);
+													setScheduleDateTime(d);
+												}}
+											/>
+											<div className="ampm-toggle">
+												<button type="button" className={`period-btn ${ampm === 'AM' ? 'active' : ''}`} onClick={() => handleSetAmpm('AM')}>AM</button>
+												<button type="button" className={`period-btn ${ampm === 'PM' ? 'active' : ''}`} onClick={() => handleSetAmpm('PM')}>PM</button>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
+
+							<div className="quick-presets" aria-label="Quick schedule presets">
+								<span className="presets-label">Quick Options:</span>
+								<div className="presets-grid">
+									<button type="button" className="preset-chip" onClick={() => {
+										const d = roundToNextQuarter(new Date());
+										d.setHours(d.getHours() + 1);
+										setScheduleDateTime(d);
+									}}>
+										<CalendarIcon size={12} />In 1 hour
+									</button>
+									<button type="button" className="preset-chip" onClick={() => {
+										const d = new Date();
+										d.setDate(d.getDate() + 1);
+										d.setHours(12, 0, 0, 0);
+										setScheduleDateTime(d);
+									}}>
+										<CalendarIcon size={12} />Tomorrow 12 PM
+									</button>
+									<button type="button" className="preset-chip" onClick={() => {
+										const d = new Date();
+										const day = d.getDay();
+										const diff = (8 - day) % 7 || 7;
+										d.setDate(d.getDate() + diff);
+										d.setHours(12, 0, 0, 0);
+										setScheduleDateTime(d);
+									}}>
+										<CalendarIcon size={12} />Next Monday 12 PM
+									</button>
+								</div>
+							</div>
+
 						</div>
 						<div className="scheduler-modal-footer">
-							<button className="btn btn-outline" onClick={closeScheduleModal}>Cancel</button>
 							<button 
 								className="btn btn-primary" 
 								disabled={!scheduleDateTime} 

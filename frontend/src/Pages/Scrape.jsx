@@ -10,16 +10,12 @@ const SearchPosts = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   
-  // Enhanced filter states similar to ReportTable
   const [selectedPlatform, setSelectedPlatform] = useState(null);
-  const [selectedSeverity, setSelectedSeverity] = useState(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [query, setQuery] = useState('');
-  const [type, setType] = useState('hashtag'); // 'hashtag' or 'username'
+  const [type, setType] = useState('hashtag');
   const [location, setLocation] = useState('');
-
-  // Filter options
   const platformOptions = [
     { value: 'twitter', label: 'Twitter' },
     { value: 'facebook', label: 'Facebook' },
@@ -27,26 +23,12 @@ const SearchPosts = () => {
     { value: 'linkedin', label: 'LinkedIn' },
     { value: 'tiktok', label: 'TikTok' },
     { value: 'youtube', label: 'YouTube' },
-    { value: 'reddit', label: 'Reddit' }
   ];
   
-  const severityOptions = [
-    { value: 'High', label: 'High' },
-    { value: 'Medium', label: 'Medium' },
-    { value: 'Low', label: 'Low' }
-  ];
-
-
-
+  
   // Sample search results for demonstration
   const sampleResults = [
     {
-      id: 1,
-      platform: 'Twitter',
-      content: 'Check out this amazing cybersecurity tool! #cybersecurity #tech',
-      author: '@techuser123',
-      authorName: 'Tech User',
-      timestamp: '2 hours ago',
       likes: 45,
       retweets: 12,
       location: 'Mumbai, India',
@@ -112,21 +94,21 @@ const SearchPosts = () => {
     },
   ];
 
-  // Check if any filters are active
-  const hasActiveFilters = query || selectedPlatform || selectedSeverity || location || startDate || endDate;
+  
+  const hasActiveFilters = query || selectedPlatform || location || startDate || endDate;
 
-  // Enhanced search functionality
+  
   const performSearch = (e) => {
     if (e) e.preventDefault();
     setIsSearching(true);
     
-    // Simulate API call delay
+    
     setTimeout(() => {
       console.log('Searching for:', query, 'Type:', type);
       
-      // Filter results based on all criteria
+      
       const filtered = sampleResults.filter(result => {
-      // Hashtag/username search
+      
       const matchesQuery = query === '' || 
         (type === 'hashtag' && result.content.toLowerCase().includes(query.toLowerCase())) ||
         (type === 'username' && (
@@ -134,23 +116,22 @@ const SearchPosts = () => {
           result.authorName.toLowerCase().includes(query.toLowerCase())
         ));
 
-      // Platform filter
+      
       const matchesPlatform = !selectedPlatform || (selectedPlatform.value && result.platform.toLowerCase() === selectedPlatform.value.toLowerCase());
 
-      // Severity filter
-      const matchesSeverity = !selectedSeverity || (selectedSeverity.value && result.severity === selectedSeverity.value);
 
-      // Location filter
+      
+    // Location filter
       const matchesLocation = location === '' || 
         result.location.toLowerCase().includes(location.toLowerCase());
 
-      // Date filters
+      
+  // Date filters
       const resultDate = new Date(result.createdAt);
       const matchesStartDate = startDate === '' || resultDate >= new Date(startDate);
       const matchesEndDate = endDate === '' || resultDate <= new Date(endDate);
 
-        return matchesQuery && matchesPlatform && matchesSeverity && 
-               matchesLocation && matchesStartDate && matchesEndDate;
+        return matchesQuery && matchesPlatform && matchesLocation && matchesStartDate && matchesEndDate;
       });
 
       setSearchResults(filtered);
@@ -158,10 +139,9 @@ const SearchPosts = () => {
     }, 1000);
   };
 
-  // Clear all filters
+  
   const clearFilters = () => {
     setSelectedPlatform(null);
-    setSelectedSeverity(null);
     setQuery('');
     setType('hashtag');
     setLocation('');
@@ -254,18 +234,7 @@ const SearchPosts = () => {
               />
             </div>
 
-            <div className="filter-input-group">
-              <label className="compact-label">Severity</label>
-              <Select
-                className="react-select-container"
-                classNamePrefix="react-select"
-                options={severityOptions}
-                value={selectedSeverity}
-                onChange={setSelectedSeverity}
-                isClearable
-                placeholder="All Severities"
-              />
-            </div>
+            {/* Severity filter removed */}
 
             <div className="filter-input-group">
               <label className="compact-label">Start Date</label>
@@ -318,7 +287,7 @@ const SearchPosts = () => {
           <span className="filter-status-text">Active filters:</span>
           {query && <span className="filter-tag">{type}: {query}</span>}
           {selectedPlatform && selectedPlatform.value && <span className="filter-tag">Platform: {selectedPlatform.label}</span>}
-          {selectedSeverity && selectedSeverity.value && <span className="filter-tag">Severity: {selectedSeverity.label}</span>}
+          {/* Severity tag removed */}
           {location && <span className="filter-tag">Location: {location}</span>}
           {startDate && <span className="filter-tag">From: {startDate}</span>}
           {endDate && <span className="filter-tag">Until: {endDate}</span>}
