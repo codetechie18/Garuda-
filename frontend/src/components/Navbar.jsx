@@ -7,13 +7,18 @@ import '../Styles/Navbar.css';
 const Navbar = ({ user, onLogout }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showReportingMenu, setShowReportingMenu] = useState(false);
   const location = useLocation();
   const profileRef = useRef(null);
+  const reportingRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => { 1.68
+    const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfileMenu(false);
+      }
+      if (reportingRef.current && !reportingRef.current.contains(event.target)) {
+        setShowReportingMenu(false);
       }
     };
 
@@ -73,6 +78,23 @@ const Navbar = ({ user, onLogout }) => {
               <FileText size={20} />
               <span>Reports</span>
             </Link>
+            {/* Reporting dropdown */}
+            <div className={`nav-link reporting-link ${isActive('/reports') || isActive('/Reportstable') ? 'active' : ''}`} ref={reportingRef} onMouseLeave={() => setShowReportingMenu(false)}>
+              <button className="reporting-button" onClick={() => setShowReportingMenu(s => !s)} aria-expanded={showReportingMenu}>
+                <FileText size={20} />
+                <span>Reporting</span>
+              </button>
+              {showReportingMenu && (
+                <div className="reporting-dropdown">
+                  <Link to="/Reportstable" className="dropdown-item" onClick={() => { setShowReportingMenu(false); setMobileMenuOpen(false); }}>
+                    Search Reports
+                  </Link>
+                  <Link to="/reports" className="dropdown-item" onClick={() => { setShowReportingMenu(false); setMobileMenuOpen(false); }}>
+                    Quick Report
+                  </Link>
+                </div>
+              )}
+            </div>
             {/* Scrape removed from top nav per request */}
           </div>
 
@@ -152,14 +174,25 @@ const Navbar = ({ user, onLogout }) => {
                   </Link>
                 </div>
               </div>
+              <div className="nav-section">
+                <div className="nav-section-header">
+                  <FileText size={16} />
+                  <span>Reporting</span>
+                </div>
+                <div className="nav-submenu">
+                  <Link to="/Reportstable" className={`drawer-sublink ${isActive('/Reportstable') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    <span>Search Reports</span>
+                  </Link>
+                  <Link to="/reports" className={`drawer-sublink ${isActive('/reports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    <span>Quick Report</span>
+                  </Link>
+                </div>
+              </div>
               {/* <Link to="/reports" className={`drawer-link ${isActive('/reports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                 <FileText size={16} />
                 <span>Reporting</span>
               </Link> */}
-              <Link to="/Reportstable" className={`drawer-link ${isActive('/Reportstable') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-                <FileText size={16} />
-                <span>Reportstable</span>
-              </Link>
+              
               <Link 
                 to="/usermanagement" 
                 className={`drawer-link ${isActive('/usermanagement') ? 'active' : ''}`} 

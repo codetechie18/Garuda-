@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useState, useEffect } from 'react';
 import Login from './Pages/Login';
 import Dashboard from './Pages/Dashboard';
-// import Reports from './Pages/Reports';
+import Reports from './Pages/Reports';
 import Scrape from './Pages/Scrape';
 import SearchPosts from './Pages/SearchPosts';
 import Profile from './Pages/Profile';
@@ -74,14 +74,14 @@ function App() {
               <Navigate to="/login" replace />
             } 
           />
-          {/* <Route 
+          <Route 
             path="/reports" 
             element={
               isLoggedIn ? 
               <Reports user={user} /> : 
               <Navigate to="/login" replace />
             } 
-          /> */}
+          />
           <Route 
             path="/scrape" 
             element={

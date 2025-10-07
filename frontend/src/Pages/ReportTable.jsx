@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PostModal from './PostModal.jsx';
-import ReportModal from './ReportModal.jsx';
+import ReportModal from '../components/ReportModal.jsx';
 import { truncateText, openGoogleMaps } from '../utils.js';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Filter, RefreshCw, Eye, AlertTriangle, Flag } from 'lucide-react';
 import Select from 'react-select';
