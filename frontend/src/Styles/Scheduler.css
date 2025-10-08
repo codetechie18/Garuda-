@@ -1,27 +1,27 @@
 .ampm-toggle {
   display: flex;
   gap: 0;
-  min-width: 100px;
-  border-radius: 20px;
+  min-width: 80px;
+  border-radius: 12px;
   overflow: hidden;
   border: 1px solid #d1d5db;
   background: #f3f4f6;
-  height: 40px;
-  margin-left: 8px;
+  height: 34px;
+  margin-left: 6px;
 }
 .ampm-toggle .period-btn {
-  flex: 1 1 50px;
-  min-width: 50px;
+  flex: 1 1 40px;
+  min-width: 40px;
   border: none;
   background: transparent;
   color: #374151;
   font-weight: 600;
-  font-size: 1em;
+  font-size: 0.9rem;
   cursor: pointer;
-  padding: 0 10px;
+  padding: 0 8px;
   box-sizing: border-box;
-  height: 40px;
-  transition: background 0.2s, color 0.2s;
+  height: 34px;
+  transition: background 0.15s, color 0.15s;
 }
 .ampm-toggle .period-btn.active {
   background: #2563eb;
@@ -207,12 +207,13 @@
 }
 
 /* AM/PM toggle styling */
+/* fallback/modal ampm toggle (kept slightly larger) */
 .ampm-toggle {
   display: flex;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   overflow: hidden;
-  height: 38px;
+  height: 36px;
 }
 .ampm-toggle .period-btn {
   flex: 1;
@@ -221,6 +222,8 @@
   color: #374151;
   font-weight: 600;
   cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0 8px;
 }
 .ampm-toggle .period-btn.active {
   background: #2563eb;
@@ -297,9 +300,9 @@
 }
 .date-input-wrapper .date-input,
 .time-input {
-  height: 38px;
-  border-radius: 8px;
-  padding: 6px 10px;
+  height: 34px;
+  border-radius: 6px;
+  padding: 4px 8px;
 }
 .ampm-select {
   height: 38px;
@@ -331,12 +334,12 @@
 
 .time-select {
   width: 100%;
-  height: 40px;
-  padding: 8px 10px;
+  height: 34px;
+  padding: 6px 8px;
   border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #fff;
-  font-size: 14px;
+  font-size: 13px;
   color: #0f172a;
 }
 
@@ -348,16 +351,16 @@
 
 /* Typeable time input */
 .time-input {
-  width: 110px;
-  height: 40px;
-  padding: 6px 10px;
+  width: 92px;
+  height: 34px;
+  padding: 4px 8px;
   border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 1.15em;
+  border-radius: 6px;
+  font-size: 1rem;
   color: #0f172a;
   background: #fff;
   text-align: center;
-  letter-spacing: 1px;
+  letter-spacing: 0.6px;
 }
 
 .time-input:focus {
@@ -385,10 +388,57 @@
 
 /* Input Fields */
 .datetime-input,
-.date-input,
-.time-input {
+.date-input {
   padding-left: 34px !important;
   width: 100%;
+}
+
+/* Ensure the typeable time input is centered (no icon padding) */
+.time-input {
+  padding-left: 0 !important;
+  width: auto;
+}
+
+/* Inline-scheduler specific compact overrides */
+.inline-scheduler {
+  padding: 6px 6px;
+}
+.inline-scheduler .inline-scheduler-row {
+  display: flex;
+  gap: 10px;
+  /* align inputs/button bottoms so labels sit above and controls line up */
+  align-items: flex-end;
+}
+.inline-scheduler .inline-scheduler-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.inline-scheduler .inline-scheduler-item.label-top { align-items: flex-start; }
+.inline-scheduler .date-input input,
+.inline-scheduler .date-input .react-datepicker-wrapper input {
+  height: 36px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+.inline-scheduler .time-row { display: flex; gap: 8px; align-items: center; }
+.inline-scheduler .ampm-toggle { height: 36px; min-width: 78px; }
+.inline-scheduler .ampm-toggle .period-btn { font-size: 0.9rem; padding: 0 8px; height: 36px; }
+.inline-scheduler .time-input { width: 110px; height: 36px; font-size: 1rem; }
+
+/* Make the schedule button match the input heights and align nicely */
+.inline-scheduler .inline-scheduler-item .btn {
+  height: 36px;
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* If the schedule button is the last item, push it slightly for visual balance */
+.inline-scheduler .inline-scheduler-row > .inline-scheduler-item:last-child {
+  margin-left: 6px;
 }
 /* ========================================
    TIME INPUT COMPONENT
