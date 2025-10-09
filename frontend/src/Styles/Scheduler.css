@@ -206,8 +206,6 @@
   padding: 12px 14px;
 }
 
-/* AM/PM toggle styling */
-/* fallback/modal ampm toggle (kept slightly larger) */
 .ampm-toggle {
   display: flex;
   border: 1px solid #d1d5db;
@@ -349,9 +347,8 @@
   box-shadow: 0 6px 18px rgba(37,99,235,0.08);
 }
 
-/* Typeable time input */
+/* Typeable time input (base) - do not set a fixed width here; specific contexts override it */
 .time-input {
-  width: 92px;
   height: 34px;
   padding: 4px 8px;
   border: 1px solid #d1d5db;
@@ -361,6 +358,7 @@
   background: #fff;
   text-align: center;
   letter-spacing: 0.6px;
+  box-sizing: border-box;
 }
 
 .time-input:focus {
@@ -386,27 +384,67 @@
   pointer-events: none;
 }
 
-/* Input Fields */
 .datetime-input,
 .date-input {
   padding-left: 34px !important;
-  width: 100%;
+  .time-input, .inline-scheduler .date-input input, .inline-scheduler .date-input .react-datepicker-wrapper input, .inline-scheduler .ampm-toggle { width: 100%; }
 }
 
-/* Ensure the typeable time input is centered (no icon padding) */
 .time-input {
   padding-left: 0 !important;
-  width: auto;
 }
 
-/* Inline-scheduler specific compact overrides */
+/* Inline scheduler visual container */
+.inline-scheduler-container {
+  border: 1px solid #e6eef8;
+  background: #fbfdff;
+  padding: 14px 18px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  max-width: 100%;
+  margin: 16px auto;
+  box-shadow: 0 10px 30px rgba(37,99,235,0.04);
+}
+
+.inline-scheduler {
+  display: block;
+}
+
+.inline-scheduler-row {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.inline-scheduler-item {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 640px) {
+  .inline-scheduler-container {
+    padding: 8px;
+    margin: 10px 0;
+  }
+  .inline-scheduler-row {
+    gap: 8px;
+    align-items: stretch;
+  }
+  .inline-scheduler-item {
+    width: 100%;
+  }
+  .time-row { display: flex; gap: 8px; align-items: center; }
+  .time-input, .inline-scheduler .date-input input, .inline-scheduler .date-input .react-datepicker-wrapper input { width: 100%; }
+  .inline-scheduler .inline-scheduler-row > .inline-scheduler-item:last-child { margin-left: 0; width: 100%; }
+}
+
 .inline-scheduler {
   padding: 6px 6px;
 }
 .inline-scheduler .inline-scheduler-row {
   display: flex;
   gap: 10px;
-  /* align inputs/button bottoms so labels sit above and controls line up */
   align-items: flex-end;
 }
 .inline-scheduler .inline-scheduler-item {
@@ -421,24 +459,39 @@
   padding: 6px 10px;
   border-radius: 6px;
   font-size: 0.95rem;
+  width: 110px;
+  box-sizing: border-box;
 }
 .inline-scheduler .time-row { display: flex; gap: 8px; align-items: center; }
-.inline-scheduler .ampm-toggle { height: 36px; min-width: 78px; }
+.inline-scheduler .ampm-toggle { height: px; width: 110px; border-radius: 6px; overflow: hidden; }
 .inline-scheduler .ampm-toggle .period-btn { font-size: 0.9rem; padding: 0 8px; height: 36px; }
-.inline-scheduler .time-input { width: 110px; height: 36px; font-size: 1rem; }
+.inline-scheduler .time-input { width: 200px; height: 40px; font-size: 1rem; box-sizing: border-box; }
 
 /* Make the schedule button match the input heights and align nicely */
 .inline-scheduler .inline-scheduler-item .btn {
-  height: 36px;
-  padding: 6px 12px;
+  height: 44px; /* larger tap target */
+  padding: 8px 16px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  font-size: 1rem;
+  min-width: 140px;
 }
 
 /* If the schedule button is the last item, push it slightly for visual balance */
 .inline-scheduler .inline-scheduler-row > .inline-scheduler-item:last-child {
-  margin-left: 6px;
+  margin-left: auto; /* push schedule button to the far right */
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .inline-scheduler .inline-scheduler-item .btn {
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    justify-content: center;
+  }
 }
 /* ========================================
    TIME INPUT COMPONENT
@@ -491,50 +544,6 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.period-toggle {
-  display: flex;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  overflow: hidden;
-  height: 42px;
-}
-
-.period-btn {
-  flex: 1;
-  border: none;
-  background: #ffffff;
-  color: #6b7280;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-right: 1px solid #d1d5db;
-}
-
-.period-btn:last-child {
-  border-right: none;
-}
-
-.period-btn:hover {
-  background: #f9fafb;
-}
-
-.period-btn.active {
-  background: #2563eb;
-  color: #ffffff;
-}
-
-.period-btn:focus {
-  outline: none;
-  box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.2);
-}
-
-.time-hint {
-  display: block;
-  margin-top: 4px;
-  font-size: 11px;
-  color: #9ca3af;
-}
 /* ========================================
    QUICK PRESETS
    ======================================== */

@@ -3,8 +3,6 @@ import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import { Calendar as CalendarIcon, SearchCodeIcon } from 'lucide-react';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../Styles/ReportTable.css';
-import '../Styles/Scrape.css';
 import '../Styles/Scheduler.css';
 
 // Clean, minimal Scheduler component
@@ -17,9 +15,6 @@ export default function Scheduler() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  // pagination placeholders (not used in this minimal mock)
-
-  // Inline scheduling state
   const [scheduleDateTime, setScheduleDateTime] = useState(null);
   const [timeInput, setTimeInput] = useState(''); // hh:mm (12-hour)
   const [ampm, setAmpm] = useState('AM');
@@ -69,9 +64,7 @@ export default function Scheduler() {
     { value: 'Completed', label: 'Completed' }
   ];
 
-  // (search UI present above; in this mock we don't use filteredReports)
-
-  // scheduledReports - simple mock for UI
+ 
   const [scheduledReports] = useState(sampleReports.map((r, i) => ({ ...r, id: i + 1, date: new Date().toISOString(), status: ['Scheduled','In Progress','Completed'][i % 3] })));
 
   const filteredScheduledReports = useMemo(() => {
@@ -99,7 +92,6 @@ export default function Scheduler() {
     if (!scheduleDateTime || filteredScheduledReports.length === 0) return;
     const toSchedule = filteredScheduledReports.map(r => r.id);
     console.log('Scheduling visible reports:', toSchedule, 'for:', scheduleDateTime);
-    // TODO: persist schedule changes
     alert(`Successfully scheduled ${toSchedule.length} report${toSchedule.length !== 1 ? 's' : ''} for ${scheduleDateTime.toLocaleString()}`);
   };
 
@@ -158,9 +150,9 @@ export default function Scheduler() {
         </div>
       </div>
 
-      <div className="scheduled-reports-section">
-        {/* Inline scheduler controls placed BEFORE the scheduled reports list */}
-        <div className="inline-scheduler">
+      
+  <div className="inline-scheduler-container">
+    <div className="inline-scheduler">
           <div className="inline-scheduler-row">
             <div className="inline-scheduler-item">
               <label className="compact-label">Date</label>
@@ -223,10 +215,11 @@ export default function Scheduler() {
               </button>
             </div>
           </div>
-        </div>
+    </div>
+  </div>
 
-        <div className="scheduled-reports-header"><h2 className="scheduled-reports-title">Scheduled Reports</h2></div>
-
+        <div className="scheduled-reports-section">
+          <div className="scheduled-reports-header"><h2 className="scheduled-reports-title">Scheduled Reports</h2></div>
         <div className="scheduled-reports-table-container">
           <table className="scheduled-reports-table">
             <thead>

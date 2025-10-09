@@ -3,7 +3,7 @@ import { Search, RefreshCw } from 'lucide-react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../Styles/SearchPosts.css';
+
 import '../Styles/Scrape.css';
 
 const SearchPosts = () => {
@@ -151,7 +151,7 @@ const SearchPosts = () => {
   };
 
   return (
-    <div className="search-posts-page">
+    <div className="outside-container">
       <div className="security-reports__header">
         <div className="header-content">
           <div className="header-text">
