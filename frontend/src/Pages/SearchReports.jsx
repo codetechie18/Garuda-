@@ -6,8 +6,8 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Filter,
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../Styles/ReportTable.css';
-import '../Styles/Scrape.css';
+import '../Styles/SearchReports.css';
+
 
 // Sample data 
 const sampleReports = [
@@ -129,7 +129,7 @@ const sampleReports = [
   }
 ];
 
-const ReportTable = () => {
+const SearchReports = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [reportingPost, setReportingPost] = useState(null);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
@@ -666,4 +666,4 @@ const ReportTable = () => {
   );
 };
 
-export default ReportTable;
+export default SearchReports;

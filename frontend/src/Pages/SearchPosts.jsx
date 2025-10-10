@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import '../Styles/ReportTable.css';
+import '../Styles/SearchPosts.css';
 import { truncateText } from '../utils.js';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';

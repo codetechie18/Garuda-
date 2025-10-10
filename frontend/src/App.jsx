@@ -2,13 +2,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useState, useEffect } from 'react';
 import Login from './Pages/Login';
 import Dashboard from './Pages/Dashboard';
-import Reports from './Pages/Reports';
+import QuickReports from './Pages/QuickReport.jsx';
 import Scrape from './Pages/Scrape';
 import SearchPosts from './Pages/SearchPosts';
 import Profile from './Pages/Profile';
 import Navbar from './components/Navbar';
 import UserManagement from './Pages/UserManagement';
-import ReportTable from './Pages/ReportTable.jsx';
+import SearchReports from './Pages/SearchReports.jsx';
 import Scheduler from './Pages/Scheduler.jsx';
 import './App.css';
 
@@ -75,10 +75,10 @@ function App() {
             } 
           />
           <Route 
-            path="/reports" 
+            path="/QuickReports" 
             element={
               isLoggedIn ? 
-              <Reports user={user} /> : 
+              <QuickReports user={user} /> : 
               <Navigate to="/login" replace />
             } 
           />
@@ -123,8 +123,8 @@ function App() {
             }
           />
           <Route 
-            path="/reportstable" 
-            element={<ReportTable />}
+            path="/searchreports" 
+            element={<SearchReports />}
           />  
           <Route path="/" element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />} />
         </Routes>

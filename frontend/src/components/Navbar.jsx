@@ -79,23 +79,22 @@ const Navbar = ({ user, onLogout }) => {
               <span>Reports</span>
             </Link>
             {/* Reporting dropdown */}
-            <div className={`nav-link reporting-link ${isActive('/reports') || isActive('/Reportstable') ? 'active' : ''}`} ref={reportingRef} onMouseLeave={() => setShowReportingMenu(false)}>
+            <div className={`nav-link reporting-link ${isActive('/reports') || isActive('/SearchReports') ? 'active' : ''}`} ref={reportingRef} onMouseLeave={() => setShowReportingMenu(false)}>
               <button className="reporting-button" onClick={() => setShowReportingMenu(s => !s)} aria-expanded={showReportingMenu}>
                 <FileText size={20} />
                 <span>Reporting</span>
               </button>
               {showReportingMenu && (
                 <div className="reporting-dropdown">
-                  <Link to="/Reportstable" className="dropdown-item" onClick={() => { setShowReportingMenu(false); setMobileMenuOpen(false); }}>
+                  <Link to="/SearchReports" className="dropdown-item" onClick={() => { setShowReportingMenu(false); setMobileMenuOpen(false); }}>
                     Search Reports
                   </Link>
-                  <Link to="/reports" className="dropdown-item" onClick={() => { setShowReportingMenu(false); setMobileMenuOpen(false); }}>
-                    Quick Report
+                  <Link to="/QuickReports" className="dropdown-item" onClick={() => { setShowReportingMenu(false); setMobileMenuOpen(false); }}>
+                    Quick Reports
                   </Link>
                 </div>
               )}
             </div>
-            {/* Scrape removed from top nav per request */}
           </div>
 
           <span className="welcome-text">Welcome, {user?.firstName}</span>
@@ -180,11 +179,11 @@ const Navbar = ({ user, onLogout }) => {
                   <span>Reporting</span>
                 </div>
                 <div className="nav-submenu">
-                  <Link to="/Reportstable" className={`drawer-sublink ${isActive('/Reportstable') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/SearchReports" className={`drawer-sublink ${isActive('/SearchReports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                     <span>Search Reports</span>
                   </Link>
-                  <Link to="/reports" className={`drawer-sublink ${isActive('/reports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-                    <span>Quick Report</span>
+                  <Link to="/QuickReports" className={`drawer-sublink ${isActive('/QuickReports') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    <span>Quick Reports</span>
                   </Link>
                 </div>
               </div>

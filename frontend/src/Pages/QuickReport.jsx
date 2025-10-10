@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import '../Styles/Reports.css';
+import '../Styles/QuickReports.css';
 
-// Simple Quick Report page: paste a post URL, analyze it locally, preview breakdown, and report.
-const Reports = () => {
+const QuickReports = () => {
   const [postUrl, setPostUrl] = useState('');
   const [postPreview, setPostPreview] = useState(null);
   const [urlError, setUrlError] = useState('');
@@ -92,4 +91,4 @@ const Reports = () => {
   );
 };
 
-export default Reports;
+export default QuickReports;
