@@ -40,6 +40,67 @@
   padding: 16px 20px;
 }
 
+/* PascalCase variant used in some JSX files */
+.Scheduler-page {
+  padding: 16px 20px;
+}
+
+/* Visible container wrapper matching design */
+.Scheduler-container {
+  /* Fill most of the viewport width while keeping small gutters */
+  width: calc(100% - 48px);
+  max-width: none;
+  margin: 18px 24px;
+  background: #f8fafc;
+  border: 1px solid rgba(230,238,248,0.8);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 22px rgba(2,6,23,0.04);
+  display: block;
+}
+
+/* Hero/header inside the container (big gradient banner) */
+.security-reports__header {
+  background: linear-gradient(90deg, rgba(102,126,234,1) 0%, rgba(118,75,162,1) 100%);
+  padding: 28px 28px;
+  border-radius: 10px;
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(102,126,234,0.08);
+  margin-bottom: 18px;
+}
+.security-reports__header .header-text { max-width: 86%; }
+.security-reports__title { font-size: 22px; font-weight: 700; margin: 0; }
+.security-reports__subtitle { margin: 8px 0 0 0; color: rgba(255,255,255,0.92); font-weight: 500; }
+
+/* Make the filter/search area look like a separated white card */
+.search-filter-container {
+  background: #ffffff;
+  border: 1px solid #e6eef8;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 18px;
+  box-shadow: 0 6px 18px rgba(37,99,235,0.03);
+}
+
+/* Scheduled reports section as white card */
+.scheduled-reports-section {
+  background: #ffffff;
+  border: 1px solid #e6eef8;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.03);
+  margin-top: 12px;
+}
+
+@media (max-width: 640px) {
+  .Scheduler-container {
+    margin: 10px;
+    padding: 12px;
+    border-radius: 10px;
+  }
+  .security-reports__header { padding: 18px; }
+}
+
 .page-header {
   display: flex;
   align-items: center;

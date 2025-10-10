@@ -1,10 +1,31 @@
-/* Search Posts Page Styles - All styles scoped to prevent conflicts */
+
 .search-posts-page {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
   background: #f8fafc;
   min-height: 100vh;
+}
+
+.SearchPosts-page,
+.searchposts-page {
+  padding: 20px;
+}
+
+.SearchPosts-container,
+.search-posts-container {
+  width: calc(100% - 48px);
+  max-width: none;
+  margin: 18px 24px;
+  background: #f8fafc;
+  border: 1px solid rgba(230,238,248,0.8);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 22px rgba(2,6,23,0.04);
+}
+
+@media (max-width: 640px) {
+  .SearchPosts-container, .search-posts-container { margin: 10px; padding: 12px; }
 }
 
 .search-posts-page .page-header {

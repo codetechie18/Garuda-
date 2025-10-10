@@ -282,7 +282,9 @@ const SearchReports = () => {
   };
 
   return (
-    <div className="security-reports">
+    <div className="SearchReports-page">
+      <div className="SearchReports-container">
+        <div className="security-reports">
       {/* Page Header */}
       <div className="security-reports__header">
         <div className="header-content">
@@ -662,6 +664,8 @@ const SearchReports = () => {
           onClose={() => setIsReportModalOpen(false)} 
         />
       )}
+        </div>
+      </div>
     </div>
   );
 };

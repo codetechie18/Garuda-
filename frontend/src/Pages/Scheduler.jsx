@@ -96,8 +96,8 @@ export default function Scheduler() {
   };
 
   return (
-    <div className="scrape-page">
-      <div className="scrape-container">
+    <div className="Scheduler-page">
+      <div className="Scheduler-container">
         <div className="security-reports__header">
         <div className="header-content">
           <div className="header-text">
@@ -211,7 +211,7 @@ export default function Scheduler() {
 
             <div className="inline-scheduler-item">
               <button className="btn btn-primary" disabled={!scheduleDateTime || filteredScheduledReports.length === 0} onClick={saveSchedule}>
-                <CalendarIcon size={14} /> Schedule ({filteredScheduledReports.length})
+                <CalendarIcon size={14} /> Schedule 
               </button>
             </div>
           </div>

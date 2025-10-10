@@ -33,6 +33,23 @@
     padding: 0 24px;
 }
 
+/* Page/container variants (QuickReports) to match Scheduler layout */
+.quick-reports-page, .QuickReports-page { padding: 20px; }
+.quick-reports-container, .QuickReports-container {
+    width: calc(100% - 48px);
+    max-width: none;
+    margin: 18px 24px;
+    background: #f8fafc;
+    border: 1px solid rgba(230,238,248,0.8);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 10px 22px rgba(2,6,23,0.04);
+}
+
+@media (max-width: 640px) {
+  .quick-reports-container, .QuickReports-container { margin: 10px; padding: 12px; }
+}
+
 /* make containers use border-box so padding doesn't cause overflow */
 .reports-container,
 .add-report-form,

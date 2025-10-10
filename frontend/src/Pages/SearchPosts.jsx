@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import '../Styles/SearchPosts.css';
 import { truncateText } from '../utils.js';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
@@ -15,7 +14,7 @@ function highlightHashtags(text) {
   );
 }
 import { Search } from 'lucide-react';
-import '../Styles/Scrape.css';
+import '../Styles/SearchPosts.css';
 
 
 const platformOptions = [
@@ -128,7 +127,7 @@ const SAMPLE_RESULTS = [
   }
 ];
 
-const Scrape = () => {
+const SearchPosts = () => {
   const [query, setQuery] = useState('');
   const [type, setType] = useState('hashtag'); // 'hashtag' or 'username'
   const [loading, setLoading] = useState(false);
@@ -347,8 +346,8 @@ const Scrape = () => {
   }, []);
 
   return (
-    <div className="scrape-page">
-      <div className="scrape-container">
+    <div className="SearchPosts-page">
+      <div className="SearchPosts-container">
         <div className="security-reports__header">
           <div className="header-content">
             <div className="header-text">
@@ -363,7 +362,7 @@ const Scrape = () => {
         </div>
         {/* <p>Search posts on the internet by hashtag or username. Note: this UI simulates searching. For real scraping, connect to a backend API that performs authorized scraping or uses official platform APIs.</p> */}
 
-        <form className="scrape-form" onSubmit={performSearch}>
+        <form className="SearchPosts-form" onSubmit={performSearch}>
           <div className="search-filter-container">
             {/* Search Section */}
             <div className="search-section-compact">
@@ -709,4 +708,4 @@ const Scrape = () => {
 
 // No prop types required for this component currently.
 
-export default Scrape;
+export default SearchPosts;

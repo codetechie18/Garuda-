@@ -91,6 +91,23 @@
   margin: 0 auto;
 }
 
+/* Page/container wrappers to match Scheduler layout */
+.search-reports-page, .SearchReports-page { padding: 20px; }
+.search-reports-container, .SearchReports-container {
+  width: calc(100% - 48px);
+  max-width: none;
+  margin: 18px 24px;
+  background: #f8fafc;
+  border: 1px solid rgba(230,238,248,0.8);
+  border-radius: 12px;
+ 
+  box-shadow: 0 10px 22px rgba(2,6,23,0.04);
+}
+
+@media (max-width: 640px) {
+  .search-reports-container, .SearchReports-container { margin: 10px; padding: 12px; }
+}
+
 /* Table Container */
 .report-table-container {
   background: white;
@@ -1688,11 +1705,6 @@
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-}
-
-/* Desktop Table */
-.report-table__wrapper {
-  /* overflow-x: auto; */
 }
 
 .report-table {

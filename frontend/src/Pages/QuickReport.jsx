@@ -54,8 +54,10 @@ const QuickReports = () => {
   };
 
   return (
-    <div className="reports quick-report-page">
-      <div className="reports-container">
+    <div className="QuickReports-page">
+      <div className="QuickReports-container">
+        <div className="reports quick-report-page">
+          <div className="reports-container">
         <header className="reports-header">
           <h1>Quick Report</h1>
           <p>Paste a social post link to get an automatic breakdown and report it.</p>
@@ -86,6 +88,8 @@ const QuickReports = () => {
             </div>
           )}
         </section>
+          </div>
+        </div>
       </div>
     </div>
   );
