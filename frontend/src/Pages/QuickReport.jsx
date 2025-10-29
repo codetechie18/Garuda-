@@ -58,10 +58,14 @@ const QuickReports = () => {
       <div className="QuickReports-container">
         <div className="reports quick-report-page">
           <div className="reports-container">
-        <header className="reports-header">
-          <h1>Quick Report</h1>
-          <p>Paste a social post link to get an automatic breakdown and report it.</p>
-        </header>
+        <div className="security-reports__header">
+          <div className="header-content">
+            <div className="header-text">
+              <h1 className="security-reports__title">Quick Report</h1>
+              <p className="security-reports__subtitle">Paste a social post link to get an automatic breakdown and report it.</p>
+            </div>
+          </div>
+        </div>
 
         <section className="post-analyzer">
           <label className="field-label">Post URL</label>

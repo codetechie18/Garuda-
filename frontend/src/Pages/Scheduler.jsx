@@ -95,6 +95,27 @@ export default function Scheduler() {
     alert(`Successfully scheduled ${toSchedule.length} report${toSchedule.length !== 1 ? 's' : ''} for ${scheduleDateTime.toLocaleString()}`);
   };
 
+  // Quick preset helper — sets scheduleDateTime based on a relative offset or explicit time
+  const applyPreset = (type) => {
+    const now = new Date();
+    let d = new Date(now);
+    if (type === 'in-60') {
+      d = new Date(now.getTime() + 60 * 60 * 1000);
+    } else if (type === 'tomorrow-12') {
+      d = new Date(now);
+      d.setDate(d.getDate() + 1);
+      d.setHours(12, 0, 0, 0);
+    } else if (type === 'next-monday-12') {
+      // compute next Monday
+      const day = now.getDay(); // 0 = Sunday, 1 = Monday
+      const daysUntilNextMon = ((8 - day) % 7) || 7; // at least 1 day ahead
+      d = new Date(now);
+      d.setDate(d.getDate() + daysUntilNextMon);
+      d.setHours(12, 0, 0, 0);
+    }
+    setScheduleDateTime(d);
+  };
+
   return (
     <div className="Scheduler-page">
       <div className="Scheduler-container">
@@ -148,76 +169,84 @@ export default function Scheduler() {
             <button type="button" className="btn btn-outline clear-filters-btn-compact" onClick={() => { setSelectedPlatform(null); setSelectedStatus(null); setQuery(''); setLocation(''); setStartDate(''); setEndDate(''); }} disabled={!(selectedPlatform || selectedStatus || query || location || startDate || endDate)}>Clear Filters</button>
           </div>
         </div>
-      </div>
-
-      
-  <div className="inline-scheduler-container">
-    <div className="inline-scheduler">
+        {/* Scheduler moved into filter section (no extra container) */}
+        <div className="inline-scheduler">
           <div className="inline-scheduler-row">
-            <div className="inline-scheduler-item">
-              <label className="compact-label">Date</label>
-              <DatePicker
-                selected={scheduleDateTime}
-                onChange={(date) => {
-                  if (!date) { setScheduleDateTime(null); return; }
-                  const base = scheduleDateTime ? new Date(scheduleDateTime) : new Date();
-                  const newDate = new Date(date);
-                  if (scheduleDateTime) newDate.setHours(base.getHours(), base.getMinutes(), 0, 0);
-                  setScheduleDateTime(newDate);
-                }}
-                dateFormat="MMM d, yyyy"
-                className="filter-input-compact date-input"
-                placeholderText="Choose date"
-                minDate={new Date()}
-                showPopperArrow={false}
-              />
-            </div>
-
-            <div className="inline-scheduler-item">
-              <label className="compact-label">Time</label>
-              <div className="time-row">
-                <input
-                  type="text"
-                  className="time-input"
-                  placeholder="12:00"
-                  maxLength={5}
-                  value={timeInput}
-                  onChange={(e) => {
-                    let val = e.target.value.replace(/[^0-9:]/g, '');
-                    const colonCount = (val.match(/:/g) || []).length;
-                    if (colonCount > 1) val = val.replace(/:(?=.*:)/g, '');
-                    if (/^\d{3,}$/.test(val) && val[2] !== ':') val = val.slice(0, 2) + ':' + val.slice(2, 4);
-                    if (val.length > 5) val = val.slice(0, 5);
-                    setTimeInput(val);
-                    if (!/^([0]?[1-9]|1[0-2]):[0-5][0-9]$/.test(val)) { setScheduleDateTime(null); return; }
-                    const [hhStr, mmStr] = val.split(':');
-                    let hh = Number(hhStr); let mm = Number(mmStr);
-                    if (Number.isNaN(hh) || Number.isNaN(mm)) return;
-                    if (ampm === 'PM' && hh < 12) hh = hh + 12;
-                    if (ampm === 'AM' && hh === 12) hh = 0;
+              <div className="inline-scheduler-item">
+                <label className="compact-label">Date</label>
+                <DatePicker
+                  selected={scheduleDateTime}
+                  onChange={(date) => {
+                    if (!date) { setScheduleDateTime(null); return; }
                     const base = scheduleDateTime ? new Date(scheduleDateTime) : new Date();
-                    const d = new Date(base);
-                    d.setHours(hh, mm, 0, 0);
-                    setScheduleDateTime(d);
+                    const newDate = new Date(date);
+                    if (scheduleDateTime) newDate.setHours(base.getHours(), base.getMinutes(), 0, 0);
+                    setScheduleDateTime(newDate);
                   }}
+                  dateFormat="MMM d, yyyy"
+                  className="filter-input-compact date-input"
+                  placeholderText="Choose date"
+                  minDate={new Date()}
+                  showPopperArrow={false}
                 />
+              </div>
 
-                <div className="ampm-toggle">
-                  <button type="button" className={`period-btn ${ampm === 'AM' ? 'active' : ''}`} onClick={() => handleSetAmpm('AM')}>AM</button>
-                  <button type="button" className={`period-btn ${ampm === 'PM' ? 'active' : ''}`} onClick={() => handleSetAmpm('PM')}>PM</button>
+              <div className="inline-scheduler-item">
+                <label className="compact-label">Time</label>
+                <div className="time-row">
+                  <input
+                    type="text"
+                    className="time-input"
+                    placeholder="12:00"
+                    maxLength={5}
+                    value={timeInput}
+                    onChange={(e) => {
+                      let val = e.target.value.replace(/[^0-9:]/g, '');
+                      const colonCount = (val.match(/:/g) || []).length;
+                      if (colonCount > 1) val = val.replace(/:(?=.*:)/g, '');
+                      if (/^\d{3,}$/.test(val) && val[2] !== ':') val = val.slice(0, 2) + ':' + val.slice(2, 4);
+                      if (val.length > 5) val = val.slice(0, 5);
+                      setTimeInput(val);
+                      if (!/^([0]?[1-9]|1[0-2]):[0-5][0-9]$/.test(val)) { setScheduleDateTime(null); return; }
+                      const [hhStr, mmStr] = val.split(':');
+                      let hh = Number(hhStr); let mm = Number(mmStr);
+                      if (Number.isNaN(hh) || Number.isNaN(mm)) return;
+                      if (ampm === 'PM' && hh < 12) hh = hh + 12;
+                      if (ampm === 'AM' && hh === 12) hh = 0;
+                      const base = scheduleDateTime ? new Date(scheduleDateTime) : new Date();
+                      const d = new Date(base);
+                      d.setHours(hh, mm, 0, 0);
+                      setScheduleDateTime(d);
+                    }}
+                  />
+
+                  <div className="ampm-toggle">
+                    <button type="button" className={`period-btn ${ampm === 'AM' ? 'active' : ''}`} onClick={() => handleSetAmpm('AM')}>AM</button>
+                    <button type="button" className={`period-btn ${ampm === 'PM' ? 'active' : ''}`} onClick={() => handleSetAmpm('PM')}>PM</button>
+                  </div>
                 </div>
+              </div>
+
+              <div className="inline-scheduler-item">
+                <button className="btn btn-primary" disabled={!scheduleDateTime || filteredScheduledReports.length === 0} onClick={saveSchedule}>
+                  <CalendarIcon size={14} /> Schedule 
+                </button>
               </div>
             </div>
 
-            <div className="inline-scheduler-item">
-              <button className="btn btn-primary" disabled={!scheduleDateTime || filteredScheduledReports.length === 0} onClick={saveSchedule}>
-                <CalendarIcon size={14} /> Schedule 
-              </button>
+            <div className="quick-presets" aria-label="Quick schedule presets">
+              <label className="presets-label">Quick Options:</label>
+              <div className="presets-grid">
+                <button type="button" className="preset-chip" onClick={() => applyPreset('in-60')}>In 1 hour</button>
+                <button type="button" className="preset-chip" onClick={() => applyPreset('tomorrow-12')}>Tomorrow 12:00</button>
+                <button type="button" className="preset-chip" onClick={() => applyPreset('next-monday-12')}>Next Monday 12:00</button>
+              </div>
             </div>
           </div>
-    </div>
-  </div>
+      </div>
 
+      
+  
         <div className="scheduled-reports-section">
           <div className="scheduled-reports-header"><h2 className="scheduled-reports-title">Scheduled Reports</h2></div>
         <div className="scheduled-reports-table-container">
