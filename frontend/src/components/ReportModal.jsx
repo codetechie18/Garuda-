@@ -81,16 +81,6 @@ const ReportModal = ({ report, onClose }) => {
       aria-labelledby="report-modal-title"
     >
       <div className="modal-content report-modal">
-        <div className="modal-header">
-          <h2 id="report-modal-title">Submit Report</h2>
-          <button 
-            className="modal-close"
-            onClick={onClose}
-            aria-label="Close report modal"
-          >
-            ×
-          </button>
-        </div>
         
         <form onSubmit={handleSubmit} className="modal-body">
           <div className="report-modal__summary">
@@ -150,7 +140,7 @@ const ReportModal = ({ report, onClose }) => {
             />
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label htmlFor="additionalEvidence">Additional Evidence</label>
             <textarea 
               id="additionalEvidence"
@@ -160,33 +150,9 @@ const ReportModal = ({ report, onClose }) => {
               placeholder="Links to related posts, screenshots, or other supporting information..."
               rows="3"
             />
-          </div>
+          </div> */}
 
-          <div className="form-group">
-            <label htmlFor="reporterName">Your Name</label>
-            <input 
-              type="text"
-              id="reporterName"
-              name="reporterName"
-              value={formData.reporterName}
-              onChange={handleInputChange}
-              placeholder="Enter your name"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="reporterContact">Contact Information</label>
-            <input 
-              type="email"
-              id="reporterContact"
-              name="reporterContact"
-              value={formData.reporterContact}
-              onChange={handleInputChange}
-              placeholder="your.email@example.com"
-              required
-            />
-          </div>
+         
 
           <div className="modal-footer">
             <button type="submit" className="modal-button modal-button--primary">

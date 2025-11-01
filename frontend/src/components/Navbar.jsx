@@ -200,10 +200,10 @@ const Navbar = ({ user, onLogout }) => {
                 <User size={16} />
                 <span>User Management</span>
               </Link>
-              <Link to="/admin" className={`drawer-link ${isActive('/admin') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+              {/* <Link to="/admin" className={`drawer-link ${isActive('/admin') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                 <Settings size={16} />
                 <span>Administration</span>
-              </Link>
+              </Link> */}
               <Link to="/scheduler" className={`drawer-link ${isActive('/scheduler') ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                 <Calendar size={16} />
                 <span>Scheduler</span>

@@ -176,8 +176,6 @@ const SearchReports = () => {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // In a real app, you would fetch fresh data from your API here
-    // For now, we'll just reset to first page and show a refresh animation
     setCurrentPage(1);
     
     setIsRefreshing(false);
@@ -533,7 +531,7 @@ const SearchReports = () => {
                     <td className="actions-cell">
                       <div className="action-buttons">
                         <button 
-                          className="btn btn-view"
+                          className="btn btn-vie"
                           onClick={() => handlePostClick(report)}
                           title="View details"
                         >

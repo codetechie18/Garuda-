@@ -207,11 +207,15 @@ const Dashboard = ({ user }) => {
               <p>Geographical distribution of incidents</p>
             </div>
             <div className="map-card-body">
-              <Map points={[
-                { lat: 28.6139, lng: 77.2090, title: 'New Delhi', count: 12 },
-                { lat: 19.0760, lng: 72.8777, title: 'Mumbai', count: 8 },
-                { lat: 12.9716, lng: 77.5946, title: 'Bangalore', count: 6 },
-              ]} />
+              <Map
+                points={[
+                  { lat: 21.1458, lng: 79.0882, title: 'Nagpur', count: 12 }
+                ]}
+                center={[21.1458, 79.0882]}
+                zoom={12}
+                minZoom={12}
+                maxBounds={[[21.00, 78.80], [21.35, 79.40]]}
+              />
             </div>
           </div>
 

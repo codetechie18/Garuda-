@@ -17,12 +17,13 @@ const HeatLayer = ({ points, options = {} }) => {
     if (!points || points.length === 0) return undefined;
 
     const maxCount = Math.max(...points.map(p => p[2] || 1), 1);
-  // Use default leaflet.heat gradient by not supplying a custom gradient
-  const opts = Object.assign({ radius: 35, blur: 25, maxZoom: 17, max: maxCount }, options);
+    // Use default leaflet.heat gradient by not supplying a custom gradient
+    // autoFit controls whether HeatLayer will call map.fitBounds on the points
+    const opts = Object.assign({ radius: 35, blur: 25, maxZoom: 17, max: maxCount, autoFit: false }, options);
 
     const heatLayer = L.heatLayer(points, opts).addTo(map);
     try {
-      if (points.length) map.fitBounds(points.map(p => [p[0], p[1]]), { padding: [40, 40] });
+      if (points.length && opts.autoFit) map.fitBounds(points.map(p => [p[0], p[1]]), { padding: [40, 40] });
     } catch {
       /* ignore fitBounds errors */
     }
@@ -40,22 +41,42 @@ HeatLayer.propTypes = {
   options: PropTypes.object,
 };
 
-const Map = () => {
+const Map = ({ points: propPoints, center, zoom = 11, minZoom, maxBounds }) => {
   // map incidents severity to intensity (0-1) and use central dataset
   const severityToIntensity = (s) => (s === 'high' ? 1.0 : s === 'medium' ? 0.6 : 0.3);
-  const heatPoints = (heatDummy || []).map(i => [i.lat, i.lng, severityToIntensity(i.severity)]);
 
-  // center on first dummy point if available, fallback to Mumbai
-  const defaultCenter = heatDummy && heatDummy.length ? [heatDummy[0].lat, heatDummy[0].lng] : [19.0760, 72.8777];
+  // normalize incoming points: accept either array of [lat,lng,intensity] or objects {lat,lng,count|severity}
+  const pointsArray = (propPoints && propPoints.length)
+    ? propPoints.map(p => Array.isArray(p) ? p : [p.lat, p.lng, p.count || 1])
+    : (heatDummy || []).map(i => [i.lat, i.lng, severityToIntensity(i.severity)]);
+
+  // determine center: prefer explicit center prop, then first point, then fallback (Mumbai)
+  const defaultCenter = center || (pointsArray && pointsArray.length ? [pointsArray[0][0], pointsArray[0][1]] : [19.0760, 72.8777]);
 
   return (
     <div style={{ height: 360 }}>
-  <MapContainer center={defaultCenter} zoom={11} style={{ height: '100%', width: '100%' }} preferCanvas={true}>
+      <MapContainer
+        center={defaultCenter}
+        zoom={zoom}
+        minZoom={minZoom}
+        style={{ height: '100%', width: '100%' }}
+        preferCanvas={true}
+        maxBounds={maxBounds}
+        maxBoundsViscosity={maxBounds ? 0.9 : 0}
+      >
         <TileLayer attribution='&copy; OpenStreetMap contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <HeatLayer points={heatPoints} options={{ radius: 35, blur: 25, maxZoom: 17 }} />
+        <HeatLayer points={pointsArray} options={{ radius: 35, blur: 25, maxZoom: 17 }} />
       </MapContainer>
     </div>
   );
+};
+
+Map.propTypes = {
+  points: PropTypes.array,
+  center: PropTypes.array,
+  zoom: PropTypes.number,
+  minZoom: PropTypes.number,
+  maxBounds: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
 };
 
 export default Map;
