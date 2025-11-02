@@ -90,9 +90,20 @@
   max-width: 1400px;
   margin: 0 auto;
 }
-
+.search-reports-page, .SearchReports-page {
+  padding: 20px;
+}
 /* Page/container wrappers to match Scheduler layout */
-.search-reports-page, .SearchReports-page { padding: 20px; }
+.search-reports-page, .SearchReports-container { 
+  width: calc(100% - 48px);
+  max-width: none;
+  margin: 18px 24px;
+  background: #f8fafc;
+  border: 1px solid rgba(230,238,248,0.8);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 22px rgba(2,6,23,0.04);
+}
 
 /* Report Table Styles */
 .app {

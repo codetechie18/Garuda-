@@ -169,7 +169,9 @@ export default function Scheduler() {
             <button type="button" className="btn btn-outline clear-filters-btn-compact" onClick={() => { setSelectedPlatform(null); setSelectedStatus(null); setQuery(''); setLocation(''); setStartDate(''); setEndDate(''); }} disabled={!(selectedPlatform || selectedStatus || query || location || startDate || endDate)}>Clear Filters</button>
           </div>
         </div>
-        {/* Scheduler moved into filter section (no extra container) */}
+      
+      
+      <div className="inputs-divider" aria-hidden="true" />
         <div className="inline-scheduler">
           <div className="inline-scheduler-row">
               <div className="inline-scheduler-item">
@@ -227,6 +229,15 @@ export default function Scheduler() {
                 </div>
               </div>
 
+              <div className="inline-scheduler-item quick-presets-inline" aria-label="Quick schedule presets">
+                <label className="presets-label">Quick Options:</label>
+                <div className="presets-grid">
+                  <button type="button" className="preset-chip" onClick={() => applyPreset('in-60')}>In 1 hour</button>
+                  <button type="button" className="preset-chip" onClick={() => applyPreset('tomorrow-12')}>Tomorrow 12:00</button>
+                  <button type="button" className="preset-chip" onClick={() => applyPreset('next-monday-12')}>Next Monday 12:00</button>
+                </div>
+              </div>
+
               <div className="inline-scheduler-item">
                 <button className="btn btn-primary" disabled={!scheduleDateTime || filteredScheduledReports.length === 0} onClick={saveSchedule}>
                   <CalendarIcon size={14} /> Schedule 
@@ -234,14 +245,7 @@ export default function Scheduler() {
               </div>
             </div>
 
-            <div className="quick-presets" aria-label="Quick schedule presets">
-              <label className="presets-label">Quick Options:</label>
-              <div className="presets-grid">
-                <button type="button" className="preset-chip" onClick={() => applyPreset('in-60')}>In 1 hour</button>
-                <button type="button" className="preset-chip" onClick={() => applyPreset('tomorrow-12')}>Tomorrow 12:00</button>
-                <button type="button" className="preset-chip" onClick={() => applyPreset('next-monday-12')}>Next Monday 12:00</button>
-              </div>
-            </div>
+            
           </div>
       </div>
 

@@ -165,15 +165,10 @@ const SearchReports = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  // Get unique platforms and severities for filter options (now using static lists)
-  // const platforms = [...new Set(sampleReports.map(report => report.platform))];
-  // const severities = [...new Set(sampleReports.map(report => report.toxicitySeverity))];
 
-  // Refresh functionality
   const handleRefresh = async () => {
     setIsRefreshing(true);
     
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     setCurrentPage(1);
@@ -181,11 +176,8 @@ const SearchReports = () => {
     setIsRefreshing(false);
   };
 
-  // Search functionality
   const performSearch = (e) => {
     if (e) e.preventDefault();
-    // In a real app, you would make an API call here
-    // For now, we'll just show the sample data
     console.log('Searching for:', query, 'Type:', type);
   };
 
@@ -282,8 +274,7 @@ const SearchReports = () => {
   return (
     <div className="SearchReports-page">
       <div className="SearchReports-container">
-        <div className="security-reports">
-      {/* Page Header */}
+           {/* Page Header */}
       <div className="security-reports__header">
         <div className="header-content">
           <div className="header-text">
@@ -664,7 +655,7 @@ const SearchReports = () => {
       )}
         </div>
       </div>
-    </div>
+   
   );
 };
 

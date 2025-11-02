@@ -680,32 +680,9 @@ const SearchPosts = () => {
       
       </div>
 
-      {/* Heat Map Section
-      <div className="heatmap-section">
-        <h2 className="heatmap-title">Heat Map of Reports <span className="heatmap-demo-label">(Demo)</span></h2>
-        <div className="heatmap-flex-row">
-          <div className="heatmap-map-container">
-            <div ref={heatmapRef} id="heatmap-map" className="heatmap-map-inner"></div>
-          </div>
-          <div className="heatmap-icons-container">
-            <div className="heatmap-icons-row">
-              <span title="Facebook" className="heatmap-icon"><i className="fa-brands fa-facebook heatmap-facebook"></i></span>
-              <span title="Twitter" className="heatmap-icon"><i className="fa-brands fa-twitter heatmap-twitter"></i></span>
-              <span title="Instagram" className="heatmap-icon"><i className="fa-brands fa-instagram heatmap-instagram"></i></span>
-              <span title="LinkedIn" className="heatmap-icon"><i className="fa-brands fa-linkedin heatmap-linkedin"></i></span>
-              <span title="Reddit" className="heatmap-icon"><i className="fa-brands fa-reddit heatmap-reddit"></i></span>
-              <span title="YouTube" className="heatmap-icon"><i className="fa-brands fa-youtube heatmap-youtube"></i></span>
-              <span title="TikTok" className="heatmap-icon"><i className="fa-brands fa-tiktok heatmap-tiktok"></i></span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-  */}
     </div>
   );
 };
 
-// No prop types required for this component currently.
 
 export default SearchPosts;

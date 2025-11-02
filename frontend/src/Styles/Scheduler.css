@@ -82,6 +82,19 @@
   box-shadow: 0 6px 18px rgba(37,99,235,0.03);
 }
 
+.inputs-divider {
+  height: 1px;
+  width: 100%;
+  margin: 12px 0;
+  background: linear-gradient(90deg, rgba(230,239,248,1), rgba(230,238,248,1));
+  opacity: 0.85;
+  border-radius: 1px;
+}
+
+@media (max-width: 640px) {
+  .inputs-divider { display: none; }
+}
+
 /* Scheduled reports section as white card */
 .scheduled-reports-section {
   background: #ffffff;
@@ -351,12 +364,6 @@
   margin-top: 10px;
 }
 
-/* compact date/time layout */
-.datetime-section .compact-label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
 .date-input-wrapper .date-input,
 .time-input {
   height: 34px;
@@ -388,7 +395,7 @@
 .date-time-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 18px;
 }
 
 .time-select {
@@ -455,17 +462,6 @@
   padding-left: 0 !important;
 }
 
-/* Inline scheduler visual container */
-.inline-scheduler-container {
-  border: 1px solid #e6eef8;
-  background: #fbfdff;
-  padding: 14px 18px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  max-width: 100%;
-  margin: 16px auto;
-  box-shadow: 0 10px 30px rgba(37,99,235,0.04);
-}
 
 .inline-scheduler {
   display: block;
@@ -473,7 +469,7 @@
 
 .inline-scheduler-row {
   display: flex;
-  gap: 12px;
+  gap: 120px;
   align-items: end;
   flex-wrap: wrap;
 }
@@ -495,14 +491,12 @@
   .inline-scheduler-item {
     width: 100%;
   }
-  .time-row { display: flex; gap: 8px; align-items: center; }
+  .time-row { display: flex; gap: 8px; }
   .time-input, .inline-scheduler .date-input input, .inline-scheduler .date-input .react-datepicker-wrapper input { width: 100%; }
   .inline-scheduler .inline-scheduler-row > .inline-scheduler-item:last-child { margin-left: 0; width: 100%; }
 }
 
-.inline-scheduler {
-  padding: 6px 6px;
-}
+
 .inline-scheduler .inline-scheduler-row {
   display: flex;
   gap: 10px;
@@ -611,6 +605,25 @@
 
 .quick-presets {
   margin-top: 16px;
+}
+
+.quick-presets-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.quick-presets-inline .presets-grid {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .quick-presets-inline { flex-direction: row; align-items: center; }
+  .quick-presets-inline .presets-label { margin-bottom: 0; margin-right: 8px; }
+   /* .quick-presets-inline { margin-left: 30px; } */
 }
 
 .presets-label {
