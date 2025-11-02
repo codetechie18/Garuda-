@@ -623,7 +623,10 @@
 @media (min-width: 640px) {
   .quick-presets-inline { flex-direction: row; align-items: center; }
   .quick-presets-inline .presets-label { margin-bottom: 0; margin-right: 8px; }
-   /* .quick-presets-inline { margin-left: 30px; } */
+ 
+ .inline-scheduler .inline-scheduler-row .quick-presets-inline {
+    margin-left: 290px;
+     }
 }
 
 .presets-label {
